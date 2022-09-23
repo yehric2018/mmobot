@@ -9,3 +9,9 @@
 5. Run the command `python -m venv env`: this creates a Python virtual environment
 6. Run the command `env\Scripts\activate.bat`: this activates the newly created Python virtual environment
 7. Run the command `pip install -r requirements.txt`: This installs all the dependencies needed for the project.
+
+## Setup
+1. Create a file called `.env` that contains the following contents:
+```
+DISCORD_TOKEN={insert bot token here}
+```
