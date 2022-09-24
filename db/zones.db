@@ -1,46 +1,50 @@
-Throne Room
-Royal Vault:GL,Royal Palace:G,Dining Hall:G
+throne-room
+royal-vault:GL,royal-palace:G,dining-hall:G
 
 ====================
-Royal Palace
-Throne Room:G,Dining Hall:G,Town Square:,Hot Springs:G
+royal-vault
+throne-room:G
 
 ====================
-Dining Hall
-Throne Room:G,Royal Palace:G
+royal-palace
+throne-room:G,dining-hall:G,town-square:,hot-springs:G
 
 ====================
-Hot Springs
-Royal Palace:G,Town Square
+dining-hall
+throne-room:G,royal-palace:G
 
 ====================
-Town Square
-Marketplace:,City Gate:,Barracks:G,Arena:G,Tavern:G,Royal Palace:,Yak Farm:,Mines Entrance:
+hot-springs
+royal-palace:G,town-square:
 
 ====================
-Marketplace
-Town Square:
+town-square
+marketplace:,city-gate:,barracks:G,arena:G,tavern:G,royal-palace:,yak-farm:,mines-entrance:
 
 ====================
-City Gate
-Town Square:,City Outskirts:G
-Hawk:30,roc:2
-====================
-Barracks
-Town Square:G
+marketplace
+town-square:
 
 ====================
-Arena
-Town Square:G
+city-gate
+town-square:,city-outskirts:G
+Hawk:300,Roc:20
+====================
+barracks
+town-square:G
 
 ====================
-Tavern
-Town Square:G
+arena
+town-square:G
 
 ====================
-Yak Farm
-Town Square:
-Yak:80,Hawk:20
+tavern
+town-square:G
+
 ====================
-Mines Entrance
-Town Square:,Mines
+yak-farm
+town-square:
+Yak:800,Hawk:200
+====================
+mines-entrance
+town-square:,mines:G
