@@ -1,0 +1,46 @@
+Throne Room
+Royal Vault:GL,Royal Palace:G,Dining Hall:G
+
+====================
+Royal Palace
+Throne Room:G,Dining Hall:G,Town Square:,Hot Springs:G
+
+====================
+Dining Hall
+Throne Room:G,Royal Palace:G
+
+====================
+Hot Springs
+Royal Palace:G,Town Square
+
+====================
+Town Square
+Marketplace:,City Gate:,Barracks:G,Arena:G,Tavern:G,Royal Palace:,Yak Farm:,Mines Entrance:
+
+====================
+Marketplace
+Town Square:
+
+====================
+City Gate
+Town Square:,City Outskirts:G
+Hawk:30,roc:2
+====================
+Barracks
+Town Square:G
+
+====================
+Arena
+Town Square:G
+
+====================
+Tavern
+Town Square:G
+
+====================
+Yak Farm
+Town Square:
+Yak:80,Hawk:20
+====================
+Mines Entrance
+Town Square:,Mines

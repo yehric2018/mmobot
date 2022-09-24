@@ -1,0 +1,90 @@
+Training Dummy,1
+
+1000,50,0,0,0
+peaceful
+====================
+Yak,1
+yak meat,leather
+100,20,0,0,0
+peaceful
+====================
+Hawk,1
+feather,egg
+5,0,60,40,0
+flying
+peaceful
+====================
+Bat,2
+bat fang,bat urine
+20,0,70,50,10
+flying
+aggressive
+====================
+Snake,2
+snake hide
+30,0,50,30,15
+venom:10,1
+defensive
+====================
+Wolf,2
+wolf hide,wolf meat
+60,0,40,15,30
+aggressive
+====================
+Troll,3
+rock club
+140,20,10,15,50
+aggressive
+equip:rock club
+====================
+Roc,3
+roc feather,roc egg
+100,10,40,40,40
+flying
+defensive
+====================
+Crawler,3
+silk,spider venom
+100,20,30,40,40
+venom:10,2
+aggressive
+ability:silk shot
+====================
+Kobold,3
+
+
+aggressive
+====================
+Wyvern,4
+wyvern hide
+300,20,40,40,60
+flying
+aggressive
+====================
+Yeti,4
+yeti meat
+400,30,20,30,70
+aggressive
+====================
+Golem,4
+mystic ore
+400,100,0,10,100
+defensive
+====================
+Basilisk,4
+basilisk hide,basilisk venom
+200,15,30,25,30
+venom:50,20
+aggressive
+====================
+Ice Drake,5
+
+1000,40,40,40,80
+ability:icy breath
+defensive
+====================
+Fire Drake,5
+
+1000,40,40,40,80
+ability:fire breath
+defensive
