@@ -40,6 +40,7 @@ class Player(Base):
     equipped_accessory = Column(String(100))
     guarding = Column(String(100))
     last_attack = Column(DateTime)
+    last_location = Column(String(100))
 
     def __repr__(self):
         return f'Player(nickname={self.nickname})'
