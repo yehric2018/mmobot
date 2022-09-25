@@ -1,5 +1,3 @@
-import discord
-
 class Zone():
     def __init__(self, data):
         lines = data.split('\n')

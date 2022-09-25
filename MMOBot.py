@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from zones import Zone
+from db.zones import Zone
 
 class MMOBot(commands.Bot):
     def __init__(self):
