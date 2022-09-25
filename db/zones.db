@@ -7,7 +7,11 @@ throne-room:G
 
 ====================
 royal-palace
-throne-room:G,dining-hall:G,town-square:,hot-springs:G
+throne-room:G,dining-hall:G,town-square:,hot-springs:G,prison:GL
+
+====================
+prison
+royal-palace:GL
 
 ====================
 dining-hall
