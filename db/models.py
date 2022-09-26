@@ -16,7 +16,7 @@ inventory_table = Table(
     Base.metadata,
     Column('id', Integer, primary_key=True),
     Column('player_name', ForeignKey('Players.name')),
-    Column('item_id', ForeignKey('Items.id'))
+    Column('item_id', ForeignKey('Items.id')),
 )
 
 class Player(Base):
@@ -49,7 +49,11 @@ class Player(Base):
     equipped_weapon = Column(String(40), ForeignKey('Weapons.id'))
     equipped_attire = Column(String(40))
     equipped_accessory = Column(String(40))
-    inventory = relationship( "Item", secondary=inventory_table)
+    inventory = relationship(
+        "Item",
+        order_by=inventory_table.columns.id,
+        secondary=inventory_table
+    )
 
     guarding = Column(String(100))
     last_attack = Column(DateTime)
