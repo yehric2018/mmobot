@@ -12,12 +12,11 @@ from sqlalchemy.orm import relationship
 Base = declarative_base()
 
 inventory_table = Table(
-    "Inventories",
+    "Inventory",
     Base.metadata,
     Column('id', Integer, primary_key=True),
     Column('player_name', ForeignKey('Players.name')),
-    Column('item_id', ForeignKey('Items.id')),
-    Column('quantity', Integer)
+    Column('item_id', ForeignKey('Items.id'))
 )
 
 class Player(Base):
@@ -39,17 +38,17 @@ class Player(Base):
     max_endurance = Column(Integer)
     strength = Column(Integer)
     luck = Column(Integer)
-    experience = Column(Integer)
+    experience = Column(Integer, default=0)
     magic_number = Column(Integer)
-    fighting_skill = Column(Integer)
-    hunting_skill = Column(Integer)
-    mining_skill = Column(Integer)
-    cooking_skill = Column(Integer)
-    crafting_skill = Column(Integer)
+    fighting_skill = Column(Integer, default=0)
+    hunting_skill = Column(Integer, default=0)
+    mining_skill = Column(Integer, default=0)
+    cooking_skill = Column(Integer, default=0)
+    crafting_skill = Column(Integer, default=0)
 
-    equipped_weapon = Column(String(100))
-    equipped_armor = Column(String(100))
-    equipped_accessory = Column(String(100))
+    equipped_weapon = Column(String(40), ForeignKey('Weapons.id'))
+    equipped_attire = Column(String(40))
+    equipped_accessory = Column(String(40))
     inventory = relationship( "Item", secondary=inventory_table)
 
     guarding = Column(String(100))
@@ -57,7 +56,7 @@ class Player(Base):
     last_location = Column(String(100))
 
     def __repr__(self):
-        return f'Player(nickname={self.nickname})'
+        return f'Player(name={self.name})'
 
 class Item(Base):
     __tablename__ = 'Items'
@@ -73,12 +72,18 @@ class Item(Base):
         'polymorphic_on': item_type
     }
 
+    def __repr__(self):
+        return f'Item(name={self.name})'
+
 class Weapon(Item):
     __tablename__ = 'Weapons'
-    id = Column(String(40), ForeignKey("Items.id"), primary_key=True)
+    id = Column(String(40), ForeignKey('Items.id'), primary_key=True)
     weapon_type = Column(String(20))
     strength = Column(Integer)
     
     __mapper_args__ = {
         'polymorphic_identity': 'weapon'
     }
+
+    def __repr__(self):
+        return f'Weapon(name={self.name})'

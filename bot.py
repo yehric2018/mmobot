@@ -2,15 +2,17 @@ from datetime import datetime
 import os
 
 import discord
+
+from discord import DiscordException, Embed
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy import select
+from sqlalchemy import create_engine, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 
 from MMOBot import MMOBot
 from constants import STANCE_NORMAL
-from db.models import Player
+from db.models import Player, Weapon
 from utils.stats import roll_initial_stats
 
 load_dotenv()
@@ -41,9 +43,41 @@ async def on_member_join(member):
 async def attack_command(context):
     await context.send('You cannot attack yet')
 
+@bot.command(name='inventory')
+async def inventory_command(context):
+    with Session(engine) as session:
+        get_player_statement = (select(Player)
+            .where(Player.discord_id == context.author.id)
+            .where(Player.is_active))
+        try:
+            player = session.scalars(get_player_statement).one()
+            message = ''
+            for item in player.inventory:
+                message += f'  • {item.name}'
+                if (item.id == player.equipped_weapon or
+                        item.id == player.equipped_attire or
+                        item.id == player.equipped_accessory):
+                    message += '(equipped)'
+                message += '\n'
+            embed = Embed(
+                title=f'{context.author.nick}\'s Inventory',
+                description=message
+            )
+            await context.send(embed=embed)
+        except NoResultFound:
+            raise DiscordException
+
 @bot.command(name='me')
 async def me_command(context):
     await context.send(f'Your name is {context.author.nick}')
+    with Session(engine) as session:
+        get_player_statement = (select(Player)
+            .where(Player.discord_id == context.author.id)
+            .where(Player.is_active))
+        try:
+            player = session.scalars(get_player_statement).one()
+        except NoResultFound:
+            raise DiscordException
 
 @bot.command(name='move')
 async def move_command(context, *args):
@@ -93,27 +127,24 @@ async def name_command(context, *args):
     if len(args) == 0:
         await context.send(f'Please enter the name of your hero! For example: !name Joanne')
         return
-    
-    for word in args:
-        if not word.isalnum():
-            await context.send(f'Your name can only include alphanumeric characters')
-            return
-    player_name = ' '.join(args)
+    if len(args) > 1:
+        await context.send(f'Your name can only be one word, sorry!')
+        return
+
+    player_name = args[0]
     if len(player_name) < 2 or len(player_name) > 20:
         await context.send(f'Your name must be between 2 and 20 characters')
         return
 
     with Session(engine) as session:
         stats = roll_initial_stats()
-        get_ancestors_statement = select(Player).where(Player.discord_id == context.author.id)
-        max_ancestry = 0
-        for ancestor in session.scalars(get_ancestors_statement):
-            if ancestor.is_active:
-                message = f'Cannot start new player - {ancestor.name} is still fighting hard and strong!'
-                await context.send(message)
-                return
-            if ancestor.ancestry > max_ancestry:
-                max_ancestry = ancestor.ancestry
+        get_ancestors_statement = (select(func.max(Player.ancestry))
+                .where(Player.discord_id == context.author.id))
+        max_ancestry = session.scalars(get_ancestors_statement).one()
+        if max_ancestry == None:
+            max_ancestry = 0
+        else:
+            max_ancestry = int(max_ancestry)
         birthday = datetime.now()
         new_player = Player(
             name=player_name,
@@ -131,13 +162,7 @@ async def name_command(context, *args):
             max_endurance=stats['endurance'],
             strength=stats['strength'],
             luck=stats['luck'],
-            experience=0,
             magic_number=0,
-            fighting_skill=0,
-            hunting_skill=0,
-            mining_skill=0,
-            cooking_skill=0,
-            crafting_skill=0
         )
 
         try:
