@@ -16,6 +16,7 @@ MAX_INITIAL_STRENGTH = 27
 MIN_LUCK = 1
 MAX_LUCK = 7
 
+
 def roll_initial_stats():
     stats = {}
     stats['hp'] = random.randint(MIN_INITIAL_HP_CAP, MAX_INITIAL_HP_CAP)

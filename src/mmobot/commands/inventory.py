@@ -5,11 +5,14 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from mmobot.db.models import Player
 
+
 async def inventory_logic(context, engine):
     with Session(engine) as session:
-        get_player_statement = (select(Player)
+        get_player_statement = (
+            select(Player)
             .where(Player.discord_id == context.author.id)
-            .where(Player.is_active))
+            .where(Player.is_active)
+        )
         try:
             player = session.scalars(get_player_statement).one()
             message = ''
