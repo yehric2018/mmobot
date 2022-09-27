@@ -32,16 +32,15 @@ def setup_weapons():
         all_weapons = []
         for data in weapon_data:
             lines = data.split('\n')
-            item_stats = lines[3].split(',')
+            item_stats = lines[2].split(',')
 
             weapon = Weapon(
                 id=lines[0],
-                name=lines[1],
                 item_type='weapon',
                 size=int(item_stats[0]),
                 weight=int(item_stats[1]),
-                weapon_type=lines[2],
-                strength=int(lines[4])
+                weapon_type=lines[1],
+                strength=int(lines[3])
             )
             all_weapons.append(weapon)
         

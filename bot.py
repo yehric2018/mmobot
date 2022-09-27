@@ -67,7 +67,7 @@ async def give_command(context, *args):
 
         giving_item = None
         for item in giving_player.inventory:
-            if item.name == item_name:
+            if item.id == item_name:
                 giving_item = item
                 giving_player.inventory.remove(item)
                 break
@@ -80,7 +80,7 @@ async def give_command(context, *args):
         receiving_player.inventory.append(giving_item)
 
         session.commit()
-        await context.send(f'<@{receiving_player.discord_id}> received {giving_item.name} from {giver_name}!')
+        await context.send(f'<@{receiving_player.discord_id}> received {giving_item.id} from {giver_name}!')
 
 @bot.command(name='inventory')
 async def inventory_command(context):
@@ -92,7 +92,7 @@ async def inventory_command(context):
             player = session.scalars(get_player_statement).one()
             message = ''
             for index, item in enumerate(player.inventory):
-                message += f'  {index}. {item.name}'
+                message += f'  {index}. {item.id}'
                 if (item.id == player.equipped_weapon or
                         item.id == player.equipped_attire or
                         item.id == player.equipped_accessory):
