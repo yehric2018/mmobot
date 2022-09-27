@@ -66,7 +66,6 @@ class Item(Base):
     __tablename__ = 'Items'
 
     id = Column(String(40), primary_key=True)
-    name = Column(String(100))
     item_type = Column(String(20))
     size = Column(Integer)
     weight = Column(Integer)
