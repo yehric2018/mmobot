@@ -3,5 +3,6 @@
         "./src"
     ],
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": false
+    "python.linting.flake8Args": ["--max-line-length=100"],
+    "python.linting.enabled": true
 }

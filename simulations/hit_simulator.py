@@ -1,5 +1,3 @@
-from datetime import datetime
-import os
 import random
 
 from sqlalchemy import Boolean
@@ -16,6 +14,7 @@ STANCE_BATTLE = 1
 STANCE_GUARD = 2
 STANCE_REST = 3
 STANCE_SLEEP = 4
+
 
 class Player(Base):
     __tablename__ = 'Players'
@@ -51,6 +50,7 @@ class Player(Base):
 
     def __repr__(self):
         return f'Player(nickname={self.nickname})'
+
 
 IRON_SWORD = {
     'damage': 40,
@@ -138,9 +138,18 @@ defender = NEW_PLAYER_1
 defender_weapon = IRON_SWORD
 defender_armor = LEATHER_ARMOR
 
+
 def calculate_hit_chance(p1, p2):
-    offense_score = (4/3) * (0.30 * p1.dexterity + 0.65 * p1.fighting_skill + 0.05 * (p1.mobility - 25)) + p1.luck
-    defense_score = (4/3) * (0.65 * p2.dexterity + 0.15 * p2.fighting_skill + 0.20 * (p2.mobility - 25)) + p2.luck
+    offense_score = (4/3) * (
+        0.30 * p1.dexterity +
+        0.65 * p1.fighting_skill +
+        0.05 * (p1.mobility - 25)
+    ) + p1.luck
+    defense_score = (4/3) * (
+        0.65 * p2.dexterity +
+        0.15 * p2.fighting_skill +
+        0.20 * (p2.mobility - 25)
+    ) + p2.luck
 
     raw_percentage = int(offense_score - defense_score + 40)
     if raw_percentage < 0:
@@ -148,6 +157,7 @@ def calculate_hit_chance(p1, p2):
     elif raw_percentage > 100:
         return 100
     return raw_percentage
+
 
 def calculate_hit_damage(p1, p1_weapon, p2, p2_armor):
     random_number = random.randint(0, 99)
@@ -167,6 +177,7 @@ def calculate_hit_damage(p1, p1_weapon, p2, p2_armor):
         return 0
     return int(final_damage)
 
+
 hit_chance = calculate_hit_chance(attacker, defender)
 print('P1 attacks P2')
 print(f'Hit chance: {hit_chance}%')
@@ -178,7 +189,7 @@ if random_number < hit_chance:
     print(f'P2 took {hit_damage} damage')
     remaining_hp = defender.hp - hit_damage
     if remaining_hp <= 0:
-        print(f'P2 is incapacitated')
+        print('P2 is incapacitated')
     elif remaining_hp <= 50:
         print('P2 is weak')
     else:
