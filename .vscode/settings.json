@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "./src"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true
+}
