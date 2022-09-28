@@ -97,9 +97,8 @@ class Weapon(Item):
 class ZonePath(Base):
     __tablename__ = 'ZonePaths'
 
-    id = Column(Integer, primary_key=True)
-    start_zone_name = Column(String(40), ForeignKey('Zones.channel_name'))
-    end_zone_name = Column(String(40), ForeignKey('Zones.channel_name'))
+    start_zone_name = Column(String(40), ForeignKey('Zones.channel_name'), primary_key=True)
+    end_zone_name = Column(String(40), ForeignKey('Zones.channel_name'), primary_key=True)
     distance = Column(Integer)
     guardable = Column(Boolean)
     lockable = Column(Boolean)

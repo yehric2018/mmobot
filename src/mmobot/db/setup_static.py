@@ -35,9 +35,7 @@ def setup_zones():
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
-            lines = data.split('\n')
-            zone = Zone(channel_name=lines[0])
-            all_zones.append(zone)
+            all_zones.append(Zone(channel_name=data))
 
     with open('zone-paths.db', 'r') as f:
         file_text = f.read()
