@@ -22,13 +22,13 @@ class Zone():
                 props['guards'] = []
             else:
                 props['guardable'] = False
-            
+
             if 'L' in static_props:
                 props['lockable'] = True
                 props['locked'] = False
             else:
                 props['lockable'] = False
-            
+
             self.navigation[next_zone] = props
 
     def _init_spawns(self, data):

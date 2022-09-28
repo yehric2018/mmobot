@@ -1,13 +1,10 @@
-from ctypes import sizeof
 import os
-from turtle import window_height
-from unicodedata import name
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from models import Base, Item, Weapon
+from models import Base, Weapon, Zone, ZonePath
 
 load_dotenv()
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
@@ -15,15 +12,58 @@ MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
 MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
 
-engine = create_engine(f'mysql+pymysql://{MYSQL_USERNAME}:{MYSQL_PASSWORD}@{MYSQL_HOSTNAME}/{MYSQL_DATABASE_NAME}')
+connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
+    MYSQL_USERNAME,
+    MYSQL_PASSWORD,
+    MYSQL_HOSTNAME,
+    MYSQL_DATABASE_NAME
+)
+engine = create_engine(connection_str)
 
 DB_ENTRY_SEPERATOR = '\n====================\n'
 
+
 def setup():
+    setup_zones()
     setup_items()
+
+
+def setup_zones():
+    all_zones = []
+    all_zone_paths = []
+    with open('zones.db', 'r') as f:
+        file_text = f.read()
+        zone_data = file_text.split(DB_ENTRY_SEPERATOR)
+        for data in zone_data:
+            lines = data.split('\n')
+            zone = Zone(channel_name=lines[0])
+            all_zones.append(zone)
+
+    with open('zone-paths.db', 'r') as f:
+        file_text = f.read()
+        zone_data = file_text.split(DB_ENTRY_SEPERATOR)
+        for data in zone_data:
+            lines = data.split('\n')
+            zone_path = ZonePath(
+                start_zone_name=lines[0],
+                end_zone_name=lines[1],
+                distance=int(lines[2]),
+                guardable='G' in lines[3],
+                lockable='L' in lines[3]
+            )
+            all_zone_paths.append(zone_path)
+
+    with Session(engine) as session:
+        for zone in all_zones:
+            session.merge(zone)
+        for zone_path in all_zone_paths:
+            session.merge(zone_path)
+        session.commit()
+
 
 def setup_items():
     setup_weapons()
+
 
 def setup_weapons():
     with open('weapons.db', 'r') as f:
@@ -43,11 +83,12 @@ def setup_weapons():
                 strength=int(lines[3])
             )
             all_weapons.append(weapon)
-        
+
         with Session(engine) as session:
             for weapon in all_weapons:
                 session.merge(weapon)
             session.commit()
 
-Base.metadata.create_all(engine)     
+
+Base.metadata.create_all(engine)
 setup()

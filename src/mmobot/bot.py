@@ -16,7 +16,7 @@ MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
 MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
 
-connection_str = f'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
+connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_USERNAME,
     MYSQL_PASSWORD,
     MYSQL_HOSTNAME,
@@ -64,12 +64,12 @@ async def me_command(context):
 
 @bot.command(name='move')
 async def move_command(context, *args):
-    await move_logic(bot, context, args)
+    await move_logic(bot, context, args, engine)
 
 
 @bot.command(name='navigation')
 async def navigation_command(context):
-    await navigation_logic(bot, context)
+    await navigation_logic(bot, context, engine)
 
 
 @bot.command(name='name')

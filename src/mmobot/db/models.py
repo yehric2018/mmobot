@@ -1,4 +1,3 @@
-from ast import For
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -16,8 +15,9 @@ inventory_table = Table(
     Base.metadata,
     Column('id', Integer, primary_key=True),
     Column('player_name', ForeignKey('Players.name')),
-    Column('item_id', ForeignKey('Items.id')),
+    Column('item_id', ForeignKey('Items.id'))
 )
+
 
 class Player(Base):
     __tablename__ = 'Players'
@@ -55,12 +55,13 @@ class Player(Base):
         secondary=inventory_table
     )
 
-    guarding = Column(String(100))
+    guarding = Column(String(40))
     last_attack = Column(DateTime)
     last_location = Column(String(100))
 
     def __repr__(self):
         return f'Player(name={self.name})'
+
 
 class Item(Base):
     __tablename__ = 'Items'
@@ -78,15 +79,40 @@ class Item(Base):
     def __repr__(self):
         return f'Item(name={self.name})'
 
+
 class Weapon(Item):
     __tablename__ = 'Weapons'
     id = Column(String(40), ForeignKey('Items.id'), primary_key=True)
     weapon_type = Column(String(20))
     strength = Column(Integer)
-    
+
     __mapper_args__ = {
         'polymorphic_identity': 'weapon'
     }
 
     def __repr__(self):
         return f'Weapon(name={self.name})'
+
+
+class ZonePath(Base):
+    __tablename__ = 'ZonePaths'
+
+    id = Column(Integer, primary_key=True)
+    start_zone_name = Column(String(40), ForeignKey('Zones.channel_name'))
+    end_zone_name = Column(String(40), ForeignKey('Zones.channel_name'))
+    distance = Column(Integer)
+    guardable = Column(Boolean)
+    lockable = Column(Boolean)
+
+    def __repr__(self):
+        return f'ZonePath({self.start_zone_name} to {self.end_zone_name})'
+
+
+class Zone(Base):
+    __tablename__ = 'Zones'
+
+    channel_name = Column(String(40), primary_key=True)
+    navigation = relationship('ZonePath', foreign_keys='ZonePath.start_zone_name')
+
+    def __repr__(self):
+        return f'Zone({self.channel_name})'

@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-from db.zones import Zone
-
 DB_ENTRY_SEPERATOR = '\n====================\n'
 
 
@@ -20,7 +18,6 @@ class MMOBot(commands.Bot):
         with open('db/zones.db', 'r') as f:
             file_text = f.read()
             zone_data = file_text.split(DB_ENTRY_SEPERATOR)
-            self.zones = {}
+            self.zones = set()
             for data in zone_data:
-                zone = Zone(data)
-                self.zones[zone.channel_name] = zone
+                self.zones.add(data)
