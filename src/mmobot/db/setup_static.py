@@ -31,13 +31,13 @@ def setup():
 def setup_zones():
     all_zones = []
     all_zone_paths = []
-    with open('zones.db', 'r') as f:
+    with open('static/zones.db', 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
             all_zones.append(Zone(channel_name=data))
 
-    with open('zone-paths.db', 'r') as f:
+    with open('static/zone-paths.db', 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
@@ -64,7 +64,7 @@ def setup_items():
 
 
 def setup_weapons():
-    with open('weapons.db', 'r') as f:
+    with open('static/weapons.db', 'r') as f:
         file_text = f.read()
         weapon_data = file_text.split(DB_ENTRY_SEPERATOR)
         all_weapons = []

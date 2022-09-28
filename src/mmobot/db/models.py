@@ -82,6 +82,7 @@ class Item(Base):
 
 class Weapon(Item):
     __tablename__ = 'Weapons'
+
     id = Column(String(40), ForeignKey('Items.id'), primary_key=True)
     weapon_type = Column(String(20))
     strength = Column(Integer)

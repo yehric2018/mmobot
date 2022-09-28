@@ -15,7 +15,7 @@ class MMOBot(commands.Bot):
         self._setup_zones()
 
     def _setup_zones(self):
-        with open('db/zones.db', 'r') as f:
+        with open('db/static/zones.db', 'r') as f:
             file_text = f.read()
             zone_data = file_text.split(DB_ENTRY_SEPERATOR)
             self.zones = set()
