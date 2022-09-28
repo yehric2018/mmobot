@@ -5,6 +5,7 @@ from db.zones import Zone
 
 DB_ENTRY_SEPERATOR = '\n====================\n'
 
+
 class MMOBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()

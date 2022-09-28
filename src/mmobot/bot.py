@@ -23,7 +23,7 @@ connection_str = f'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_DATABASE_NAME
 )
 
-engine = create_engine()
+engine = create_engine(connection_str)
 bot = MMOBot()
 
 
