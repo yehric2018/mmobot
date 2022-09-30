@@ -30,19 +30,12 @@ async def give_logic(bot, context, args, engine):
 
         if giving_item_name.startswith('/'):
             giving_item_id = convert_alphanum_to_int(giving_item_name[1:])
-            for item_instance in giving_player.inventory:
-                if item_instance.id == giving_item_id:
-                    giving_item_instance = item_instance
-                    break
+            giving_item_instance = find_item_with_id(giving_player.inventory, giving_item_id)
         elif (giving_item_name.isnumeric() and
                 int(giving_item_name) < len(giving_player.inventory)):
             giving_item_instance = giving_player.inventory[int(giving_item_name)]
         else:
-            for item_instance in giving_player.inventory:
-                item_name = item_instance.item.id
-                if item_name == giving_item_name:
-                    giving_item_instance = item_instance
-                    break
+            giving_item_instance = find_item_with_name(giving_player.inventory, giving_item_name)
         if giving_item_instance is None:
             await context.send(f'You do not have the item: {giving_item_name}')
             return
@@ -56,3 +49,16 @@ async def give_logic(bot, context, args, engine):
             giver_name
         )
         await context.send(message)
+
+
+def find_item_with_id(inventory, id):
+    for item_instance in inventory:
+        if item_instance.id == id:
+            return item_instance
+
+
+def find_item_with_name(inventory, name):
+    for item_instance in inventory:
+        item_name = item_instance.item.id
+        if item_name == name:
+            return item_instance

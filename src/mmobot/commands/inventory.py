@@ -20,10 +20,10 @@ async def inventory_logic(context, engine):
             for index, item_instance in enumerate(player.inventory):
                 display_id = convert_int_to_alphanum(item_instance.id)
                 message += f'  {index}. [ /{display_id} ] : {item_instance.item.id}'
-                if (item_instance.id == player.equipped_weapon or
-                        item_instance.id == player.equipped_attire or
-                        item_instance.id == player.equipped_accessory):
-                    message += '(equipped)'
+                # if (item_instance.id == player.equipped_weapon or
+                #         item_instance.id == player.equipped_attire or
+                #         item_instance.id == player.equipped_accessory):
+                #     message += '(equipped)'
                 message += '\n'
             embed = Embed(
                 title=f'{context.author.nick}\'s Inventory',
