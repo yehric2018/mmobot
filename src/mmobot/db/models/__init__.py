@@ -1,3 +1,4 @@
+from .base import Base
 from .entity import Entity
 from .item import Item
 from .item_instance import ItemInstance
@@ -9,6 +10,7 @@ from .zone import Zone
 from .zone_path import ZonePath
 
 __all__ = [
+    'Base',
     'Entity',
     'Item',
     'ItemInstance',

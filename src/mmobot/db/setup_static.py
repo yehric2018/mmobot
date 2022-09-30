@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from models import Base, Weapon, Zone, ZonePath
+from mmobot.db.models import Base, Weapon, Zone, ZonePath
 
 load_dotenv()
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
