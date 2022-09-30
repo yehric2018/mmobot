@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -10,7 +11,10 @@ load_dotenv()
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
+if '--test' in sys.argv:
+    MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
+else:
+    MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
 
 connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_USERNAME,

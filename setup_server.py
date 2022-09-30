@@ -38,6 +38,8 @@ async def add_zones(guild):
         guild.me: PermissionOverwrite(read_messages=True)
     }
     world_category = discord.utils.get(guild.categories, name='World')
+    if world_category is None:
+        world_category = await guild.create_category('World')
     for zone_name in get_zones():
         channel = discord.utils.get(guild.channels, name=zone_name)
         if channel is None:
