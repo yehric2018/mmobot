@@ -7,7 +7,13 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
-from commands import give_logic, inventory_logic, move_logic, name_logic, navigation_logic
+from mmobot.commands import (
+    give_logic,
+    inventory_logic,
+    move_logic,
+    name_logic,
+    navigation_logic
+)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -43,7 +49,7 @@ class MMOBot(commands.Bot):
         self._setup_zones()
 
     def _setup_zones(self):
-        with open('db/static/zones.db', 'r') as f:
+        with open('../db/static/zones.db', 'r') as f:
             file_text = f.read()
             zone_data = file_text.split(DB_ENTRY_SEPERATOR)
             self.zones = set()
