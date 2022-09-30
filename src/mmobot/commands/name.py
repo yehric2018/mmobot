@@ -27,7 +27,6 @@ async def name_logic(context, args, engine):
         return
 
     with Session(engine) as session:
-        stats = roll_initial_stats()
         get_ancestors_statement = (
             select(func.max(Player.ancestry))
             .where(Player.discord_id == context.author.id)
@@ -45,16 +44,7 @@ async def name_logic(context, args, engine):
             birthday=birthday,
             is_active=True,
             stance=STANCE_NORMAL,
-            hp=stats['hp'],
-            max_hp=stats['hp'],
-            armor=stats['armor'],
-            mobility=stats['mobility'],
-            dexterity=stats['dexterity'],
-            endurance=stats['endurance'],
-            max_endurance=stats['endurance'],
-            strength=stats['strength'],
-            luck=stats['luck'],
-            magic_number=0,
+            stats=roll_initial_stats()
         )
 
         try:

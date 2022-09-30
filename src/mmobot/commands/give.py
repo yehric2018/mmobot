@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
 from mmobot.utils.discord import handle_mentions
+from mmobot.utils.entities import convert_alphanum_to_int
 
 
 async def give_logic(bot, context, args, engine):
@@ -14,7 +15,7 @@ async def give_logic(bot, context, args, engine):
 
     giver_name = context.author.nick
     receiver_name = handle_mentions(args[0], context.message.mentions)
-    item_name = args[1]
+    giving_item_name = args[1]
     if all(member.nick != receiver_name for member in context.channel.members):
         await context.send(f'Could not find player {receiver_name} in current location')
         return
@@ -25,21 +26,33 @@ async def give_logic(bot, context, args, engine):
         giving_player = session.scalars(giving_player_statement).one()
         receiving_player = session.scalars(receiving_player_statement).one()
 
-        giving_item = None
-        for item in giving_player.inventory:
-            if item.id == item_name:
-                giving_item = item
-                giving_player.inventory.remove(item)
-                break
-        if giving_item is None:
-            if item_name.isnumeric() and int(item_name) < len(giving_player.inventory):
-                giving_item = giving_player.inventory[int(item_name)]
-            else:
-                await context.send(f'You do not have the item: {item_name}')
-                return
-        receiving_player.inventory.append(giving_item)
+        giving_item_instance = None
+
+        if giving_item_name.startswith('/'):
+            giving_item_id = convert_alphanum_to_int(giving_item_name[1:])
+            for item_instance in giving_player.inventory:
+                if item_instance.id == giving_item_id:
+                    giving_item_instance = item_instance
+                    break
+        elif (giving_item_name.isnumeric() and
+                int(giving_item_name) < len(giving_player.inventory)):
+            giving_item_instance = giving_player.inventory[int(giving_item_name)]
+        else:
+            for item_instance in giving_player.inventory:
+                item_name = item_instance.item.id
+                if item_name == giving_item_name:
+                    giving_item_instance = item_instance
+                    break
+        if giving_item_instance is None:
+            await context.send(f'You do not have the item: {giving_item_name}')
+            return
+        giving_item_instance.player_id = receiving_player.id
 
         session.commit()
 
-        message = f'<@{receiving_player.discord_id}> received {giving_item.id} from {giver_name}!'
+        message = '<@{0}> received {1} from {2}!'.format(
+            receiving_player.discord_id,
+            giving_item_instance.item.id,
+            giver_name
+        )
         await context.send(message)

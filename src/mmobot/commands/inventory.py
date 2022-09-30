@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 
 from mmobot.db.models import Player
+from mmobot.utils.entities import convert_int_to_alphanum
 
 
 async def inventory_logic(context, engine):
@@ -16,11 +17,12 @@ async def inventory_logic(context, engine):
         try:
             player = session.scalars(get_player_statement).one()
             message = ''
-            for index, item in enumerate(player.inventory):
-                message += f'  {index}. {item.id}'
-                if (item.id == player.equipped_weapon or
-                        item.id == player.equipped_attire or
-                        item.id == player.equipped_accessory):
+            for index, item_instance in enumerate(player.inventory):
+                display_id = convert_int_to_alphanum(item_instance.id)
+                message += f'  {index}. [ /{display_id} ] : {item_instance.item.id}'
+                if (item_instance.id == player.equipped_weapon or
+                        item_instance.id == player.equipped_attire or
+                        item_instance.id == player.equipped_accessory):
                     message += '(equipped)'
                 message += '\n'
             embed = Embed(
