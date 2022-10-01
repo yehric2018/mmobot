@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
-from mmobot.utils.discord import handle_mentions
+from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int
 
 
@@ -14,15 +14,23 @@ async def give_logic(bot, context, args, engine):
         return
 
     giver_name = context.author.nick
-    receiver_name = handle_mentions(args[0], context.message.mentions)
     giving_item_name = args[1]
-    if all(member.nick != receiver_name for member in context.channel.members):
-        await context.send(f'Could not find player {receiver_name} in current location')
-        return
+
+    if is_mention(args[0]):
+        receiver_id = int(args[0][2:-1])
+        receiving_player_statement = select(Player).where(Player.discord_id == receiver_id)
+        if all(member.id != receiver_id for member in context.channel.members):
+            await context.send(f'Could not find player {args[0]} in current location')
+            return
+    else:
+        receiver_name = args[0]
+        receiving_player_statement = select(Player).where(Player.name == receiver_name)
+        if all(member.nick != receiver_name for member in context.channel.members):
+            await context.send(f'Could not find player {args[0]} in current location')
+            return
 
     with Session(engine) as session:
         giving_player_statement = select(Player).where(Player.name == giver_name)
-        receiving_player_statement = select(Player).where(Player.name == receiver_name)
         giving_player = session.scalars(giving_player_statement).one()
         receiving_player = session.scalars(receiving_player_statement).one()
 
