@@ -15,4 +15,6 @@ def test_convert_alphanum_to_int():
 
 def test_convert_alphanum_int_inverse():
     assert convert_alphanum_to_int(convert_int_to_alphanum(999)) == 999
+    assert convert_alphanum_to_int(convert_int_to_alphanum(21738)) == 21738
     assert convert_int_to_alphanum(convert_alphanum_to_int('abc2')) == 'abc2'
+    assert convert_int_to_alphanum(convert_alphanum_to_int('nz82f')) == 'nz82f'
