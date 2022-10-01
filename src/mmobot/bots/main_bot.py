@@ -97,12 +97,12 @@ async def me_command(context):
 
 @bot.command(name='move')
 async def move_command(context, *args):
-    await move_logic(bot, context, args, engine)
+    await move_logic(bot.zones, context, args, engine)
 
 
 @bot.command(name='navigation')
 async def navigation_command(context):
-    await navigation_logic(bot, context, engine)
+    await navigation_logic(bot.zones, context, engine)
 
 
 @bot.command(name='name')

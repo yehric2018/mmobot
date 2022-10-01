@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from mmobot.db.models import Zone
 
 
-async def navigation_logic(bot, context, engine):
-    if context.channel.name not in bot.zones:
+async def navigation_logic(zones, context, engine):
+    if context.channel.name not in zones:
         return
 
     with Session(engine) as session:

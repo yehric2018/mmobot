@@ -5,16 +5,16 @@ from sqlalchemy.orm import Session
 from mmobot.db.models import Zone
 
 
-async def move_logic(bot, context, args, engine):
+async def move_logic(zones, context, args, engine):
     member = context.author
-    if context.channel.name not in bot.zones or member.guild_permissions.administrator:
+    if context.channel.name not in zones:
         return
     if len(args) == 0:
         await context.send('Please specify a location to move to! For example: !move hawaii')
         return
 
     zone_name = args[0]
-    if zone_name not in bot.zones:
+    if zone_name not in zones:
         await context.send(f'{zone_name} is not an existing location')
         return
 

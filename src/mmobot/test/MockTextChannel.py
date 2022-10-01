@@ -1,35 +1,39 @@
-from discord import Member, PermissionOverwrite, Permissions, Role, TextChannel, User
+from discord import Permissions
+
+from mmobot.test.MockMember import MockMember
 
 
-ZONE_PERMISSIONS_NOT_IN = 384399657025
+DEFAULT_PERMISSIONS = 0
 
 
-class MockTextChannel(TextChannel):
-    def __init__(self, name):
+class MockTextChannel:
+    def __init__(self, name, permissions=Permissions(DEFAULT_PERMISSIONS)):
         self.name = name
+        self.default_permissions = permissions
         self.permissions = {}
         self.messages = []
 
     def permissions_for(self, obj, /) -> Permissions:
-        if isinstance(obj, Member) and obj in self.permissions:
-            allow, _ = self.permissions[obj].from_pair()
-            read_messages = allow.read_messages
-            send_messages = allow.send_messages
-        permissions = Permissions(ZONE_PERMISSIONS_NOT_IN, read_messages, send_messages)
+        permissions = self.default_permissions
+        if obj in self.permissions:
+            member_permissions = self.permissions[obj]
+            permissions.update(
+                read_messages=member_permissions.read_messages,
+                send_messages=member_permissions.send_messages
+            )
         return permissions
 
     async def send(self, message):
         self.messages.append(message)
 
-    async def set_permissions(self, target, **permissions):
-        if not (isinstance(target, User) or isinstance(target, Role)):
-            raise ValueError('target parameter must be either Member or Role')
+    async def set_permissions(self, target, read_messages, send_messages):
+        if not isinstance(target, MockMember):
+            raise ValueError('target parameter must be MockMember')
 
-        if len(permissions) == 0:
-            raise ValueError('No overwrite provided.')
-        try:
-            overwrite = PermissionOverwrite(**permissions)
-        except (ValueError, TypeError):
-            raise TypeError('Invalid permissions given to keyword arguments.')
+        overwrite = Permissions(
+            DEFAULT_PERMISSIONS,
+            read_messages=read_messages,
+            send_messages=send_messages
+        )
 
         self.permissions[target] = overwrite
