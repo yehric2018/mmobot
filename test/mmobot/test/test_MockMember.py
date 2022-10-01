@@ -1,4 +1,4 @@
-from mmobot.test.MockMember import MockMember
+from mmobot.test.mock import MockMember
 
 
 def test_MockMember_initialize():

@@ -4,3 +4,5 @@ STANCE_BATTLE = 1
 STANCE_GUARD = 2
 STANCE_REST = 3
 STANCE_SLEEP = 4
+
+DB_ENTRY_SEPERATOR = '\n====================\n'

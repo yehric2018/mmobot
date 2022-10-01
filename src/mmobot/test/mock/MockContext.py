@@ -1,4 +1,4 @@
-from mmobot.test import MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockGuild, MockMember, MockTextChannel
 
 
 class MockContext:

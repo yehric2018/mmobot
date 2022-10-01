@@ -1,5 +1,5 @@
 import pytest
-from mmobot.test import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
 
 TEST_MESSAGE = 'test message'
@@ -12,12 +12,12 @@ def sending_member():
 
 @pytest.fixture
 def sending_channel():
-    return MockTextChannel('channel1')
+    return MockTextChannel(1, 'channel1')
 
 
 @pytest.fixture
 def non_sending_channel():
-    return MockTextChannel('channel2')
+    return MockTextChannel(2, 'channel2')
 
 
 @pytest.fixture

@@ -1,4 +1,4 @@
-from mmobot.test import MockTextChannel
+from mmobot.test.mock import MockTextChannel
 
 
 class MockGuild:

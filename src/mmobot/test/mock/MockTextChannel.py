@@ -1,13 +1,17 @@
 from discord import Permissions
 
-from mmobot.test.MockMember import MockMember
+from mmobot.test.mock import MockMember
 
 
 DEFAULT_PERMISSIONS = 0
 
 
 class MockTextChannel:
-    def __init__(self, name, permissions=Permissions(DEFAULT_PERMISSIONS)):
+    def __init__(self, id, name, permissions=None):
+        if permissions is None:
+            permissions = Permissions(DEFAULT_PERMISSIONS)
+        self.id = id
+        self.mention = f'<#{self.id}>'
         self.name = name
         self.default_permissions = permissions
         self.permissions = {}
@@ -26,10 +30,7 @@ class MockTextChannel:
     async def send(self, message):
         self.messages.append(message)
 
-    async def set_permissions(self, target, read_messages, send_messages):
-        if not isinstance(target, MockMember):
-            raise ValueError('target parameter must be MockMember')
-
+    async def set_permissions(self, target: MockMember, read_messages, send_messages):
         overwrite = Permissions(
             DEFAULT_PERMISSIONS,
             read_messages=read_messages,
