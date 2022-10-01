@@ -27,7 +27,7 @@ async def move_logic(zones, context, args, engine):
         if all(zone_path.end_zone_name != zone_name for zone_path in zone.navigation):
             await context.send(f'You cannot travel to {zone_name} from {context.channel.name}')
             return
-        curr_channel = discord.utils.get(context.guild.channels, name=context.channel.name)
+        curr_channel = context.channel
         dest_channel = discord.utils.get(context.guild.channels, name=zone_name)
 
         await curr_channel.send(f'{member.mention} has left for {dest_channel.mention}.')
