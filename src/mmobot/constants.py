@@ -6,3 +6,6 @@ STANCE_REST = 3
 STANCE_SLEEP = 4
 
 DB_ENTRY_SEPERATOR = '\n====================\n'
+
+# Discord permissions
+PERMISSIONS_DEFAULT = 0
