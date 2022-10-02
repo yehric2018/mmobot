@@ -27,7 +27,12 @@ class MockTextChannel:
             )
         return permissions
 
-    async def send(self, message):
+    async def send(self, message='', embed=None):
+        if embed is not None:
+            message = ''
+            message += f'<title>{embed.title}</title>\n'
+            message += f'<desc>{embed.description}</desc>\n'
+            print(repr(embed.description))
         self.messages.append(message)
 
     async def set_permissions(self, target: MockMember, read_messages, send_messages):

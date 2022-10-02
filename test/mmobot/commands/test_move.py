@@ -117,8 +117,24 @@ async def test_commandMove_noArgsProvided(zones, move_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_notInZone(zones, move_context, non_zone_channel, engine):
+async def test_commandMove_nonexistantZone(zones, move_context, engine):
+    await move_logic(zones, move_context, ['nowhere'], engine)
+    assert len(move_context.channel.messages) == 1
+    expected_message = 'nowhere is not an existing location'
+    assert move_context.channel.messages[0] == expected_message
+
+
+@pytest.mark.asyncio
+async def test_commandMove_notInZoneChannel(zones, move_context, non_zone_channel, engine):
     move_context.channel = non_zone_channel
     await move_logic(zones, move_context, ['marketplace'], engine)
     assert len(move_context.channel.messages) == 0
     assert len(move_context.guild.channels[1].messages) == 0
+
+
+@pytest.mark.asyncio
+async def test_commandMove_nonadjacentZone(zones, move_context, engine):
+    await move_logic(zones, move_context, ['throne-room'], engine)
+    assert len(move_context.channel.messages) == 1
+    expected_message = 'You cannot travel to throne-room from town-square'
+    assert move_context.channel.messages[0] == expected_message

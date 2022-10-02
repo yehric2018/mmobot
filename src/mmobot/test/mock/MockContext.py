@@ -7,5 +7,5 @@ class MockContext:
         self.channel = channel
         self.guild = guild
 
-    async def send(self, message):
-        await self.channel.send(message)
+    async def send(self, message='', embed=None):
+        await self.channel.send(message=message, embed=embed)
