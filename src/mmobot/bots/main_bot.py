@@ -1,5 +1,4 @@
 import os
-import sys
 
 import discord
 
@@ -14,16 +13,15 @@ from mmobot.commands import (
     name_logic,
     navigation_logic
 )
+from mmobot.constants import DB_ENTRY_SEPERATOR
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+PROJECT_PATH = os.getenv('PROJECT_PATH')
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-if '--test' in sys.argv:
-    MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-else:
-    MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
+MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
 
 connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_USERNAME,
@@ -33,9 +31,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 )
 
 engine = create_engine(connection_str)
-
-
-DB_ENTRY_SEPERATOR = '\n====================\n'
 
 
 class MMOBot(commands.Bot):
@@ -49,7 +44,7 @@ class MMOBot(commands.Bot):
         self._setup_zones()
 
     def _setup_zones(self):
-        with open('../db/static/zones.db', 'r') as f:
+        with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/zones.db'), 'r') as f:
             file_text = f.read()
             zone_data = file_text.split(DB_ENTRY_SEPERATOR)
             self.zones = set()

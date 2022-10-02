@@ -5,9 +5,11 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from mmobot.constants import DB_ENTRY_SEPERATOR
 from mmobot.db.models import Base, Weapon, Zone, ZonePath
 
 load_dotenv()
+PROJECT_PATH = os.getenv('PROJECT_PATH')
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
@@ -24,8 +26,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 )
 engine = create_engine(connection_str)
 
-DB_ENTRY_SEPERATOR = '\n====================\n'
-
 
 def setup():
     setup_zones()
@@ -35,13 +35,13 @@ def setup():
 def setup_zones():
     all_zones = []
     all_zone_paths = []
-    with open('static/zones.db', 'r') as f:
+    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/zones.db'), 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
             all_zones.append(Zone(channel_name=data))
 
-    with open('static/zone-paths.db', 'r') as f:
+    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/zones-paths.db'), 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
@@ -68,7 +68,7 @@ def setup_items():
 
 
 def setup_weapons():
-    with open('static/weapons.db', 'r') as f:
+    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/weapons.db'), 'r') as f:
         file_text = f.read()
         weapon_data = file_text.split(DB_ENTRY_SEPERATOR)
         all_weapons = []
