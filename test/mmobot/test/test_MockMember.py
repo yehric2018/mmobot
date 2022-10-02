@@ -1,3 +1,4 @@
+import pytest
 from mmobot.test.mock import MockMember
 
 
@@ -9,6 +10,15 @@ def test_MockMember_initialize():
     assert member.nick == 'member_name'
     assert member.mention is not None
     assert member.mention == '<@1>'
+
+
+@pytest.mark.asyncio
+async def test_MockMember_edit_changeNick():
+    member = MockMember(1, 'member_name')
+    await member.edit(nick='NewName')
+    assert member.id == 1
+    assert member.mention == '<@1>'
+    assert member.nick == 'NewName'
 
 
 def test_MockMember_eq_sameMember():

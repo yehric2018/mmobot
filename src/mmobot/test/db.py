@@ -1,4 +1,11 @@
+from sqlalchemy import select
+
 from mmobot.db.models import Entity, ItemInstance, Player
+
+
+def get_player_with_name(session, name):
+    get_player_statement = select(Player).where(Player.name == name)
+    return session.scalars(get_player_statement).one()
 
 
 def add_player(session, player):

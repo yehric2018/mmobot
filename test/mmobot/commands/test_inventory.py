@@ -50,12 +50,7 @@ def session(engine):
 @pytest.fixture(autouse=True)
 def player(session):
     delete_all_entities(session)
-    player = Player(
-        id=1,
-        name='player',
-        discord_id=100,
-        is_active=True
-    )
+    player = Player(id=1, name='player', discord_id=100, is_active=True)
     add_player(session, player)
     yield player
     delete_all_entities(session)
