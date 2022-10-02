@@ -82,7 +82,7 @@ async def attack_command(context):
 
 @bot.command(name='give')
 async def give_command(context, *args):
-    await give_logic(bot, context, args, engine)
+    await give_logic(bot.zones, context, args, engine)
 
 
 @bot.command(name='inventory')

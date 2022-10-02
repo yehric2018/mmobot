@@ -16,6 +16,7 @@ class MockTextChannel:
         self.default_permissions = permissions
         self.permissions = {}
         self.messages = []
+        self.members = []
 
     def permissions_for(self, obj, /) -> Permissions:
         permissions = self.default_permissions
@@ -35,11 +36,15 @@ class MockTextChannel:
             print(repr(embed.description))
         self.messages.append(message)
 
-    async def set_permissions(self, target: MockMember, read_messages, send_messages):
+    async def set_permissions(self, member: MockMember, read_messages, send_messages):
         overwrite = Permissions(
             DEFAULT_PERMISSIONS,
             read_messages=read_messages,
             send_messages=send_messages
         )
+        self.permissions[member] = overwrite
 
-        self.permissions[target] = overwrite
+        if member not in self.members and (read_messages or send_messages):
+            self.members.append(member)
+        elif member in self.members and not read_messages and not send_messages:
+            self.members.remove(member)

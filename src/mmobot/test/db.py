@@ -8,6 +8,11 @@ def get_player_with_name(session, name):
     return session.scalars(get_player_statement).one()
 
 
+def get_item_instance_with_id(session, id):
+    get_item_statement = select(ItemInstance).where(ItemInstance.id == id)
+    return session.scalars(get_item_statement).one()
+
+
 def add_player(session, player):
     session.add(player)
     session.commit()

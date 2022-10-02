@@ -55,6 +55,7 @@ async def test_MockTextChannel_setPermissions_to_read_write(member, channel):
     permissions = channel.permissions_for(member)
     assert permissions.read_messages is True
     assert permissions.send_messages is True
+    assert member in channel.members
 
 
 @pytest.mark.asyncio
@@ -63,6 +64,7 @@ async def test_MockTextChannel_setPermissions_to_no_permissions(member, channel)
     permissions = channel.permissions_for(member)
     assert permissions.read_messages is False
     assert permissions.send_messages is False
+    assert member not in channel.members
 
 
 @pytest.mark.asyncio

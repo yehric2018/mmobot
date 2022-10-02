@@ -6,8 +6,8 @@ from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int
 
 
-async def give_logic(bot, context, args, engine):
-    if context.channel.name not in bot.zones:
+async def give_logic(zones, context, args, engine):
+    if context.channel.name not in zones:
         return
     if len(args) != 2:
         await context.send('Please supply give arguments like this: **!give player item**')
