@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 from mmobot.commands import (
+    equip_logic,
     give_logic,
     inventory_logic,
     move_logic,
     name_logic,
-    navigation_logic
+    navigation_logic,
+    unequip_logic,
 )
 from mmobot.constants import DB_ENTRY_SEPERATOR
 
@@ -75,6 +77,11 @@ async def attack_command(context):
     await context.send('You cannot attack yet')
 
 
+@bot.command(name='equip')
+async def equip_command(context, *args):
+    await equip_logic(bot.zones, context, args, engine)
+
+
 @bot.command(name='give')
 async def give_command(context, *args):
     await give_logic(bot.zones, context, args, engine)
@@ -103,6 +110,11 @@ async def navigation_command(context):
 @bot.command(name='name')
 async def name_command(context, *args):
     await name_logic(context, args, engine)
+
+
+@bot.command(name='unequip')
+async def unequip_command(context, *args):
+    await unequip_logic(bot.zones, context, args, engine)
 
 
 @bot.event
