@@ -23,6 +23,8 @@ async def inventory_logic(zones, context, engine):
             for index, item_instance in enumerate(player.inventory):
                 display_id = convert_int_to_alphanum(item_instance.id)
                 message += f'  {index}. [ /{display_id} ] : {item_instance.item.id}'
+                if player.equipped_weapon_id == item_instance.id:
+                    message += ' **(weapon)**'
                 message += '\n'
             embed = Embed(
                 title=f'{context.author.nick}\'s Inventory',

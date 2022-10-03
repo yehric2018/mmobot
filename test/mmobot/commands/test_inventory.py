@@ -11,7 +11,8 @@ from mmobot.db.models.player import Player
 from mmobot.test.db import (
     add_item_instance,
     add_player,
-    delete_all_entities
+    delete_all_entities,
+    update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 from mmobot.utils.zones import read_zone_names
@@ -36,6 +37,12 @@ zones = read_zone_names()
 SINGLE_ITEM_INVENTORY_MESSAGE = '''\
 <title>player\'s Inventory</title>
 <desc>  0. [ /2 ] : desert-scimitar
+</desc>
+'''
+
+EQUIPPED_WEAPON_INVENTORY_MESSAGE = '''\
+<title>player\'s Inventory</title>
+<desc>  0. [ /2 ] : desert-scimitar **(weapon)**
 </desc>
 '''
 
@@ -103,6 +110,15 @@ async def test_commandInventory_singleItem(inventory_context, engine, session):
     await inventory_logic(zones, inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     assert inventory_context.channel.messages[0] == SINGLE_ITEM_INVENTORY_MESSAGE
+
+
+@pytest.mark.asyncio
+async def test_commandInventory_equippedWeapon(inventory_context, engine, session):
+    add_item_instance(session, 2, 1, 'desert-scimitar')
+    update_player(session, 1, {'equipped_weapon_id': 2})
+    await inventory_logic(zones, inventory_context, engine)
+    assert len(inventory_context.channel.messages) == 1
+    assert inventory_context.channel.messages[0] == EQUIPPED_WEAPON_INVENTORY_MESSAGE
 
 
 @pytest.mark.asyncio
