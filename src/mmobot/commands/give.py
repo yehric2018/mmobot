@@ -44,11 +44,13 @@ async def give_logic(zones, context, args, engine):
             giving_item_instance = giving_player.inventory[int(giving_item_name)]
         else:
             giving_item_instance = find_item_with_name(giving_player.inventory, giving_item_name)
+
         if giving_item_instance is None:
             await context.send(f'You do not have the item: {giving_item_name}')
             return
         giving_item_instance.player_id = receiving_player.id
-
+        if giving_player.equipped_weapon_id == giving_item_instance.id:
+            giving_player.equipped_weapon_id = None
         session.commit()
 
         message = '<@{0}> received {1} from {2}!'.format(

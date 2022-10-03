@@ -35,13 +35,14 @@ def setup():
 def setup_zones():
     all_zones = []
     all_zone_paths = []
-    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/zones.db'), 'r') as f:
+    with open(os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'zones.db'), 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
             all_zones.append(Zone(channel_name=data))
 
-    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/zones-paths.db'), 'r') as f:
+    zone_paths_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'zone-paths.db')
+    with open(zone_paths_path, 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
@@ -68,7 +69,8 @@ def setup_items():
 
 
 def setup_weapons():
-    with open(os.path.join(PROJECT_PATH, 'src/mmobot/db/static/weapons.db'), 'r') as f:
+    weapons_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'weapons.db')
+    with open(os.path.join(weapons_path), 'r') as f:
         file_text = f.read()
         weapon_data = file_text.split(DB_ENTRY_SEPERATOR)
         all_weapons = []

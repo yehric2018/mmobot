@@ -7,7 +7,10 @@ from mmobot.db.models import Player
 from mmobot.utils.entities import convert_int_to_alphanum
 
 
-async def inventory_logic(context, engine):
+async def inventory_logic(zones, context, engine):
+    if context.channel.name not in zones:
+        return
+
     with Session(engine) as session:
         get_player_statement = (
             select(Player)
