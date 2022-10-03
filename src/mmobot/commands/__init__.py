@@ -4,6 +4,7 @@ from .inventory import inventory_logic
 from .move import move_logic
 from .name import name_logic
 from .navigation import navigation_logic
+from .unequip import unequip_logic
 
 __all__ = [
     'equip_logic',
@@ -12,4 +13,5 @@ __all__ = [
     'move_logic',
     'name_logic',
     'navigation_logic',
+    'unequip_logic'
 ]
