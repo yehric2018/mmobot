@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
-from mmobot.db.models import Base, Weapon, Zone, ZonePath
+from mmobot.db.models import Base, Item, Weapon, Zone, ZonePath
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -65,6 +65,25 @@ def setup_zones():
 
 
 def setup_items():
+    items_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'items.db')
+    with open(os.path.join(items_path), 'r') as f:
+        file_text = f.read()
+        item_data = file_text.split(DB_ENTRY_SEPERATOR)
+        all_items = []
+        for data in item_data:
+            lines = data.split('\n')
+            item_stats = lines[1].split(',')
+
+            all_items.append(Item(
+                id=lines[0],
+                size=int(item_stats[0]),
+                weight=int(item_stats[1])
+            ))
+
+        with Session(engine) as session:
+            for item in all_items:
+                session.merge(item)
+            session.commit()
     setup_weapons()
 
 
