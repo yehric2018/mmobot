@@ -31,7 +31,7 @@ sword
 platinum-sword
 sword
 50,100
-150
+140
 ====================
 desert-scimitar
 sword
@@ -60,13 +60,13 @@ sword
 ====================
 blazing-blade
 sword
-60,90
-180
+60,75
+130
 ====================
 crystal-sword
 sword
 80,130
-300
+200
 ====================
 wooden-bow
 bow
