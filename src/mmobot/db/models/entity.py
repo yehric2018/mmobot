@@ -1,6 +1,7 @@
 from sqlalchemy import Column
 from sqlalchemy import DDL
 from sqlalchemy import event
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Sequence
 from sqlalchemy import String
@@ -18,6 +19,7 @@ class Entity(Base):
     )
 
     entity_type = Column(String(20))
+    zone = Column(String(40), ForeignKey('Zones.channel_name'))
 
     __mapper_args__ = {
         'polymorphic_identity': 'entity',

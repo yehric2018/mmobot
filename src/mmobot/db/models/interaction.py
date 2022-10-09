@@ -11,7 +11,6 @@ class Interaction(Entity):
 
     id = Column(Integer, ForeignKey('Entities.id'), primary_key=True)
     interaction_type = Column(String(20))
-    zone = Column(String(40), ForeignKey('Zones.channel_name'))
 
     __mapper_args__ = {
         'polymorphic_identity': 'interaction'
