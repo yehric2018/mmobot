@@ -7,7 +7,7 @@ from mmobot.db.models import Player
 from mmobot.utils.entities import convert_int_to_alphanum
 
 
-async def inventory_logic(zones, context, engine):
+async def inventory_logic(context, engine):
     if context.channel.category.name != 'World':
         return
 

@@ -17,7 +17,6 @@ from mmobot.test.db import (
     update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -32,8 +31,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_HOSTNAME,
     MYSQL_DATABASE_NAME
 )
-
-zones = read_zone_names()
 
 
 MESSAGE_GIVE_SUCCESS = '<@101> received desert-scimitar from giver!'
@@ -102,7 +99,7 @@ def giving_context(giving_member, channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandGive_withItemName(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', 'desert-scimitar'], engine)
+    await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_SUCCESS
     assert giving_context.channel.messages[0] == expected_message
@@ -116,7 +113,7 @@ async def test_commandGive_withItemName(giving_context, engine, session, setup_i
 
 @pytest.mark.asyncio
 async def test_commandGive_withInventoryIndex(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', '0'], engine)
+    await give_logic(giving_context, ['receiver', '0'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_SUCCESS
     assert giving_context.channel.messages[0] == expected_message
@@ -130,7 +127,7 @@ async def test_commandGive_withInventoryIndex(giving_context, engine, session, s
 
 @pytest.mark.asyncio
 async def test_commandGive_withEntityId(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', '/5k'], engine)
+    await give_logic(giving_context, ['receiver', '/5k'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_SUCCESS
     assert giving_context.channel.messages[0] == expected_message
@@ -144,7 +141,7 @@ async def test_commandGive_withEntityId(giving_context, engine, session, setup_i
 
 @pytest.mark.asyncio
 async def test_commandGive_withDiscordMention(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['<@101>', 'desert-scimitar'], engine)
+    await give_logic(giving_context, ['<@101>', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_SUCCESS
     assert giving_context.channel.messages[0] == expected_message
@@ -159,7 +156,7 @@ async def test_commandGive_withDiscordMention(giving_context, engine, session, s
 @pytest.mark.asyncio
 async def test_commandGive_equippedWeapon(giving_context, engine, session, setup_item):
     update_player(session, 1, {'equipped_weapon_id': 200})
-    await give_logic(zones, giving_context, ['receiver', 'desert-scimitar'], engine)
+    await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_SUCCESS
     assert giving_context.channel.messages[0] == expected_message
@@ -175,7 +172,7 @@ async def test_commandGive_equippedWeapon(giving_context, engine, session, setup
 
 @pytest.mark.asyncio
 async def test_commandGive_noArgsProvided(giving_context, engine):
-    await give_logic(zones, giving_context, [], engine)
+    await give_logic(giving_context, [], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_WRONG_USAGE
     assert giving_context.channel.messages[0] == expected_message
@@ -183,7 +180,7 @@ async def test_commandGive_noArgsProvided(giving_context, engine):
 
 @pytest.mark.asyncio
 async def test_commandGive_oneArgProvided(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['<@101>'], engine)
+    await give_logic(giving_context, ['<@101>'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = MESSAGE_GIVE_WRONG_USAGE
     assert giving_context.channel.messages[0] == expected_message
@@ -195,7 +192,7 @@ async def test_commandGive_oneArgProvided(giving_context, engine, session, setup
 async def test_commandGive_notInZone(
         giving_context, non_zone_channel, engine, session, setup_item):
     giving_context.channel = non_zone_channel
-    await give_logic(zones, giving_context, ['receiver', 'desert-scimitar'], engine)
+    await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 0
 
 
@@ -207,7 +204,7 @@ async def test_commandGive_recieverNotInZone(
         read_messages=False,
         send_messages=False
     )
-    await give_logic(zones, giving_context, ['receiver', 'desert-scimitar'], engine)
+    await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'Could not find player receiver in current location'
     assert giving_context.channel.messages[0] == expected_message
@@ -217,7 +214,7 @@ async def test_commandGive_recieverNotInZone(
 
 @pytest.mark.asyncio
 async def test_commandGive_itemNameNotInInventory(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', 'blazing-blade'], engine)
+    await give_logic(giving_context, ['receiver', 'blazing-blade'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'You do not have the item: blazing-blade'
     assert giving_context.channel.messages[0] == expected_message
@@ -228,7 +225,7 @@ async def test_commandGive_itemNameNotInInventory(giving_context, engine, sessio
 @pytest.mark.asyncio
 async def test_commandGive_inventoryIndexNotInInventory(
         giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', '200'], engine)
+    await give_logic(giving_context, ['receiver', '200'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'You do not have the item: 200'
     assert giving_context.channel.messages[0] == expected_message
@@ -238,7 +235,7 @@ async def test_commandGive_inventoryIndexNotInInventory(
 
 @pytest.mark.asyncio
 async def test_commandGive_entityIdNotInInventory(giving_context, engine, session, setup_item):
-    await give_logic(zones, giving_context, ['receiver', '/abc'], engine)
+    await give_logic(giving_context, ['receiver', '/abc'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'You do not have the item: /abc'
     assert giving_context.channel.messages[0] == expected_message

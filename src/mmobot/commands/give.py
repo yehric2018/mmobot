@@ -6,7 +6,7 @@ from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int
 
 
-async def give_logic(zones, context, args, engine):
+async def give_logic(context, args, engine):
     if context.channel.category.name != 'World':
         return
     if len(args) != 2:

@@ -75,22 +75,22 @@ async def on_member_join(member):
 
 @bot.command(name='attack')
 async def attack_command(context, *args):
-    await attack_logic(bot.zones, context, args, engine)
+    await attack_logic(context, args, engine)
 
 
 @bot.command(name='equip')
 async def equip_command(context, *args):
-    await equip_logic(bot.zones, context, args, engine)
+    await equip_logic(context, args, engine)
 
 
 @bot.command(name='give')
 async def give_command(context, *args):
-    await give_logic(bot.zones, context, args, engine)
+    await give_logic(context, args, engine)
 
 
 @bot.command(name='inventory')
 async def inventory_command(context):
-    await inventory_logic(bot.zones, context, engine)
+    await inventory_logic(context, engine)
 
 
 @bot.command(name='me')
@@ -100,12 +100,12 @@ async def me_command(context):
 
 @bot.command(name='move')
 async def move_command(context, *args):
-    await move_logic(bot.zones, context, args, engine)
+    await move_logic(context, args, engine)
 
 
 @bot.command(name='navigation')
 async def navigation_command(context):
-    await navigation_logic(bot.zones, context, engine)
+    await navigation_logic(context, engine)
 
 
 @bot.command(name='name')
@@ -115,7 +115,7 @@ async def name_command(context, *args):
 
 @bot.command(name='unequip')
 async def unequip_command(context, *args):
-    await unequip_logic(bot.zones, context, args, engine)
+    await unequip_logic(context, args, engine)
 
 
 @bot.event

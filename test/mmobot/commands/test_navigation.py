@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 
 from mmobot.commands import navigation_logic
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -41,11 +40,6 @@ REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
 @pytest.fixture
 def engine():
     return create_engine(connection_str)
-
-
-@pytest.fixture
-def zones():
-    return read_zone_names()
 
 
 @pytest.fixture
@@ -83,15 +77,15 @@ def navigation_context(member, zone_channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandNavigation_success(zones, navigation_context, engine):
-    await navigation_logic(zones, navigation_context, engine)
+async def test_commandNavigation_success(navigation_context, engine):
+    await navigation_logic(navigation_context, engine)
     assert len(navigation_context.channel.messages) == 1
     assert navigation_context.channel.messages[0] == REACHABLE_FROM_TOWN_SQUARE_MESSAGE
 
 
 @pytest.mark.asyncio
 async def test_commandNavigation_notInZoneChannel(
-        zones, navigation_context, non_zone_channel, engine):
+        navigation_context, non_zone_channel, engine):
     navigation_context.channel = non_zone_channel
-    await navigation_logic(zones, navigation_context, engine)
+    await navigation_logic(navigation_context, engine)
     assert len(navigation_context.channel.messages) == 0

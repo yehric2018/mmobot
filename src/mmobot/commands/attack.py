@@ -8,8 +8,8 @@ from mmobot.utils.entities import convert_alphanum_to_int
 from mmobot.utils.mining import attack_command_mining
 
 
-async def attack_logic(zones, context, args, engine):
-    if context.channel.name not in zones:
+async def attack_logic(context, args, engine):
+    if context.channel.category.name != 'World':
         return
     if len(args) != 1:
         message = 'Please indicate a single attack target, for example: !attack target'

@@ -6,7 +6,7 @@ from mmobot.db.models import Player
 from mmobot.utils.entities import convert_alphanum_to_int
 
 
-async def equip_logic(zones, context, args, engine):
+async def equip_logic(context, args, engine):
     if context.channel.category.name != 'World':
         return
     if len(args) != 1:

@@ -15,7 +15,6 @@ from mmobot.test.db import (
     update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -30,8 +29,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_HOSTNAME,
     MYSQL_DATABASE_NAME
 )
-
-zones = read_zone_names()
 
 
 SINGLE_ITEM_INVENTORY_MESSAGE = '''\
@@ -98,7 +95,7 @@ def inventory_context(member, channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandInventory_emptyInventory(inventory_context, engine):
-    await inventory_logic(zones, inventory_context, engine)
+    await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     expected_message = '<title>player\'s Inventory</title>\n<desc></desc>\n'
     assert inventory_context.channel.messages[0] == expected_message
@@ -107,7 +104,7 @@ async def test_commandInventory_emptyInventory(inventory_context, engine):
 @pytest.mark.asyncio
 async def test_commandInventory_singleItem(inventory_context, engine, session):
     add_item_instance(session, 2, 1, 'desert-scimitar')
-    await inventory_logic(zones, inventory_context, engine)
+    await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     assert inventory_context.channel.messages[0] == SINGLE_ITEM_INVENTORY_MESSAGE
 
@@ -116,7 +113,7 @@ async def test_commandInventory_singleItem(inventory_context, engine, session):
 async def test_commandInventory_equippedWeapon(inventory_context, engine, session):
     add_item_instance(session, 2, 1, 'desert-scimitar')
     update_player(session, 1, {'equipped_weapon_id': 2})
-    await inventory_logic(zones, inventory_context, engine)
+    await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     assert inventory_context.channel.messages[0] == EQUIPPED_WEAPON_INVENTORY_MESSAGE
 
@@ -125,5 +122,5 @@ async def test_commandInventory_equippedWeapon(inventory_context, engine, sessio
 async def test_commandInventory_notInZone(
         inventory_context, non_zone_channel, engine):
     inventory_context.channel = non_zone_channel
-    await inventory_logic(zones, inventory_context, engine)
+    await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 0

@@ -8,7 +8,6 @@ from sqlalchemy import create_engine
 
 from mmobot.commands import move_logic
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -31,11 +30,6 @@ DEFAULT_PERMISSIONS = 0
 @pytest.fixture
 def engine():
     return create_engine(connection_str)
-
-
-@pytest.fixture
-def zones():
-    return read_zone_names()
 
 
 @pytest.fixture
@@ -90,8 +84,8 @@ def move_context(moving_member, current_channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandMove_success(
-        zones, move_context, moving_member, engine, no_permissions, read_write_permissions):
-    await move_logic(zones, move_context, ['marketplace'], engine)
+        move_context, moving_member, engine, no_permissions, read_write_permissions):
+    await move_logic(move_context, ['marketplace'], engine)
 
     assert len(move_context.channel.messages) == 1
     leaving_message = '<@1> has left for <#12>.'
@@ -108,8 +102,8 @@ async def test_commandMove_success(
 
 
 @pytest.mark.asyncio
-async def test_commandMove_noArgsProvided(zones, move_context, engine):
-    await move_logic(zones, move_context, [], engine)
+async def test_commandMove_noArgsProvided(move_context, engine):
+    await move_logic(move_context, [], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'Please specify a location to move to! For example: !move hawaii'
     assert move_context.channel.messages[0] == expected_message
@@ -117,24 +111,24 @@ async def test_commandMove_noArgsProvided(zones, move_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonexistantZone(zones, move_context, engine):
-    await move_logic(zones, move_context, ['nowhere'], engine)
+async def test_commandMove_nonexistantZone(move_context, engine):
+    await move_logic(move_context, ['nowhere'], engine)
     assert len(move_context.channel.messages) == 1
-    expected_message = 'nowhere is not an existing location'
+    expected_message = 'You cannot travel to nowhere from town-square'
     assert move_context.channel.messages[0] == expected_message
 
 
 @pytest.mark.asyncio
-async def test_commandMove_notInZoneChannel(zones, move_context, non_zone_channel, engine):
+async def test_commandMove_notInZoneChannel(move_context, non_zone_channel, engine):
     move_context.channel = non_zone_channel
-    await move_logic(zones, move_context, ['marketplace'], engine)
+    await move_logic(move_context, ['marketplace'], engine)
     assert len(move_context.channel.messages) == 0
     assert len(move_context.guild.channels[1].messages) == 0
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonadjacentZone(zones, move_context, engine):
-    await move_logic(zones, move_context, ['throne-room'], engine)
+async def test_commandMove_nonadjacentZone(move_context, engine):
+    await move_logic(move_context, ['throne-room'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'You cannot travel to throne-room from town-square'
     assert move_context.channel.messages[0] == expected_message

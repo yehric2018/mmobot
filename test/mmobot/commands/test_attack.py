@@ -18,7 +18,6 @@ from mmobot.test.db import (
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 from mmobot.test.random import MockRandomInt
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -35,8 +34,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 )
 
 RANDOM_CALL = 'random.randint'
-
-zones = read_zone_names()
 
 
 @pytest.fixture(scope='module')
@@ -119,7 +116,7 @@ async def test_commandAttack_mining(attack_context, session, engine, monkeypatch
     session.commit()
     mock_random = MockRandomInt([20, 1])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
-    await attack_logic(zones, attack_context, ['/k'], engine)
+    await attack_logic(attack_context, ['/k'], engine)
 
     assert len(attack_context.channel.messages) == 2
     expected_message1 = 'Mining [ /k ]...'

@@ -15,7 +15,6 @@ from mmobot.test.db import (
     get_player_with_name
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -30,8 +29,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_HOSTNAME,
     MYSQL_DATABASE_NAME
 )
-
-zones = read_zone_names()
 
 
 MESSAGE_EQUIP_SUCCESS = 'You have equipped: desert-scimitar'
@@ -93,7 +90,7 @@ def equip_context(member, channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandEquip_weaponWithName(equip_context, engine, session, setup_item):
-    await equip_logic(zones, equip_context, ['desert-scimitar'], engine)
+    await equip_logic(equip_context, ['desert-scimitar'], engine)
     assert len(equip_context.channel.messages) == 1
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -102,7 +99,7 @@ async def test_commandEquip_weaponWithName(equip_context, engine, session, setup
 
 @pytest.mark.asyncio
 async def test_commandEquip_weaponWithInventoryIndex(equip_context, engine, session, setup_item):
-    await equip_logic(zones, equip_context, ['0'], engine)
+    await equip_logic(equip_context, ['0'], engine)
     assert len(equip_context.channel.messages) == 1
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -111,7 +108,7 @@ async def test_commandEquip_weaponWithInventoryIndex(equip_context, engine, sess
 
 @pytest.mark.asyncio
 async def test_commandEquip_weaponWithEntityId(equip_context, engine, session, setup_item):
-    await equip_logic(zones, equip_context, ['/5k'], engine)
+    await equip_logic(equip_context, ['/5k'], engine)
     assert len(equip_context.channel.messages) == 1
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -121,8 +118,8 @@ async def test_commandEquip_weaponWithEntityId(equip_context, engine, session, s
 @pytest.mark.asyncio
 async def test_commandEquip_replaceOldWeapon(equip_context, engine, session, setup_item):
     add_weapon_instance(session, 201, 1, 'basic-pickaxe')
-    await equip_logic(zones, equip_context, ['desert-scimitar'], engine)
-    await equip_logic(zones, equip_context, ['basic-pickaxe'], engine)
+    await equip_logic(equip_context, ['desert-scimitar'], engine)
+    await equip_logic(equip_context, ['basic-pickaxe'], engine)
     assert len(equip_context.channel.messages) == 2
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     assert equip_context.channel.messages[1] == MESSAGE_EQUIP_PICKAXE_SUCCESS
@@ -134,13 +131,13 @@ async def test_commandEquip_replaceOldWeapon(equip_context, engine, session, set
 async def test_commandEquip_notInZone(
         equip_context, non_zone_channel, engine, session, setup_item):
     equip_context.channel = non_zone_channel
-    await equip_logic(zones, equip_context, ['desert-scimitar'], engine)
+    await equip_logic(equip_context, ['desert-scimitar'], engine)
     assert len(equip_context.channel.messages) == 0
 
 
 @pytest.mark.asyncio
 async def test_commandEquip_noArgsProvided(equip_context, engine):
-    await equip_logic(zones, equip_context, [], engine)
+    await equip_logic(equip_context, [], engine)
     assert len(equip_context.channel.messages) == 1
     expected_message = 'Please indicate what item you would like to equip,' \
         ' for example: !equip item'
@@ -149,7 +146,7 @@ async def test_commandEquip_noArgsProvided(equip_context, engine):
 
 @pytest.mark.asyncio
 async def test_commandEquip_itemNameNotInInventory(equip_context, engine):
-    await equip_logic(zones, equip_context, ['iron-sword'], engine)
+    await equip_logic(equip_context, ['iron-sword'], engine)
     assert len(equip_context.channel.messages) == 1
     expected_message = 'You do not have the item: iron-sword'
     assert equip_context.channel.messages[0] == expected_message
@@ -157,7 +154,7 @@ async def test_commandEquip_itemNameNotInInventory(equip_context, engine):
 
 @pytest.mark.asyncio
 async def test_commandEquip_inventoryIndexNotInInventory(equip_context, engine):
-    await equip_logic(zones, equip_context, ['20'], engine)
+    await equip_logic(equip_context, ['20'], engine)
     assert len(equip_context.channel.messages) == 1
     expected_message = 'You do not have the item: 20'
     assert equip_context.channel.messages[0] == expected_message
@@ -165,7 +162,7 @@ async def test_commandEquip_inventoryIndexNotInInventory(equip_context, engine):
 
 @pytest.mark.asyncio
 async def test_commandEquip_entityIdNotInInventory(equip_context, engine):
-    await equip_logic(zones, equip_context, ['/abc'], engine)
+    await equip_logic(equip_context, ['/abc'], engine)
     assert len(equip_context.channel.messages) == 1
     expected_message = 'You do not have the item: /abc'
     assert equip_context.channel.messages[0] == expected_message

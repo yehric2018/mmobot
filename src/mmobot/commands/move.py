@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from mmobot.db.models import Zone
 
 
-async def move_logic(zones, context, args, engine):
+async def move_logic(context, args, engine):
     if context.channel.category.name != 'World':
         return
     if len(args) == 0:
@@ -14,10 +14,6 @@ async def move_logic(zones, context, args, engine):
 
     zone_name = args[0]
     member = context.author
-    if zone_name not in zones:
-        await context.send(f'{zone_name} is not an existing location')
-        return
-
     with Session(engine) as session:
         get_zone_statement = (
             select(Zone)

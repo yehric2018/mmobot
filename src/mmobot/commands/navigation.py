@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from mmobot.db.models import Zone
 
 
-async def navigation_logic(zones, context, engine):
+async def navigation_logic(context, engine):
     if context.channel.category.name != 'World':
         return
 

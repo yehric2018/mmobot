@@ -16,7 +16,6 @@ from mmobot.test.db import (
     update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-from mmobot.utils.zones import read_zone_names
 
 
 load_dotenv()
@@ -31,8 +30,6 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
     MYSQL_HOSTNAME,
     MYSQL_DATABASE_NAME
 )
-
-zones = read_zone_names()
 
 MESSAGE_HOW_TO_USE = 'Please indicate which item you would like to unequip, '\
             'for example: !unequip item'
@@ -100,7 +97,7 @@ def unequip_context(member, channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponWithName(unequip_context, engine, session):
-    await unequip_logic(zones, unequip_context, ['desert-scimitar'], engine)
+    await unequip_logic(unequip_context, ['desert-scimitar'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == MESSAGE_UNEQUIP_NAME_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -109,7 +106,7 @@ async def test_commandUnequip_weaponWithName(unequip_context, engine, session):
 
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponWithIndex(unequip_context, engine, session):
-    await unequip_logic(zones, unequip_context, ['0'], engine)
+    await unequip_logic(unequip_context, ['0'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == MESSAGE_UNEQUIP_NAME_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -118,7 +115,7 @@ async def test_commandUnequip_weaponWithIndex(unequip_context, engine, session):
 
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponWithId(unequip_context, engine, session):
-    await unequip_logic(zones, unequip_context, ['/5k'], engine)
+    await unequip_logic(unequip_context, ['/5k'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == 'Unequipped /5k'
     player = get_player_with_name(session, 'player')
@@ -128,13 +125,13 @@ async def test_commandUnequip_weaponWithId(unequip_context, engine, session):
 @pytest.mark.asyncio
 async def test_commandUnequip_notInZone(unequip_context, non_zone_channel, engine):
     unequip_context.channel = non_zone_channel
-    await unequip_logic(zones, unequip_context, ['desert-scimitar'], engine)
+    await unequip_logic(unequip_context, ['desert-scimitar'], engine)
     assert len(unequip_context.channel.messages) == 0
 
 
 @pytest.mark.asyncio
 async def test_commandUnequip_noArgsProvided(unequip_context, engine, session):
-    await unequip_logic(zones, unequip_context, [], engine)
+    await unequip_logic(unequip_context, [], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == MESSAGE_HOW_TO_USE
     player = get_player_with_name(session, 'player')
@@ -144,7 +141,7 @@ async def test_commandUnequip_noArgsProvided(unequip_context, engine, session):
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponNameNotEquipped(unequip_context, engine, session):
     update_player(session, 1, {'equipped_weapon_id': 900})
-    await unequip_logic(zones, unequip_context, ['desert-scimitar'], engine)
+    await unequip_logic(unequip_context, ['desert-scimitar'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == 'desert-scimitar is not equipped'
     player = get_player_with_name(session, 'player')
@@ -154,7 +151,7 @@ async def test_commandUnequip_weaponNameNotEquipped(unequip_context, engine, ses
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponIndexNotEquipped(unequip_context, engine, session):
     update_player(session, 1, {'equipped_weapon_id': 900})
-    await unequip_logic(zones, unequip_context, ['0'], engine)
+    await unequip_logic(unequip_context, ['0'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == 'desert-scimitar is not equipped'
     player = get_player_with_name(session, 'player')
@@ -164,7 +161,7 @@ async def test_commandUnequip_weaponIndexNotEquipped(unequip_context, engine, se
 @pytest.mark.asyncio
 async def test_commandUnequip_weaponIdNotEquipped(unequip_context, engine, session):
     update_player(session, 1, {'equipped_weapon_id': 900})
-    await unequip_logic(zones, unequip_context, ['/5k'], engine)
+    await unequip_logic(unequip_context, ['/5k'], engine)
     assert len(unequip_context.channel.messages) == 1
     assert unequip_context.channel.messages[0] == '/5k is not equipped'
     player = get_player_with_name(session, 'player')
