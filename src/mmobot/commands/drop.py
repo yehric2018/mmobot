@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
-from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.players import find_item_with_id, find_item_with_name
 
 
@@ -24,8 +24,8 @@ async def drop_logic(context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(get_player_statement).one()
-        if item_reference.startswith('/'):
-            item_id = convert_alphanum_to_int(item_reference[1:])
+        if is_entity_id(item_reference):
+            item_id = convert_alphanum_to_int(item_reference)
             drop_item = find_item_with_id(player.inventory, item_id)
         elif item_reference.isnumeric() and int(item_reference) < len(player.inventory):
             drop_item = player.inventory[int(item_reference)]

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 
 from mmobot.db.models import Player
-from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 
 
 async def unequip_logic(context, args, engine):
@@ -25,8 +25,8 @@ async def unequip_logic(context, args, engine):
         player = session.scalars(get_player_statement).one()
 
         did_unequip = False
-        if item_reference.startswith('/'):
-            did_unequip = unequip_using_id(player, convert_alphanum_to_int(item_reference[1:]))
+        if is_entity_id(item_reference):
+            did_unequip = unequip_using_id(player, convert_alphanum_to_int(item_reference))
         elif item_reference.isnumeric() and int(item_reference) < len(player.inventory):
             item_reference = player.inventory[int(item_reference)].item.id
             did_unequip = unequip_using_name(player, item_reference)

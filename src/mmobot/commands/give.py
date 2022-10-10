@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
 from mmobot.utils.discord import is_mention
-from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.players import find_item_with_id, find_item_with_name
 
 
@@ -37,8 +37,8 @@ async def give_logic(context, args, engine):
 
         giving_item_instance = None
 
-        if giving_item_name.startswith('/'):
-            giving_item_id = convert_alphanum_to_int(giving_item_name[1:])
+        if is_entity_id(giving_item_name):
+            giving_item_id = convert_alphanum_to_int(giving_item_name)
             giving_item_instance = find_item_with_id(giving_player.inventory, giving_item_id)
         elif (giving_item_name.isnumeric() and
                 int(giving_item_name) < len(giving_player.inventory)):
