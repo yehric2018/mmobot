@@ -96,6 +96,7 @@ async def test_commandName_newMemberSuccess(name_context, engine, session):
     assert player.name == 'player'
     assert player.ancestry == 1
     assert player.is_active is True
+    assert player.zone == 'town-square'
     assert name_context.author.nick == 'player'
     permissions = name_context.guild.channels[1].permissions_for(name_context.author)
     assert permissions.read_messages is True
@@ -113,6 +114,7 @@ async def test_commandName_withAncestorSuccess(name_context, engine, session):
     assert player.name == 'player'
     assert player.ancestry == 2
     assert player.is_active is True
+    assert player.zone == 'town-square'
     assert name_context.author.nick == 'player'
     permissions = name_context.guild.channels[1].permissions_for(name_context.author)
     assert permissions.read_messages is True

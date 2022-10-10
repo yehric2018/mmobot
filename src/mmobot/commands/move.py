@@ -2,7 +2,7 @@ import discord
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Zone
+from mmobot.db.models import Player, Zone
 
 
 async def move_logic(context, args, engine):
@@ -20,11 +20,19 @@ async def move_logic(context, args, engine):
             .where(Zone.channel_name == context.channel.name)
         )
         zone = session.scalars(get_zone_statement).one()
+        get_player_statement = (
+            select(Player)
+            .where(Player.discord_id == context.author.id)
+            .where(Player.is_active)
+        )
+        player = session.scalars(get_player_statement).one()
         if all(zone_path.end_zone_name != zone_name for zone_path in zone.navigation):
             await context.send(f'You cannot travel to {zone_name} from {context.channel.name}')
             return
         curr_channel = context.channel
         dest_channel = discord.utils.get(context.guild.channels, name=zone_name)
+        player.zone = zone_name
+        session.commit()
 
         await curr_channel.send(f'{member.mention} has left for {dest_channel.mention}.')
 

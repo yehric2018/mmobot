@@ -44,6 +44,7 @@ async def name_logic(context, args, engine):
             birthday=birthday,
             is_active=True,
             stance=STANCE_NORMAL,
+            zone='town-square',
             stats=roll_initial_stats()
         )
 

@@ -5,8 +5,15 @@ import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 from mmobot.commands import move_logic
+from mmobot.db.models.player import Player
+from mmobot.test.db import (
+    add_player,
+    delete_all_entities,
+    get_player_with_name,
+)
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
 
@@ -27,14 +34,33 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 DEFAULT_PERMISSIONS = 0
 
 
-@pytest.fixture
+@pytest.fixture(scope='module')
 def engine():
     return create_engine(connection_str)
 
 
+@pytest.fixture(scope='module')
+def session(engine):
+    return Session(engine)
+
+
 @pytest.fixture
 def moving_member():
-    return MockMember(1, 'member')
+    return MockMember(100, 'member')
+
+
+@pytest.fixture(autouse=True)
+def prepare_database(session):
+    delete_all_entities(session)
+    add_player(session, Player(
+        id=1,
+        name='player',
+        discord_id=100,
+        is_active=True,
+        zone='town-square'
+    ))
+    yield
+    delete_all_entities(session)
 
 
 @pytest.fixture
@@ -84,21 +110,24 @@ def move_context(moving_member, current_channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandMove_success(
-        move_context, moving_member, engine, no_permissions, read_write_permissions):
+        move_context, moving_member, engine, session, no_permissions, read_write_permissions):
     await move_logic(move_context, ['marketplace'], engine)
 
     assert len(move_context.channel.messages) == 1
-    leaving_message = '<@1> has left for <#12>.'
+    leaving_message = '<@100> has left for <#12>.'
     assert move_context.channel.messages[0] == leaving_message
 
     assert len(move_context.guild.channels[1].messages) == 1
-    entering_message = '<@1> has arrived.'
+    entering_message = '<@100> has arrived.'
     assert move_context.guild.channels[1].messages[0] == entering_message
 
     leaving_permissions = move_context.channel.permissions_for(moving_member)
     assert leaving_permissions == no_permissions
     entering_permissions = move_context.guild.channels[1].permissions_for(moving_member)
     assert entering_permissions == read_write_permissions
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'marketplace'
 
 
 @pytest.mark.asyncio
@@ -111,11 +140,14 @@ async def test_commandMove_noArgsProvided(move_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonexistantZone(move_context, engine):
+async def test_commandMove_nonexistantZone(move_context, session, engine):
     await move_logic(move_context, ['nowhere'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'You cannot travel to nowhere from town-square'
     assert move_context.channel.messages[0] == expected_message
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'town-square'
 
 
 @pytest.mark.asyncio
@@ -127,8 +159,11 @@ async def test_commandMove_notInZoneChannel(move_context, non_zone_channel, engi
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonadjacentZone(move_context, engine):
+async def test_commandMove_nonadjacentZone(move_context, session, engine):
     await move_logic(move_context, ['throne-room'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'You cannot travel to throne-room from town-square'
     assert move_context.channel.messages[0] == expected_message
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'town-square'
