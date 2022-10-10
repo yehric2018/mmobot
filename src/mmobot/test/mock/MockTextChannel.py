@@ -1,13 +1,13 @@
 from discord import Permissions
 
-from mmobot.test.mock import MockMember
+from mmobot.test.mock import MockCategory, MockMember
 
 
 DEFAULT_PERMISSIONS = 0
 
 
 class MockTextChannel:
-    def __init__(self, id, name, permissions=None):
+    def __init__(self, id, name, permissions=None, category='General'):
         if permissions is None:
             permissions = Permissions(DEFAULT_PERMISSIONS)
         self.id = id
@@ -17,6 +17,7 @@ class MockTextChannel:
         self.permissions = {}
         self.messages = []
         self.members = []
+        self.category = MockCategory(category)
 
     def permissions_for(self, obj, /) -> Permissions:
         permissions = self.default_permissions

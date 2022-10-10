@@ -55,7 +55,7 @@ def member():
 
 @pytest_asyncio.fixture
 async def zone_channel(member):
-    channel = MockTextChannel(11, 'town-square')
+    channel = MockTextChannel(11, 'town-square', category='World')
     await channel.set_permissions(
         member,
         read_messages=True,

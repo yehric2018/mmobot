@@ -7,7 +7,7 @@ from mmobot.utils.entities import convert_alphanum_to_int
 
 
 async def give_logic(zones, context, args, engine):
-    if context.channel.name not in zones:
+    if context.channel.category.name != 'World':
         return
     if len(args) != 2:
         await context.send('Please supply give arguments like this: **!give player item**')

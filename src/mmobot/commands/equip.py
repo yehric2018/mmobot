@@ -7,7 +7,7 @@ from mmobot.utils.entities import convert_alphanum_to_int
 
 
 async def equip_logic(zones, context, args, engine):
-    if context.channel.name not in zones:
+    if context.channel.category.name != 'World':
         return
     if len(args) != 1:
         message = 'Please indicate what item you would like to equip, for example: !equip item'

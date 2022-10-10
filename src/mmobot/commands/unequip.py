@@ -7,7 +7,7 @@ from mmobot.utils.entities import convert_alphanum_to_int
 
 
 async def unequip_logic(zones, context, args, engine):
-    if context.channel.name not in zones:
+    if context.channel.category.name != 'World':
         return
     if len(args) != 1:
         message = 'Please indicate which item you would like to unequip, '\

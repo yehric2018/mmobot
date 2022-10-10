@@ -55,7 +55,7 @@ def read_write_permissions():
 
 @pytest_asyncio.fixture
 async def current_channel(moving_member):
-    channel = MockTextChannel(11, 'town-square')
+    channel = MockTextChannel(11, 'town-square', category='World')
     await channel.set_permissions(
         moving_member,
         read_messages=True,
@@ -66,7 +66,7 @@ async def current_channel(moving_member):
 
 @pytest.fixture
 def destination_channel():
-    return MockTextChannel(12, 'marketplace')
+    return MockTextChannel(12, 'marketplace', category='World')
 
 
 @pytest.fixture

@@ -6,7 +6,7 @@ from mmobot.db.models import Zone
 
 
 async def navigation_logic(zones, context, engine):
-    if context.channel.name not in zones:
+    if context.channel.category.name != 'World':
         return
 
     with Session(engine) as session:

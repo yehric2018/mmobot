@@ -76,7 +76,7 @@ def setup_item(session, prepare_database):
 
 @pytest_asyncio.fixture
 async def channel(giving_member, receiving_member):
-    channel = MockTextChannel(1, 'marketplace')
+    channel = MockTextChannel(1, 'marketplace', category='World')
     await channel.set_permissions(giving_member, read_messages=True, send_messages=True)
     await channel.set_permissions(receiving_member, read_messages=True, send_messages=True)
     return channel

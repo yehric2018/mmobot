@@ -1,0 +1,3 @@
+class MockCategory:
+    def __init__(self, name):
+        self.name = name

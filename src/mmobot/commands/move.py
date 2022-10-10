@@ -6,14 +6,14 @@ from mmobot.db.models import Zone
 
 
 async def move_logic(zones, context, args, engine):
-    member = context.author
-    if context.channel.name not in zones:
+    if context.channel.category.name != 'World':
         return
     if len(args) == 0:
         await context.send('Please specify a location to move to! For example: !move hawaii')
         return
 
     zone_name = args[0]
+    member = context.author
     if zone_name not in zones:
         await context.send(f'{zone_name} is not an existing location')
         return
