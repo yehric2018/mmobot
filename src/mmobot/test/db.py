@@ -1,6 +1,17 @@
 from sqlalchemy import select
 
-from mmobot.db.models import Entity, ItemInstance, Player, WeaponInstance
+from mmobot.db.models import (
+    Entity,
+    Interaction,
+    ItemInstance,
+    Minable,
+    Player,
+    WeaponInstance
+)
+
+
+def add_to_database(session, database_entry):
+    session.add(database_entry)
 
 
 def add_item_instance(session, instance_id, player_id, item_id):
@@ -31,6 +42,8 @@ def add_weapon_instance(session, instance_id, player_id, item_id):
 def delete_all_entities(session):
     session.query(WeaponInstance).delete()
     session.query(ItemInstance).delete()
+    session.query(Minable).delete()
+    session.query(Interaction).delete()
     session.query(Player).delete()
     session.query(Entity).delete()
     session.commit()
