@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from mmobot.db.models import Player
 from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.players import find_item_with_id, find_item_with_name
 
 
 async def give_logic(context, args, engine):
@@ -59,16 +60,3 @@ async def give_logic(context, args, engine):
             giver_name
         )
         await context.send(message)
-
-
-def find_item_with_id(inventory, id):
-    for item_instance in inventory:
-        if item_instance.id == id:
-            return item_instance
-
-
-def find_item_with_name(inventory, name):
-    for item_instance in inventory:
-        item_name = item_instance.item.id
-        if item_name == name:
-            return item_instance

@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
 from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.players import find_item_with_id, find_item_with_name
 
 
 async def equip_logic(context, args, engine):
@@ -38,15 +39,3 @@ async def equip_logic(context, args, engine):
             await context.send(f'You have equipped: {equipped_item.item.id}')
         else:
             await context.send(f'{equipped_item.name} cannot be equipped')
-
-
-def find_item_with_id(inventory, numeric_id):
-    for item_instance in inventory:
-        if item_instance.id == numeric_id:
-            return item_instance
-
-
-def find_item_with_name(inventory, name):
-    for item_instance in inventory:
-        if item_instance.item.id == name:
-            return item_instance
