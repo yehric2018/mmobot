@@ -109,7 +109,7 @@ async def test_commandGive_withItemName(giving_context, engine, session, setup_i
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance is not None
     assert item_instance.id == 200
-    assert item_instance.zone_name is None
+    assert item_instance.zone is None
     assert item_instance.player_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
@@ -123,7 +123,7 @@ async def test_commandGive_withInventoryIndex(giving_context, engine, session, s
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance is not None
     assert item_instance.id == 200
-    assert item_instance.zone_name is None
+    assert item_instance.zone is None
     assert item_instance.player_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
@@ -137,7 +137,7 @@ async def test_commandGive_withEntityId(giving_context, engine, session, setup_i
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance is not None
     assert item_instance.id == 200
-    assert item_instance.zone_name is None
+    assert item_instance.zone is None
     assert item_instance.player_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
@@ -151,7 +151,7 @@ async def test_commandGive_withDiscordMention(giving_context, engine, session, s
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance is not None
     assert item_instance.id == 200
-    assert item_instance.zone_name is None
+    assert item_instance.zone is None
     assert item_instance.player_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
@@ -166,7 +166,7 @@ async def test_commandGive_equippedWeapon(giving_context, engine, session, setup
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance is not None
     assert item_instance.id == 200
-    assert item_instance.zone_name is None
+    assert item_instance.zone is None
     assert item_instance.player_id == 2
     assert item_instance.item_id == 'desert-scimitar'
     player = get_player_with_name(session, 'giver')

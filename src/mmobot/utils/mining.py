@@ -1,6 +1,29 @@
 import random
 
 from mmobot.db.models import Item
+from mmobot.db.models.item_instance import ItemInstance
+from mmobot.utils.entities import convert_int_to_alphanum
+from mmobot.utils.players import find_item_with_id
+
+
+async def attack_command_mining(context, player, minable, session):
+    minable_id = convert_int_to_alphanum(minable.id)
+    await context.send(f'Mining [ /{minable_id} ]...')
+    equipped_weapon = find_item_with_id(player.inventory, player.equipped_weapon_id)
+    resources = get_mining_outcome(player.stats, equipped_weapon, minable)
+    if len(resources) == 0:
+        await context.send('No resources mined!')
+    else:
+        message = 'Mined the following resource(s):\n'
+        item_instances = []
+        for resource in resources:
+            item_instances.append(ItemInstance(player_id=player.id, item_id=resource.id))
+            message += f'    - {resource.id}\n'
+        session.add_all(item_instances)
+        await context.send(message)
+
+    if player.equipped_weapon_id is None:
+        await context.send('You lost 2 HP while mining with bare hands.')
 
 
 MAX_MINING_STRENGTH = 100

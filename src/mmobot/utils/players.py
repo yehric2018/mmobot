@@ -40,3 +40,16 @@ def roll_initial_stats():
         luck=luck,
         magic_number=0
     )
+
+
+# TODO: Write tests for each of these
+def find_item_with_id(inventory, numeric_id):
+    for item_instance in inventory:
+        if item_instance.id == numeric_id:
+            return item_instance
+
+
+def find_item_with_name(inventory, name):
+    for item_instance in inventory:
+        if item_instance.item.id == name:
+            return item_instance
