@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
 from mmobot.commands import (
+    attack_logic,
     equip_logic,
     give_logic,
     inventory_logic,
@@ -73,8 +74,8 @@ async def on_member_join(member):
 
 
 @bot.command(name='attack')
-async def attack_command(context):
-    await context.send('You cannot attack yet')
+async def attack_command(context, *args):
+    await attack_logic(bot.zones, context, args, engine)
 
 
 @bot.command(name='equip')

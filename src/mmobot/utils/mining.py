@@ -90,7 +90,7 @@ STANDARD_MINING_COMPOSITION = [
 
 def get_mining_outcome(player_stats, weapon_instance, minable):
     endurance_ratio = player_stats.endurance / player_stats.max_endurance
-    mining_score = player_stats.strength * endurance_ratio
+    mining_score = int(player_stats.strength * endurance_ratio)
     if weapon_instance is None:
         player_stats.hp -= 2
         player_stats.endurance -= 4

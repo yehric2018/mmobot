@@ -33,7 +33,7 @@ with Session(engine) as session:
     player = session.scalars(get_player_statement).one()
     item = ItemInstance(
         player_id=player.id,
-        item_id='desert-scimitar'
+        item_id='basic-pickaxe'
     )
     session.add(item)
 
