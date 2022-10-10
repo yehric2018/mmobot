@@ -1,3 +1,8 @@
+-- Added 2022/10/09
+-- The zone field is now going to be used generally for all entities, therefore it will
+-- live in the Entities class instead of the subclasses.
+-- Run these SQL commands to remove/add the zone columns to corresponding tables.
+
 SELECT 
   TABLE_NAME,COLUMN_NAME,CONSTRAINT_NAME, REFERENCED_TABLE_NAME,REFERENCED_COLUMN_NAME
 FROM

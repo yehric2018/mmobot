@@ -12,7 +12,7 @@ from mmobot.db.models import Entity
 class Player(Entity):
     __tablename__ = 'Players'
 
-    id = Column(Integer, ForeignKey('Entities.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('Entities.id', ondelete='cascade'), primary_key=True)
     name = Column(String(40), unique=True, nullable=False)
     discord_id = Column(String(40), nullable=False)
     ancestry = Column(Integer)

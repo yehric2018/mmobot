@@ -8,7 +8,7 @@ from mmobot.db.models import ItemInstance
 class WeaponInstance(ItemInstance):
     __tablename__ = 'WeaponInstances'
 
-    id = Column(Integer, ForeignKey('ItemInstances.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('ItemInstances.id', ondelete='cascade'), primary_key=True)
 
     __mapper_args__ = {
         'polymorphic_identity': 'weapon'

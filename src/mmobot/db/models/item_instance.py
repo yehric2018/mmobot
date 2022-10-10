@@ -10,7 +10,7 @@ from mmobot.db.models import Entity
 class ItemInstance(Entity):
     __tablename__ = 'ItemInstances'
 
-    id = Column(Integer, ForeignKey('Entities.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('Entities.id', ondelete='cascade'), primary_key=True)
     player_id = Column(Integer, ForeignKey('Players.id'))
     item_id = Column(String(40), ForeignKey('Items.id'))
     item = relationship('Item')

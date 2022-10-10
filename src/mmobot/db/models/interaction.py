@@ -9,7 +9,7 @@ from mmobot.db.models import Entity
 class Interaction(Entity):
     __tablename__ = 'Interactions'
 
-    id = Column(Integer, ForeignKey('Entities.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('Entities.id', ondelete='cascade'), primary_key=True)
     interaction_type = Column(String(20))
 
     __mapper_args__ = {

@@ -8,7 +8,7 @@ from mmobot.db.models import Interaction
 class Minable(Interaction):
     __tablename__ = 'Minables'
 
-    id = Column(Integer, ForeignKey('Interactions.id'), primary_key=True)
+    id = Column(Integer, ForeignKey('Interactions.id', ondelete='cascade'), primary_key=True)
     stone_comp = Column(Integer)
     coal_comp = Column(Integer)
     iron_comp = Column(Integer)

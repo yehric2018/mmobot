@@ -9,7 +9,7 @@ from mmobot.db.models import Item
 class Weapon(Item):
     __tablename__ = 'Weapons'
 
-    id = Column(String(40), ForeignKey('Items.id'), primary_key=True)
+    id = Column(String(40), ForeignKey('Items.id', ondelete='cascade'), primary_key=True)
     weapon_type = Column(String(20))
     strength = Column(Integer)
 
