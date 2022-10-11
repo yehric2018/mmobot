@@ -6,7 +6,7 @@ from mmobot.db.models import (
     ItemInstance,
     Minable,
     Player,
-    WeaponInstance
+    WeaponInstance,
 )
 
 
@@ -33,6 +33,16 @@ def add_weapon_instance(session, instance_id, player_id, item_id):
     weapon_instance = WeaponInstance(
         id=instance_id,
         player_id=player_id,
+        item_id=item_id
+    )
+    session.add(weapon_instance)
+    session.commit()
+
+
+def add_weapon_instance_to_zone(session, instance_id, zone_name, item_id):
+    weapon_instance = WeaponInstance(
+        id=instance_id,
+        zone=zone_name,
         item_id=item_id
     )
     session.add(weapon_instance)

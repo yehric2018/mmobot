@@ -16,6 +16,7 @@ from mmobot.commands import (
     move_logic,
     name_logic,
     navigation_logic,
+    pickup_logic,
     unequip_logic,
 )
 
@@ -106,6 +107,11 @@ async def navigation_command(context):
 @bot.command(name='name')
 async def name_command(context, *args):
     await name_logic(context, args, engine)
+
+
+@bot.command(name='pickup')
+async def pickup_command(context, *args):
+    await pickup_logic(context, args, engine)
 
 
 @bot.command(name='unequip')
