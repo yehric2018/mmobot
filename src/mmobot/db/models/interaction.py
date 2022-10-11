@@ -11,6 +11,7 @@ class Interaction(Entity):
 
     id = Column(Integer, ForeignKey('Entities.id', ondelete='cascade'), primary_key=True)
     interaction_type = Column(String(20))
+    title = Column(String(100))
 
     __mapper_args__ = {
         'polymorphic_identity': 'interaction'

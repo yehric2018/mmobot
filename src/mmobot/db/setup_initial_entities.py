@@ -29,6 +29,7 @@ engine = create_engine(connection_str)
 
 MINES_MINABLE_1 = Minable(
     zone='mines-entrance',
+    title='Large minable rock wall',
     stone_comp=8000,
     coal_comp=2000,
     iron_comp=2500,

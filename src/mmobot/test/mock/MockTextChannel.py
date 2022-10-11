@@ -34,7 +34,8 @@ class MockTextChannel:
             message = ''
             message += f'<title>{embed.title}</title>\n'
             message += f'<desc>{embed.description}</desc>\n'
-            print(repr(embed.description))
+            for field in embed.fields:
+                message += f'<field>{field.name}:{field.value}</field>\n'
         self.messages.append(message)
 
     async def set_permissions(self, member: MockMember, read_messages, send_messages):
