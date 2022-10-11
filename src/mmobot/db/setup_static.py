@@ -39,7 +39,12 @@ def setup_zones():
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
-            all_zones.append(Zone(channel_name=data))
+            lines = data.split('\n')
+            zone_name = lines[0]
+            all_zones.append(Zone(channel_name=zone_name))
+            for i in range(1, len(lines)):
+                minizone_name = lines[i][1:]
+                all_zones.append(Zone(channel_name=minizone_name, minizone_parent=zone_name))
 
     zone_paths_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'zone-paths.db')
     with open(zone_paths_path, 'r') as f:

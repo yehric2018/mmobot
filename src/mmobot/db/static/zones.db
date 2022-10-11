@@ -3,6 +3,7 @@ throne-room
 royal-vault
 ====================
 royal-palace
+>royal-bedroom
 ====================
 prison
 ====================
@@ -17,6 +18,8 @@ marketplace
 city-gate
 ====================
 barracks
+>guild-hall-a
+>guild-hall-b
 ====================
 arena
 ====================

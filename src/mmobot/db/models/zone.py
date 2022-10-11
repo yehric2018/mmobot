@@ -1,4 +1,4 @@
-from sqlalchemy import Column
+from sqlalchemy import Column, ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
@@ -9,8 +9,10 @@ class Zone(Base):
     __tablename__ = 'Zones'
 
     channel_name = Column(String(40), primary_key=True)
+    minizone_parent = Column(String(40), ForeignKey('Zones.channel_name', ondelete='cascade'))
 
     navigation = relationship('ZonePath', foreign_keys='ZonePath.start_zone_name')
+    minizones = relationship('Zone', foreign_keys='Zone.minizone_parent')
     interactions = relationship('Interaction', foreign_keys='Interaction.zone')
     loot = relationship('ItemInstance', foreign_keys='ItemInstance.zone')
 
