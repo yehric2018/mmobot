@@ -19,21 +19,26 @@ async def give_logic(context, args, engine):
 
     if is_mention(args[0]):
         receiver_id = int(args[0][2:-1])
-        receiving_player_statement = select(Player).where(Player.discord_id == receiver_id)
-        if all(member.id != receiver_id for member in context.channel.members):
-            await context.send(f'Could not find player {args[0]} in current location')
-            return
+        receiving_player_statement = (
+            select(Player)
+            .where(Player.discord_id == receiver_id)
+            .where(Player.zone == context.channel.name)
+        )
     else:
         receiver_name = args[0]
-        receiving_player_statement = select(Player).where(Player.name == receiver_name)
-        if all(member.nick != receiver_name for member in context.channel.members):
-            await context.send(f'Could not find player {args[0]} in current location')
-            return
+        receiving_player_statement = (
+            select(Player)
+            .where(Player.name == receiver_name)
+            .where(Player.zone == context.channel.name)
+        )
 
     with Session(engine) as session:
+        receiving_player = session.scalars(receiving_player_statement).one_or_none()
+        if receiving_player is None:
+            await context.send(f'Could not find player {args[0]} in current location')
+            return
         giving_player_statement = select(Player).where(Player.name == giver_name)
         giving_player = session.scalars(giving_player_statement).one()
-        receiving_player = session.scalars(receiving_player_statement).one()
 
         giving_item_instance = None
 

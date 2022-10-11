@@ -12,6 +12,7 @@ from mmobot.db.models import (
 
 def add_to_database(session, database_entry):
     session.add(database_entry)
+    session.commit()
 
 
 def add_item_instance(session, instance_id, player_id, item_id):
@@ -73,4 +74,6 @@ def update_player(session, id, data):
     player = session.scalars(select(Player).where(Player.id == id)).one()
     if 'equipped_weapon_id' in data:
         player.equipped_weapon_id = data['equipped_weapon_id']
+    if 'zone' in data:
+        player.zone = data['zone']
     session.commit()

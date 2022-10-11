@@ -60,8 +60,20 @@ def receiving_member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    add_player(session, Player(id=1, name='giver', discord_id=100, is_active=True))
-    add_player(session, Player(id=2, name='receiver', discord_id=101, is_active=True))
+    add_player(session, Player(
+        id=1,
+        name='giver',
+        discord_id=100,
+        is_active=True,
+        zone='marketplace'
+    ))
+    add_player(session, Player(
+        id=2,
+        name='receiver',
+        discord_id=101,
+        is_active=True,
+        zone='marketplace'
+    ))
     yield
     delete_all_entities(session)
 
@@ -204,6 +216,7 @@ async def test_commandGive_recieverNotInZone(
         read_messages=False,
         send_messages=False
     )
+    update_player(session, 2, {'zone': 'town-square'})
     await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'Could not find player receiver in current location'
