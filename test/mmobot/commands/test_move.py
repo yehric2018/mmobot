@@ -1,3 +1,4 @@
+import discord
 import os
 from discord import Permissions
 
@@ -14,7 +15,7 @@ from mmobot.test.db import (
     delete_all_entities,
     get_player_with_name,
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel, MockThread
 
 
 load_dotenv()
@@ -73,14 +74,25 @@ def read_write_permissions():
     return Permissions(DEFAULT_PERMISSIONS, read_messages=True, send_messages=True)
 
 
+@pytest.fixture
+def read_only_permissions():
+    return Permissions(DEFAULT_PERMISSIONS, read_messages=True, send_messages=False)
+
+
 @pytest_asyncio.fixture
-async def current_channel(moving_member):
+async def moving_thread():
+    return MockThread(71, 'bell-tower', category='World')
+
+
+@pytest_asyncio.fixture
+async def current_channel(moving_member, moving_thread):
     channel = MockTextChannel(11, 'town-square', category='World')
     await channel.set_permissions(
         moving_member,
         read_messages=True,
         send_messages=False
     )
+    channel.add_thread(moving_thread)
     return channel
 
 
@@ -109,7 +121,7 @@ def move_context(moving_member, current_channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_success(
+async def test_commandMove_zoneToZone(
         move_context, moving_member, engine, session, no_permissions, read_write_permissions):
     await move_logic(move_context, ['marketplace'], engine)
 
@@ -128,6 +140,54 @@ async def test_commandMove_success(
 
     player = get_player_with_name(session, 'player')
     assert player.zone == 'marketplace'
+
+
+@pytest.mark.asyncio
+async def test_commandMove_zoneToMinizone(
+    move_context, moving_member, engine, session, read_only_permissions, read_write_permissions
+):
+    await move_logic(move_context, ['bell-tower'], engine)
+
+    assert len(move_context.channel.messages) == 1
+    leaving_message = '<@100> has entered <#71>.'
+    assert move_context.channel.messages[0] == leaving_message
+
+    dest_thread = move_context.channel.threads[0]
+    assert len(dest_thread.messages) == 1
+    entering_message = '<@100> has arrived.'
+    assert dest_thread.messages[0] == entering_message
+
+    leaving_permissions = move_context.channel.permissions_for(moving_member)
+    assert leaving_permissions == read_only_permissions
+    entering_permissions = dest_thread.permissions_for(moving_member)
+    assert entering_permissions == read_write_permissions
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'bell-tower'
+
+
+@pytest.mark.asyncio
+async def test_commandMove_minizoneToZone(
+    move_context, moving_thread, moving_member,
+    engine, session, read_only_permissions, read_write_permissions
+):
+    move_context.channel = moving_thread
+    await move_logic(move_context, ['town-square'], engine)
+
+    assert len(move_context.channel.messages) == 1
+    leaving_message = '<@100> has left.'
+    assert move_context.channel.messages[0] == leaving_message
+
+    dest_channel = discord.utils.get(move_context.guild.channels, name='town-square')
+    assert len(dest_channel.messages) == 0
+
+    leaving_permissions = move_context.channel.permissions_for(moving_member)
+    assert leaving_permissions == read_only_permissions
+    entering_permissions = dest_channel.permissions_for(moving_member)
+    assert entering_permissions == read_write_permissions
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'town-square'
 
 
 @pytest.mark.asyncio
