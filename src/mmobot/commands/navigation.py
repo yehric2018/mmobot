@@ -22,4 +22,9 @@ async def navigation_logic(context, engine):
             title=f'You can reach the following locations from {context.channel.name}:',
             description=message
         )
+        if len(zone.minizones) != 0:
+            minizones_text = ''
+            for index, minizone in enumerate(zone.minizones):
+                minizones_text += f'{index}. {minizone.channel_name}\n'
+            embed.add_field(name='Minizones', value=minizones_text)
         await context.send(embed=embed)

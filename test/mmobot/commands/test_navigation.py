@@ -34,6 +34,8 @@ REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
 6. tavern
 7. yak-farm
 </desc>
+<field>Minizones:0. bell-tower
+</field>
 '''
 
 

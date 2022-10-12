@@ -1,4 +1,4 @@
-from discord import Permissions
+from discord import Embed, Permissions
 import pytest
 
 from mmobot.test.mock import MockMember, MockTextChannel
@@ -72,3 +72,17 @@ async def test_MockTextChannel_send(channel):
     await channel.send('TEST MESSAGE')
     assert len(channel.messages) == 1
     assert channel.messages[0] == 'TEST MESSAGE'
+
+
+@pytest.mark.asyncio
+async def test_MockChannel_sendWithEmbed(channel):
+    embed = Embed(
+        title='Embed title',
+        description='description'
+    )
+    embed.add_field(name='field1', value='value1')
+    await channel.send('', embed=embed)
+    assert len(channel.messages) == 1
+    expected_message = '<title>Embed title</title>\n<desc>description</desc>\n'
+    expected_message += '<field>field1:value1</field>\n'
+    assert channel.messages[0] == expected_message
