@@ -28,6 +28,7 @@ scheduler = BlockingScheduler()
 
 @scheduler.scheduled_job(IntervalTrigger(minutes=5))
 def recover_endurance():
+    print('Recovering players\'s endurance')
     with Session(engine) as session:
         get_player_statement = (
             select(Player)
@@ -42,6 +43,7 @@ def recover_endurance():
 
 @scheduler.scheduled_job(IntervalTrigger(hours=2))
 def recover_hp():
+    print('Recovering players\'s HP')
     with Session(engine) as session:
         get_player_statement = (
             select(Player)
@@ -50,6 +52,17 @@ def recover_hp():
         )
         for player in session.scalars(get_player_statement):
             player.stats.hp += 1
+
+        session.commit()
+
+
+@scheduler.scheduled_job(IntervalTrigger(hours=12))
+def increment_skill_points():
+    print('Allocating skill points')
+    with Session(engine) as session:
+        get_player_statement = select(Player).where(Player.is_active)
+        for player in session.scalars(get_player_statement):
+            player.skills.skill_points += 1
 
         session.commit()
 

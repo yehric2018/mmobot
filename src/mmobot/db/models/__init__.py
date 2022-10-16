@@ -4,6 +4,8 @@ from .interaction import Interaction
 from .item import Item
 from .item_instance import ItemInstance
 from .minable import Minable
+from .player_skills import PlayerSkills
+from .player_skill_teaching import PlayerSkillTeaching
 from .player_stats import PlayerStats
 from .player import Player
 from .weapon import Weapon
@@ -18,6 +20,8 @@ __all__ = [
     'Item',
     'ItemInstance',
     'Minable',
+    'PlayerSkills',
+    'PlayerSkillTeaching',
     'PlayerStats',
     'Player',
     'Weapon',

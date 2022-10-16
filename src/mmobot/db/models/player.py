@@ -21,8 +21,11 @@ class Player(Entity):
     parent_name = Column(String(40))
     is_active = Column(Boolean)
     stance = Column(Integer)
-    stats_id = Column(Integer, ForeignKey('PlayerStats.id'))
+
+    stats_id = Column(Integer, ForeignKey('PlayerStats.id'), unique=True, nullable=False)
     stats = relationship('PlayerStats', uselist=False)
+    skills_id = Column(Integer, ForeignKey('PlayerSkills.id'), unique=True, nullable=False)
+    skills = relationship('PlayerSkills', uselist=False)
 
     inventory = relationship(
         'ItemInstance',
