@@ -22,7 +22,6 @@ from mmobot.commands import (
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-PROJECT_PATH = os.getenv('PROJECT_PATH')
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
