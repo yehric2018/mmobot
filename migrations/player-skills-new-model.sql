@@ -20,3 +20,8 @@ ADD COLUMN skill_points INT;
 
 ALTER TABLE [].PlayerSkillTeachings
 MODIFY id INT NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE yehric_test.PlayerSkillTeachings
+RENAME COLUMN teacher TO teacher_id,
+RENAME COLUMN learner TO learner_id;

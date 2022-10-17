@@ -4,6 +4,7 @@ from .equip import equip_logic
 from .give import give_logic
 from .here import here_logic
 from .inventory import inventory_logic
+from .learn import learn_logic
 from .move import move_logic
 from .name import name_logic
 from .navigation import navigation_logic
@@ -18,6 +19,7 @@ __all__ = [
     'give_logic',
     'here_logic',
     'inventory_logic',
+    'learn_logic',
     'move_logic',
     'name_logic',
     'navigation_logic',

@@ -3,8 +3,8 @@ from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from mmobot.constants import ALL_SKILLS, TEACHING_COOLDOWN, TEACHING_DIFF
 
+from mmobot.constants import ALL_SKILLS, TEACHING_COOLDOWN, TEACHING_DIFF
 from mmobot.db.models import Player, PlayerSkills, PlayerSkillTeaching
 from mmobot.utils.discord import is_mention
 
@@ -13,7 +13,7 @@ async def teach_logic(context, args, engine):
     if context.channel.category.name != 'World':
         return
     if len(args) != 2:
-        await context.send('Please supply give arguments like this: **!teach player skill**')
+        await context.send('Please supply teach arguments like this: **!teach player skill**')
         return
 
     skill_name = args[1]
@@ -64,8 +64,8 @@ async def teach_logic(context, args, engine):
         if learner_skill.skill_level + TEACHING_DIFF <= teacher_skill.skill_level:
             teaching = PlayerSkillTeaching(
                 skill=skill_name,
-                teacher=teaching_player.id,
-                learner=learning_player.id,
+                teacher_id=teaching_player.id,
+                learner_id=learning_player.id,
                 teaching_time=current_time
             )
             session.add(teaching)
@@ -75,10 +75,10 @@ async def teach_logic(context, args, engine):
             return
 
         session.commit()
-        message = '<@{0}> learned {1} from {2}!'.format(
-            learning_player.discord_id,
+        message = '{0} taught {1} to <@{2}>!'.format(
+            context.author.nick,
             skill_name,
-            context.author.nick
+            learning_player.discord_id
         )
         await context.send(message)
 

@@ -13,10 +13,12 @@ from mmobot.commands import (
     give_logic,
     here_logic,
     inventory_logic,
+    learn_logic,
     move_logic,
     name_logic,
     navigation_logic,
     pickup_logic,
+    teach_logic,
     unequip_logic,
 )
 
@@ -88,6 +90,11 @@ async def inventory_command(context):
     await inventory_logic(context, engine)
 
 
+@bot.command(name='learn')
+async def learn_command(context, *args):
+    await learn_logic(context, args, engine)
+
+
 @bot.command(name='me')
 async def me_command(context):
     await context.send(f'Your name is {context.author.nick}')
@@ -111,6 +118,11 @@ async def name_command(context, *args):
 @bot.command(name='pickup')
 async def pickup_command(context, *args):
     await pickup_logic(context, args, engine)
+
+
+@bot.command(name='teach')
+async def teach_command(context, *args):
+    await teach_logic(context, args, engine)
 
 
 @bot.command(name='unequip')

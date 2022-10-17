@@ -34,7 +34,7 @@ ALL_SKILLS = {
         'max': 50
     }
 }
-LEARNING_COOLDOWN = timedelta(hours=24)
+LEARNING_COOLDOWN = timedelta(hours=20)
 TEACHING_COOLDOWN = timedelta(hours=8)
 TEACHING_DIFF = 5
 

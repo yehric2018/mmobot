@@ -20,7 +20,7 @@ from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
 engine = init_test_engine()
 
-MESSAGE_TEACH_SUCCESS = '<@101> learned fighting from teacher!'
+MESSAGE_TEACH_SUCCESS = 'teacher taught fighting to <@101>!'
 TEST_TIMESTAMP_STR = '2012-01-14 12:00:01'
 TEST_TIMESTAMP_DT = datetime.datetime(2012, 1, 14, 12, 0, 1)
 
@@ -124,8 +124,8 @@ async def test_commandTeach_withDiscordMention(teaching_context, session):
     learning_player = get_player_with_name(session, 'learner')
     assert learning_player.skills[0].skill_level == 5
     teaching_entry = get_player_skill_teachings(session, 1, 'fighting')[0]
-    assert teaching_entry.teacher == 1
-    assert teaching_entry.learner == 2
+    assert teaching_entry.teacher_id == 1
+    assert teaching_entry.learner_id == 2
     assert teaching_entry.teaching_time == TEST_TIMESTAMP_DT
     assert teaching_entry.skill == 'fighting'
 
@@ -142,8 +142,8 @@ async def test_commandTeach_withTextName(teaching_context, session):
     learning_player = get_player_with_name(session, 'learner')
     assert learning_player.skills[0].skill_level == 5
     teaching_entry = get_player_skill_teachings(session, 1, 'fighting')[0]
-    assert teaching_entry.teacher == 1
-    assert teaching_entry.learner == 2
+    assert teaching_entry.teacher_id == 1
+    assert teaching_entry.learner_id == 2
     assert teaching_entry.teaching_time == TEST_TIMESTAMP_DT
     assert teaching_entry.skill == 'fighting'
 
@@ -152,7 +152,7 @@ async def test_commandTeach_withTextName(teaching_context, session):
 async def test_commandTeach_noArgsProvided(teaching_context):
     await teach_logic(teaching_context, [], engine)
     assert len(teaching_context.channel.messages) == 1
-    expected_message = 'Please supply give arguments like this: **!teach player skill**'
+    expected_message = 'Please supply teach arguments like this: **!teach player skill**'
     assert teaching_context.channel.messages[0] == expected_message
 
 

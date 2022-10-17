@@ -92,10 +92,19 @@ def get_player_with_name(session, name):
     return session.scalars(get_player_statement).one()
 
 
+def get_player_skill(session, player_id, skill_name):
+    get_skill_statement = (
+        select(PlayerSkills)
+        .where(PlayerSkills.player_id == player_id)
+        .where(PlayerSkills.skill_name == skill_name)
+    )
+    return session.scalars(get_skill_statement).one_or_none()
+
+
 def get_player_skill_teachings(session, teacher_id, skill_name):
     get_teaching_statement = (
         select(PlayerSkillTeaching)
-        .where(PlayerSkillTeaching.teacher == teacher_id)
+        .where(PlayerSkillTeaching.teacher_id == teacher_id)
         .where(PlayerSkillTeaching.skill == skill_name)
     )
     return session.scalars(get_teaching_statement).all()
@@ -110,8 +119,12 @@ def update_player(session, id, data):
     player = session.scalars(select(Player).where(Player.id == id)).one()
     if 'equipped_weapon_id' in data:
         player.equipped_weapon_id = data['equipped_weapon_id']
+    if 'last_learned' in data:
+        player.last_learned = data['last_learned']
     if 'last_taught' in data:
         player.last_taught = data['last_taught']
+    if 'stats.skill_points' in data:
+        player.stats.skill_points = data['stats.skill_points']
     if 'zone' in data:
         player.zone = data['zone']
     session.commit()
