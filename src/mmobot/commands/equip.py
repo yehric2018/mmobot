@@ -36,5 +36,9 @@ async def equip_logic(context, args, engine):
             player.equipped_weapon_id = equipped_item.id
             session.commit()
             await context.send(f'You have equipped: {equipped_item.item.id}')
+        elif equipped_item.item.item_type == 'attire':
+            player.equipped_attire_id = equipped_item.id
+            session.commit()
+            await context.send(f'You have equipped: {equipped_item.item.id}')
         else:
             await context.send(f'{equipped_item.name} cannot be equipped')

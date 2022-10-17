@@ -41,7 +41,8 @@ def prepare_database(session):
         name='player',
         discord_id=100,
         is_active=True,
-        equipped_weapon_id=200
+        equipped_weapon_id=200,
+        equipped_attire_id=208
     ))
     yield
     delete_all_entities(session)
@@ -50,6 +51,7 @@ def prepare_database(session):
 @pytest.fixture(autouse=True)
 def setup_item(session, prepare_database):
     add_weapon_instance(session, 200, 1, 'desert-scimitar')
+    add_weapon_instance(session, 208, 1, 'knights-armor')
 
 
 @pytest_asyncio.fixture
@@ -102,6 +104,15 @@ async def test_commandUnequip_weaponWithId(unequip_context, session):
     assert unequip_context.channel.messages[0] == 'Unequipped /5k'
     player = get_player_with_name(session, 'player')
     assert player.equipped_weapon_id is None
+
+
+@pytest.mark.asyncio
+async def test_commandUnequip_attireWithId(unequip_context, session):
+    await unequip_logic(unequip_context, ['/5s'], engine)
+    assert len(unequip_context.channel.messages) == 1
+    assert unequip_context.channel.messages[0] == 'Unequipped /5s'
+    player = get_player_with_name(session, 'player')
+    assert player.equipped_attire_id is None
 
 
 @pytest.mark.asyncio

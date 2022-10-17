@@ -44,6 +44,9 @@ def unequip_using_id(player, id):
     if player.equipped_weapon_id == id:
         player.equipped_weapon_id = None
         return True
+    elif player.equipped_attire_id == id:
+        player.equipped_attire_id = None
+        return True
     return False
 
 
@@ -52,5 +55,8 @@ def unequip_using_name(player, name):
         if name == item_instance.item.id:
             if player.equipped_weapon_id == item_instance.id:
                 player.equipped_weapon_id = None
+                return True
+            elif player.equipped_attire_id == item_instance.id:
+                player.equipped_attire_id = None
                 return True
     return False

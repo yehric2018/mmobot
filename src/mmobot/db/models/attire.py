@@ -6,16 +6,17 @@ from sqlalchemy import String
 from mmobot.db.models import Item
 
 
-class Weapon(Item):
-    __tablename__ = 'Weapons'
+class Attire(Item):
+    __tablename__ = 'Attires'
 
     id = Column(String(40), ForeignKey('Items.id', ondelete='cascade'), primary_key=True)
-    weapon_type = Column(String(20))
-    lethality = Column(Integer)
+    coverage = Column(Integer)
+    armor = Column(Integer)
+    warmth = Column(Integer)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'weapon'
+        'polymorphic_identity': 'attire'
     }
 
     def __repr__(self):
-        return f'Weapon(name={self.name})'
+        return f'Attire(id={self.id})'

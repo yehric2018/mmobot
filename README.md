@@ -45,4 +45,4 @@ On Linux or Mac, you might need to use forward slashes instead.
 export PYTHONPATH='/home/user/mmobot/src'
 ```
 
-Once this line is added, save the file and run `source `/.bashrc`.
+Once this line is added, save the file and run `source /.bashrc`.

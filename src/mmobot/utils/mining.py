@@ -97,10 +97,10 @@ def get_mining_outcome(player_stats, weapon_instance, minable):
     else:
         weapon = weapon_instance.item
         if weapon.weapon_type == 'pickaxe':
-            mining_score += weapon.strength
+            mining_score += weapon.lethality
             player_stats.endurance -= 1
         else:
-            mining_score += weapon.strength // 4
+            mining_score += weapon.lethality // 4
             player_stats.endurance -= 2
     mining_score += player_stats.luck
     num_resources = random.randint(0, mining_score) // STRENGTH_PER_RESOURCE

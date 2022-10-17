@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
-from mmobot.db.models import Base, Item, Weapon, Zone, ZonePath
+from mmobot.db.models import Attire, Base, Item, Weapon, Zone, ZonePath
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -89,7 +89,35 @@ def setup_items():
             for item in all_items:
                 session.merge(item)
             session.commit()
+    setup_attire()
     setup_weapons()
+
+
+def setup_attire():
+    attire_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'attire.db')
+    with open(os.path.join(attire_path), 'r') as f:
+        file_text = f.read()
+        attire_data = file_text.split(DB_ENTRY_SEPERATOR)
+        all_attire = []
+        for data in attire_data:
+            lines = data.split('\n')
+            item_stats = lines[1].split(',')
+            armor_stats = lines[2].split(',')
+
+            attire = Attire(
+                id=lines[0],
+                size=int(item_stats[0]),
+                weight=int(item_stats[1]),
+                coverage=int(armor_stats[0]),
+                armor=int(armor_stats[1]),
+                warmth=int(lines[3])
+            )
+            all_attire.append(attire)
+        
+        with Session(engine) as session:
+            for attire in all_attire:
+                session.merge(attire)
+            session.commit()
 
 
 def setup_weapons():
@@ -108,7 +136,7 @@ def setup_weapons():
                 size=int(item_stats[0]),
                 weight=int(item_stats[1]),
                 weapon_type=lines[1],
-                strength=int(lines[3])
+                lethality=int(lines[3])
             )
             all_weapons.append(weapon)
 

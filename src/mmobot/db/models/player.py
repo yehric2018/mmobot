@@ -46,6 +46,7 @@ class Player(Entity):
     # Instead, we will search Player.inventory for the item we need
     # and update the equipped_ids when items are dropped/given.
     equipped_weapon_id = Column(Integer)
+    equipped_attire_id = Column(Integer)
 
     __mapper_args__ = {
         'polymorphic_identity': 'player',

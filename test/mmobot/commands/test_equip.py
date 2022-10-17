@@ -42,6 +42,7 @@ def prepare_database(session):
 @pytest.fixture()
 def setup_item(session, prepare_database):
     add_weapon_instance(session, 200, 1, 'desert-scimitar')
+    add_weapon_instance(session, 208, 1, 'knights-armor')
 
 
 @pytest_asyncio.fixture
@@ -94,6 +95,16 @@ async def test_commandEquip_weaponWithEntityId(equip_context, session, setup_ite
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     player = get_player_with_name(session, 'player')
     assert player.equipped_weapon_id == 200
+
+
+@pytest.mark.asyncio
+async def test_commandEquip_attireWithEntityId(equip_context, session, setup_item):
+    await equip_logic(equip_context, ['/5s'], engine)
+    assert len(equip_context.channel.messages) == 1
+    expected_message = 'You have equipped: knights-armor'
+    assert equip_context.channel.messages[0] == expected_message
+    player = get_player_with_name(session, 'player')
+    assert player.equipped_attire_id == 208
 
 
 @pytest.mark.asyncio
