@@ -1,9 +1,5 @@
-import os
-
 import pytest
 from discord import Permissions
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.commands import name_logic
@@ -12,32 +8,17 @@ from mmobot.db.models.player import Player
 from mmobot.test.db import (
     add_player,
     delete_all_entities,
-    get_player_with_name
+    get_player_with_name,
+    init_test_engine
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
 
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
+engine = init_test_engine()
 
 
-@pytest.fixture(scope='module')
-def engine():
-    return create_engine(connection_str)
-
-
-@pytest.fixture(scope='module')
-def session(engine):
+@pytest.fixture()
+def session():
     return Session(engine)
 
 
@@ -88,7 +69,7 @@ def wrong_name_context(member, town_square_channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandName_newMemberSuccess(name_context, engine, session):
+async def test_commandName_newMemberSuccess(name_context, session):
     await name_logic(name_context, ['player'], engine)
     player = get_player_with_name(session, 'player')
     assert player is not None
@@ -104,7 +85,7 @@ async def test_commandName_newMemberSuccess(name_context, engine, session):
 
 
 @pytest.mark.asyncio
-async def test_commandName_withAncestorSuccess(name_context, engine, session):
+async def test_commandName_withAncestorSuccess(name_context, session):
     player = Player(name='OldPlayer', discord_id=100, ancestry=1, is_active=False)
     add_player(session, player)
     await name_logic(name_context, ['player'], engine)
@@ -122,7 +103,7 @@ async def test_commandName_withAncestorSuccess(name_context, engine, session):
 
 
 @pytest.mark.asyncio
-async def test_commandName_noArgsProvided(name_context, engine):
+async def test_commandName_noArgsProvided(name_context):
     await name_logic(name_context, [], engine)
     assert len(name_context.channel.messages) == 1
     expected_message = 'Please enter the name of your hero! For example: !name Joanne'
@@ -133,7 +114,7 @@ async def test_commandName_noArgsProvided(name_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandName_wrongChannel(name_context, engine, wrong_name_context):
+async def test_commandName_wrongChannel(name_context, wrong_name_context):
     await name_logic(wrong_name_context, ['player'], engine)
     assert len(wrong_name_context.channel.messages) == 0
     assert len(name_context.channel.messages) == 0
@@ -144,7 +125,7 @@ async def test_commandName_wrongChannel(name_context, engine, wrong_name_context
 
 
 @pytest.mark.asyncio
-async def test_commandName_nameAlreadyTaken(session, name_context, engine):
+async def test_commandName_nameAlreadyTaken(session, name_context):
     player = Player(id=1, name='player', discord_id=99, is_active=True)
     add_player(session, player)
     await name_logic(name_context, ['player'], engine)
@@ -158,7 +139,7 @@ async def test_commandName_nameAlreadyTaken(session, name_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandName_nameWithSpaces(name_context, engine):
+async def test_commandName_nameWithSpaces(name_context):
     await name_logic(name_context, ['player', 'with', 'spaces'], engine)
     assert len(name_context.channel.messages) == 1
     expected_message = 'Your name can only be one word, sorry!'
@@ -170,7 +151,7 @@ async def test_commandName_nameWithSpaces(name_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandName_nameTooShort(name_context, engine):
+async def test_commandName_nameTooShort(name_context):
     await name_logic(name_context, ['x'], engine)
     assert len(name_context.channel.messages) == 1
     expected_message = 'Your name must be between 2 and 20 characters'
@@ -182,7 +163,7 @@ async def test_commandName_nameTooShort(name_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandName_nameTooLong(name_context, engine):
+async def test_commandName_nameTooLong(name_context):
     long_name = 'abcdefghijklmnopqrstuvwxyz'
     await name_logic(name_context, [long_name], engine)
     assert len(name_context.channel.messages) == 1
@@ -195,6 +176,6 @@ async def test_commandName_nameTooLong(name_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandName_activePlayerExists(name_context, engine):
+async def test_commandName_activePlayerExists(name_context):
     # TODO: Implement this edge case later
     pass

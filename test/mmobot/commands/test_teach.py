@@ -25,7 +25,7 @@ TEST_TIMESTAMP_STR = '2012-01-14 12:00:01'
 TEST_TIMESTAMP_DT = datetime.datetime(2012, 1, 14, 12, 0, 1)
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture()
 def session():
     return Session(engine)
 

@@ -1,10 +1,7 @@
-import os
 import pytest
 from mmobot.db.models.minable import Minable
 import pytest_asyncio
 
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.commands import attack_logic
@@ -15,34 +12,20 @@ from mmobot.test.db import (
     add_weapon_instance,
     delete_all_entities,
     get_player_with_name,
+    init_test_engine,
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 from mmobot.test.random import MockRandomInt
 
 
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
-
 RANDOM_CALL = 'random.randint'
 
 
-@pytest.fixture(scope='module')
-def engine():
-    return create_engine(connection_str)
+engine = init_test_engine()
 
 
-@pytest.fixture(scope='module')
-def session(engine):
+@pytest.fixture()
+def session():
     return Session(engine)
 
 
@@ -100,7 +83,7 @@ def attack_context(member, channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandAttack_mining(attack_context, session, engine, monkeypatch):
+async def test_commandAttack_mining(attack_context, session, monkeypatch):
     add_weapon_instance(session, 2222, 3333, 'basic-pickaxe')
     add_to_database(session, Minable(
         id=20,

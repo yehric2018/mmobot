@@ -1,11 +1,8 @@
 import discord
-import os
 from discord import Permissions
 
 import pytest
 import pytest_asyncio
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.commands import move_logic
@@ -14,34 +11,18 @@ from mmobot.test.db import (
     add_player,
     delete_all_entities,
     get_player_with_name,
+    init_test_engine,
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel, MockThread
-
-
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
-
 
 DEFAULT_PERMISSIONS = 0
 
 
-@pytest.fixture(scope='module')
-def engine():
-    return create_engine(connection_str)
+engine = init_test_engine()
 
 
-@pytest.fixture(scope='module')
-def session(engine):
+@pytest.fixture()
+def session():
     return Session(engine)
 
 
@@ -122,7 +103,7 @@ def move_context(moving_member, current_channel, guild):
 
 @pytest.mark.asyncio
 async def test_commandMove_zoneToZone(
-        move_context, moving_member, engine, session, no_permissions, read_write_permissions):
+        move_context, moving_member, session, no_permissions, read_write_permissions):
     await move_logic(move_context, ['marketplace'], engine)
 
     assert len(move_context.channel.messages) == 1
@@ -144,7 +125,7 @@ async def test_commandMove_zoneToZone(
 
 @pytest.mark.asyncio
 async def test_commandMove_zoneToMinizone(
-    move_context, moving_member, engine, session, read_only_permissions, read_write_permissions
+    move_context, moving_member, session, read_only_permissions, read_write_permissions
 ):
     await move_logic(move_context, ['bell-tower'], engine)
 
@@ -168,8 +149,8 @@ async def test_commandMove_zoneToMinizone(
 
 @pytest.mark.asyncio
 async def test_commandMove_minizoneToZone(
-    move_context, moving_thread, moving_member,
-    engine, session, read_only_permissions, read_write_permissions
+    move_context, moving_thread, moving_member, session,
+    read_only_permissions, read_write_permissions
 ):
     move_context.channel = moving_thread
     await move_logic(move_context, ['town-square'], engine)
@@ -191,7 +172,7 @@ async def test_commandMove_minizoneToZone(
 
 
 @pytest.mark.asyncio
-async def test_commandMove_noArgsProvided(move_context, engine):
+async def test_commandMove_noArgsProvided(move_context):
     await move_logic(move_context, [], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'Please specify a location to move to! For example: !move hawaii'
@@ -200,7 +181,7 @@ async def test_commandMove_noArgsProvided(move_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonexistantZone(move_context, session, engine):
+async def test_commandMove_nonexistantZone(move_context, session):
     await move_logic(move_context, ['nowhere'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'You cannot travel to nowhere from town-square'
@@ -211,7 +192,7 @@ async def test_commandMove_nonexistantZone(move_context, session, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandMove_notInZoneChannel(move_context, non_zone_channel, engine):
+async def test_commandMove_notInZoneChannel(move_context, non_zone_channel):
     move_context.channel = non_zone_channel
     await move_logic(move_context, ['marketplace'], engine)
     assert len(move_context.channel.messages) == 0
@@ -219,7 +200,7 @@ async def test_commandMove_notInZoneChannel(move_context, non_zone_channel, engi
 
 
 @pytest.mark.asyncio
-async def test_commandMove_nonadjacentZone(move_context, session, engine):
+async def test_commandMove_nonadjacentZone(move_context, session):
     await move_logic(move_context, ['throne-room'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = 'You cannot travel to throne-room from town-square'

@@ -1,16 +1,14 @@
-import os
 import pytest
 import pytest_asyncio
 
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Minable, Player, PlayerStats, WeaponInstance
 from mmobot.test.db import (
     add_player,
     delete_all_entities,
-    get_player_with_name
+    get_player_with_name,
+    init_test_engine
 )
 from mmobot.test.mock import MockContext, MockMember, MockTextChannel
 from mmobot.test.random import MockRandomInt
@@ -21,30 +19,14 @@ from mmobot.utils.mining import (
 )
 
 
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
-
-
 RANDOM_CALL = 'random.randint'
 
 
-@pytest.fixture(scope='module')
-def engine():
-    return create_engine(connection_str)
+engine = init_test_engine()
 
 
-@pytest.fixture(scope='module')
-def session(engine):
+@pytest.fixture()
+def session():
     return Session(engine)
 
 
@@ -347,7 +329,7 @@ def test_getMiningOutcome_usingNonPickaxe(
 
 @pytest.mark.asyncio
 async def test_attackCommandMining_noResourcesMined(
-    mining_context, player, standard_minable, session, engine, monkeypatch
+    mining_context, player, standard_minable, session, monkeypatch
 ):
     mock_random = MockRandomInt([0])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
@@ -370,7 +352,7 @@ async def test_attackCommandMining_noResourcesMined(
 
 @pytest.mark.asyncio
 async def test_attackCommandMining_oneStoneMined(
-    mining_context, player, standard_minable, session, engine, monkeypatch
+    mining_context, player, standard_minable, session, monkeypatch
 ):
     mock_random = MockRandomInt([20, 1])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
@@ -395,7 +377,7 @@ async def test_attackCommandMining_oneStoneMined(
 
 @pytest.mark.asyncio
 async def test_attackCommandMining_resourceBorderCases(
-    mining_context, player, standard_minable, session, engine, monkeypatch
+    mining_context, player, standard_minable, session, monkeypatch
 ):
     mock_random = MockRandomInt([81, 8000, 12499, 13098, 13113])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
@@ -426,7 +408,7 @@ async def test_attackCommandMining_resourceBorderCases(
 
 @pytest.mark.asyncio
 async def test_attackCommandMining_bareHands(
-    mining_context, player, standard_minable, session, engine, monkeypatch
+    mining_context, player, standard_minable, session, monkeypatch
 ):
     mock_random = MockRandomInt([20, 1])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
@@ -454,7 +436,7 @@ async def test_attackCommandMining_bareHands(
 
 @pytest.mark.asyncio
 async def test_attackCommandMining_nonPickaxe(
-    mining_context, player, basic_sword, standard_minable, session, engine, monkeypatch
+    mining_context, player, basic_sword, standard_minable, session, monkeypatch
 ):
     mock_random = MockRandomInt([20, 1])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))

@@ -1,9 +1,5 @@
-import os
-
 import pytest
 import pytest_asyncio
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.commands import inventory_logic
@@ -12,23 +8,10 @@ from mmobot.test.db import (
     add_item_instance,
     add_player,
     delete_all_entities,
+    init_test_engine,
     update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-
-
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
 
 
 SINGLE_ITEM_INVENTORY_MESSAGE = '''\
@@ -44,13 +27,11 @@ EQUIPPED_WEAPON_INVENTORY_MESSAGE = '''\
 '''
 
 
-@pytest.fixture(scope='module')
-def engine():
-    return create_engine(connection_str)
+engine = init_test_engine()
 
 
-@pytest.fixture(scope='module')
-def session(engine):
+@pytest.fixture()
+def session():
     return Session(engine)
 
 
@@ -94,7 +75,7 @@ def inventory_context(member, channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandInventory_emptyInventory(inventory_context, engine):
+async def test_commandInventory_emptyInventory(inventory_context):
     await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     expected_message = '<title>player\'s Inventory</title>\n<desc></desc>\n'
@@ -102,7 +83,7 @@ async def test_commandInventory_emptyInventory(inventory_context, engine):
 
 
 @pytest.mark.asyncio
-async def test_commandInventory_singleItem(inventory_context, engine, session):
+async def test_commandInventory_singleItem(inventory_context, session):
     add_item_instance(session, 2, 1, 'desert-scimitar')
     await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
@@ -110,7 +91,7 @@ async def test_commandInventory_singleItem(inventory_context, engine, session):
 
 
 @pytest.mark.asyncio
-async def test_commandInventory_equippedWeapon(inventory_context, engine, session):
+async def test_commandInventory_equippedWeapon(inventory_context, session):
     add_item_instance(session, 2, 1, 'desert-scimitar')
     update_player(session, 1, {'equipped_weapon_id': 2})
     await inventory_logic(inventory_context, engine)
@@ -119,8 +100,7 @@ async def test_commandInventory_equippedWeapon(inventory_context, engine, sessio
 
 
 @pytest.mark.asyncio
-async def test_commandInventory_notInZone(
-        inventory_context, non_zone_channel, engine):
+async def test_commandInventory_notInZone(inventory_context, non_zone_channel):
     inventory_context.channel = non_zone_channel
     await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 0

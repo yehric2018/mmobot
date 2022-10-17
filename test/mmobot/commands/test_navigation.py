@@ -1,26 +1,9 @@
-import os
-
 import pytest
 import pytest_asyncio
-from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
 from mmobot.commands import navigation_logic
+from mmobot.test.db import init_test_engine
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
-
-
-load_dotenv()
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
 
 
 REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
@@ -39,9 +22,7 @@ REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
 '''
 
 
-@pytest.fixture
-def engine():
-    return create_engine(connection_str)
+engine = init_test_engine()
 
 
 @pytest.fixture
@@ -79,15 +60,14 @@ def navigation_context(member, zone_channel, guild):
 
 
 @pytest.mark.asyncio
-async def test_commandNavigation_success(navigation_context, engine):
+async def test_commandNavigation_success(navigation_context):
     await navigation_logic(navigation_context, engine)
     assert len(navigation_context.channel.messages) == 1
     assert navigation_context.channel.messages[0] == REACHABLE_FROM_TOWN_SQUARE_MESSAGE
 
 
 @pytest.mark.asyncio
-async def test_commandNavigation_notInZoneChannel(
-        navigation_context, non_zone_channel, engine):
+async def test_commandNavigation_notInZoneChannel(navigation_context, non_zone_channel):
     navigation_context.channel = non_zone_channel
     await navigation_logic(navigation_context, engine)
     assert len(navigation_context.channel.messages) == 0
