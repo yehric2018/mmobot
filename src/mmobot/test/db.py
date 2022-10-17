@@ -11,6 +11,7 @@ from mmobot.db.models import (
     Minable,
     Player,
     PlayerSkills,
+    PlayerSkillTeaching,
     PlayerStats,
     WeaponInstance,
 )
@@ -78,8 +79,9 @@ def delete_all_entities(session):
     session.query(ItemInstance).delete()
     session.query(Minable).delete()
     session.query(Interaction).delete()
-    session.query(Player).delete()
     session.query(PlayerSkills).delete()
+    session.query(PlayerSkillTeaching).delete()
+    session.query(Player).delete()
     session.query(PlayerStats).delete()
     session.query(Entity).delete()
     session.commit()
@@ -88,6 +90,15 @@ def delete_all_entities(session):
 def get_player_with_name(session, name):
     get_player_statement = select(Player).where(Player.name == name)
     return session.scalars(get_player_statement).one()
+
+
+def get_player_skill_teachings(session, teacher_id, skill_name):
+    get_teaching_statement = (
+        select(PlayerSkillTeaching)
+        .where(PlayerSkillTeaching.teacher == teacher_id)
+        .where(PlayerSkillTeaching.skill == skill_name)
+    )
+    return session.scalars(get_teaching_statement).all()
 
 
 def get_item_instance_with_id(session, id):
@@ -99,6 +110,8 @@ def update_player(session, id, data):
     player = session.scalars(select(Player).where(Player.id == id)).one()
     if 'equipped_weapon_id' in data:
         player.equipped_weapon_id = data['equipped_weapon_id']
+    if 'last_taught' in data:
+        player.last_taught = data['last_taught']
     if 'zone' in data:
         player.zone = data['zone']
     session.commit()

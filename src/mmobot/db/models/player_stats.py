@@ -17,3 +17,5 @@ class PlayerStats(Base):
     strength = Column(Integer)
     luck = Column(Integer)
     magic_number = Column(Integer)
+    stat_points = Column(Integer, default=0)
+    skill_points = Column(Integer, default=0)

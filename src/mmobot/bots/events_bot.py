@@ -62,7 +62,7 @@ def increment_skill_points():
     with Session(engine) as session:
         get_player_statement = select(Player).where(Player.is_active)
         for player in session.scalars(get_player_statement):
-            player.skills.skill_points += 1
+            player.stats.skill_points += 1
 
         session.commit()
 

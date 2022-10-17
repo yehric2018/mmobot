@@ -1,3 +1,5 @@
+from datetime import date
+
 from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -24,8 +26,7 @@ class Player(Entity):
 
     stats_id = Column(Integer, ForeignKey('PlayerStats.id'), unique=True, nullable=False)
     stats = relationship('PlayerStats', uselist=False)
-    skills_id = Column(Integer, ForeignKey('PlayerSkills.id'), unique=True, nullable=False)
-    skills = relationship('PlayerSkills', uselist=False)
+    skills = relationship('PlayerSkills')
 
     inventory = relationship(
         'ItemInstance',
@@ -35,7 +36,9 @@ class Player(Entity):
 
     guarding_entity = Column(Integer, ForeignKey('Entities.id'))
     guarding_path = Column(String(40), ForeignKey('Zones.channel_name'))
-    last_attack = Column(DateTime)
+    last_attack = Column(DateTime, default=date.fromtimestamp(1))
+    last_learned = Column(DateTime, default=date.fromtimestamp(1))
+    last_taught = Column(DateTime, default=date.fromtimestamp(1))
     last_location = Column(String(40), ForeignKey('Zones.channel_name'))
 
     # The equipped item fields implicitly point to WeaponInstances.

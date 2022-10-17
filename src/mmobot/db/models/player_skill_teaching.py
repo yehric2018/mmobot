@@ -14,4 +14,4 @@ class PlayerSkillTeaching(Base):
     skill = Column(String(20))
     teacher = Column(Integer, ForeignKey('Players.id'))
     learner = Column(Integer, ForeignKey('Players.id'))
-    teaching_time = (DateTime)
+    teaching_time = Column(DateTime)
