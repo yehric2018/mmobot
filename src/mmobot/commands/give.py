@@ -22,6 +22,7 @@ async def give_logic(context, args, engine):
         receiving_player_statement = (
             select(Player)
             .where(Player.discord_id == receiver_id)
+            .where(Player.is_active)
             .where(Player.zone == context.channel.name)
         )
     else:
@@ -29,6 +30,7 @@ async def give_logic(context, args, engine):
         receiving_player_statement = (
             select(Player)
             .where(Player.name == receiver_name)
+            .where(Player.is_active)
             .where(Player.zone == context.channel.name)
         )
 

@@ -1,3 +1,7 @@
+import os
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from sqlalchemy import select
 
 from mmobot.db.models import (
@@ -6,8 +10,27 @@ from mmobot.db.models import (
     ItemInstance,
     Minable,
     Player,
+    PlayerSkills,
+    PlayerStats,
     WeaponInstance,
 )
+
+
+def init_test_engine():
+    load_dotenv()
+    MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
+    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+    MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
+    MYSQL_DATABASE_NAME = os.getenv('MYSQL_TEST_DATABASE_NAME')
+
+    connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
+        MYSQL_USERNAME,
+        MYSQL_PASSWORD,
+        MYSQL_HOSTNAME,
+        MYSQL_DATABASE_NAME
+    )
+
+    return create_engine(connection_str)
 
 
 def add_to_database(session, database_entry):
@@ -56,6 +79,8 @@ def delete_all_entities(session):
     session.query(Minable).delete()
     session.query(Interaction).delete()
     session.query(Player).delete()
+    session.query(PlayerSkills).delete()
+    session.query(PlayerStats).delete()
     session.query(Entity).delete()
     session.commit()
 

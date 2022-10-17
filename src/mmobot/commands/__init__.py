@@ -8,6 +8,7 @@ from .move import move_logic
 from .name import name_logic
 from .navigation import navigation_logic
 from .pickup import pickup_logic
+from .teach import teach_logic
 from .unequip import unequip_logic
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     'name_logic',
     'navigation_logic',
     'pickup_logic',
+    'teach_logic',
     'unequip_logic'
 ]
