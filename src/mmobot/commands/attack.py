@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 
 from mmobot.db.models import Entity, Minable, Player
+from mmobot.utils.battle import attack_command_pvp
 from mmobot.utils.discord import is_mention
-from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.mining import attack_command_mining
 
 
@@ -17,10 +18,31 @@ async def attack_logic(context, args, engine):
         return
 
     if is_mention(args[0]):
-        await context.send('You cannot attack other players...YET')
+        with Session(engine) as session:
+            get_attacker_statement = (
+                select(Player)
+                .where(Player.discord_id == context.author.id)
+                .where(Player.is_active)
+            )
+            attacker = session.scalars(get_attacker_statement).one()
+            get_defender_statement = (
+                select(Player)
+                .where(Player.discord_id == args[0][2:-1])
+                .where(Player.is_active)
+            )
+            defender = session.scalars(get_defender_statement).one_or_none()
+            if defender is None:
+                await context.send(f'Could not find target {args[0]}')
+                return
+            elif attacker == defender:
+                await context.send('You cannot attack yourself!')
+                return
+
+            await attack_command_pvp(context, attacker, defender)
+            session.commit()
         return
 
-    if args[0].startswith('/'):
+    if is_entity_id(args[0]):
         target_id = convert_alphanum_to_int(args[0][1:])
         with Session(engine) as session:
             get_player_statement = (

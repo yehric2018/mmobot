@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from sqlalchemy.orm import Session
 
 from mmobot.commands import teach_logic
-from mmobot.db.models import Player, PlayerSkills
+from mmobot.db.models import Player, PlayerSkill
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -57,27 +57,27 @@ def prepare_database(session):
         is_active=True,
         zone='barracks'
     ))
-    add_to_database(session, PlayerSkills(
+    add_to_database(session, PlayerSkill(
         player_id=1,
         skill_name='fighting',
         skill_level=30
     ))
-    add_to_database(session, PlayerSkills(
+    add_to_database(session, PlayerSkill(
         player_id=2,
         skill_name='fighting',
         skill_level=5
     ))
-    add_to_database(session, PlayerSkills(
+    add_to_database(session, PlayerSkill(
         player_id=1,
         skill_name='masonry',
         skill_level=30
     ))
-    add_to_database(session, PlayerSkills(
+    add_to_database(session, PlayerSkill(
         player_id=2,
         skill_name='masonry',
         skill_level=50
     ))
-    add_to_database(session, PlayerSkills(
+    add_to_database(session, PlayerSkill(
         player_id=2,
         skill_name='weaving',
         skill_level=50

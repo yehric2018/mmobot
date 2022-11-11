@@ -12,6 +12,7 @@ class PlayerStats(Base):
     max_hp = Column(Integer)
     armor = Column(Integer)
     mobility = Column(Integer)
+    dexterity = Column(Integer)
     endurance = Column(Integer)
     max_endurance = Column(Integer)
     strength = Column(Integer)

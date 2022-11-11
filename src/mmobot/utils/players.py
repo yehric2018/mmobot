@@ -25,6 +25,7 @@ def roll_initial_stats():
     if armor < 0:
         armor = 0
     mobility = random.randint(MIN_INITIAL_MOBILITY, MAX_INITIAL_MOBILITY)
+    dexterity = random.randint(MIN_INITIAL_DEXTERITY, MAX_INITIAL_DEXTERITY)
     endurance = random.randint(MIN_INITIAL_ENDURANCE, MAX_INITIAL_ENDURANCE)
     strength = random.randint(MIN_INITIAL_STRENGTH, MAX_INITIAL_STRENGTH)
     luck = random.randint(MIN_LUCK, MAX_LUCK)
@@ -34,6 +35,7 @@ def roll_initial_stats():
         max_hp=hp,
         armor=armor,
         mobility=mobility,
+        dexterity=dexterity,
         endurance=endurance,
         max_endurance=endurance,
         strength=strength,

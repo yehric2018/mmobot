@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from sqlalchemy.orm import Session
 
 from mmobot.commands.learn import learn_logic
-from mmobot.db.models import Player, PlayerSkills, PlayerSkillTeaching, PlayerStats
+from mmobot.db.models import Player, PlayerSkill, PlayerSkillTeaching, PlayerStats
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -51,8 +51,8 @@ def prepare_database(session):
         stats_id=1,
         zone='barracks'
     ))
-    add_to_database(session, PlayerSkills(player_id=2, skill_name='fighting', skill_level=5))
-    add_to_database(session, PlayerSkills(player_id=2, skill_name='masonry', skill_level=50))
+    add_to_database(session, PlayerSkill(player_id=2, skill_name='fighting', skill_level=5))
+    add_to_database(session, PlayerSkill(player_id=2, skill_name='masonry', skill_level=50))
     yield
     delete_all_entities(session)
 
@@ -195,7 +195,7 @@ async def test_commandLearn_useTeachingOnCooldown(learn_context, session):
     ))
     await learn_logic(learn_context, ['fighting'], engine)
     assert len(learn_context.channel.messages) == 1
-    expected_message = f'Must wait 20.0 hrs to learn from teacher.\n'
+    expected_message = 'Must wait 20.0 hrs to learn from teacher.\n'
     expected_message += 'To use skill points instead, supply learn arguments like this:' \
         ' **!learn skill points**'
     assert learn_context.channel.messages[0] == expected_message

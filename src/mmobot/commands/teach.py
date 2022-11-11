@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.constants import ALL_SKILLS, TEACHING_COOLDOWN, TEACHING_DIFF
-from mmobot.db.models import Player, PlayerSkills, PlayerSkillTeaching
+from mmobot.db.models import Player, PlayerSkill, PlayerSkillTeaching
 from mmobot.utils.discord import is_mention
 
 
@@ -87,7 +87,7 @@ def get_skill(player, skill_name):
     for skill in player.skills:
         if skill.skill_name == skill_name:
             return skill
-    return PlayerSkills(
+    return PlayerSkill(
         player_id=player.id,
         skill_name=skill_name,
         skill_level=0

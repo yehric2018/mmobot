@@ -6,7 +6,7 @@ from .weapon import Weapon
 from .zone import Zone
 from .zone_path import ZonePath
 
-from .player_skills import PlayerSkills
+from .player_skills import PlayerSkill
 from .player_skill_teaching import PlayerSkillTeaching
 from .player_stats import PlayerStats
 
@@ -26,7 +26,7 @@ __all__ = [
     'Item',
     'ItemInstance',
     'Minable',
-    'PlayerSkills',
+    'PlayerSkill',
     'PlayerSkillTeaching',
     'PlayerStats',
     'Player',

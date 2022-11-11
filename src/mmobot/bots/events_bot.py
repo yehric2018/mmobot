@@ -48,7 +48,7 @@ def recover_hp():
         get_player_statement = (
             select(Player)
             .where(Player.is_active)
-            .where(Player.stats.has(PlayerStats.hp < PlayerStats.hp))
+            .where(Player.stats.has(PlayerStats.hp < PlayerStats.max_hp))
         )
         for player in session.scalars(get_player_statement):
             player.stats.hp += 1

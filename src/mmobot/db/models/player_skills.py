@@ -5,7 +5,7 @@ from sqlalchemy import String
 from .base import Base
 
 
-class PlayerSkills(Base):
+class PlayerSkill(Base):
     __tablename__ = 'PlayerSkills'
 
     player_id = Column(Integer, ForeignKey('Players.id'), primary_key=True)

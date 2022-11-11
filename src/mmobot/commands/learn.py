@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.constants import ALL_SKILLS, LEARNING_COOLDOWN
-from mmobot.db.models import Player, PlayerSkills, PlayerSkillTeaching
+from mmobot.db.models import Player, PlayerSkill, PlayerSkillTeaching
 
 
 async def learn_logic(context, args, engine):
@@ -80,12 +80,12 @@ async def learn_logic(context, args, engine):
 
 def get_skill(session, player, skill_name):
     skill = session.scalars(
-        select(PlayerSkills)
-        .where(PlayerSkills.player_id == player.id)
-        .where(PlayerSkills.skill_name == skill_name)
+        select(PlayerSkill)
+        .where(PlayerSkill.player_id == player.id)
+        .where(PlayerSkill.skill_name == skill_name)
     ).one_or_none()
     if skill is None:
-        skill = PlayerSkills(
+        skill = PlayerSkill(
             player_id=player.id,
             skill_name=skill_name,
             skill_level=0

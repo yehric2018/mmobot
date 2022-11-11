@@ -26,7 +26,7 @@ class Player(Entity):
 
     stats_id = Column(Integer, ForeignKey('PlayerStats.id'), unique=True, nullable=False)
     stats = relationship('PlayerStats', uselist=False)
-    skills = relationship('PlayerSkills')
+    skills = relationship('PlayerSkill')
 
     inventory = relationship(
         'ItemInstance',

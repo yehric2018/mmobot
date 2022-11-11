@@ -10,7 +10,7 @@ from mmobot.db.models import (
     ItemInstance,
     Minable,
     Player,
-    PlayerSkills,
+    PlayerSkill,
     PlayerSkillTeaching,
     PlayerStats,
     WeaponInstance,
@@ -79,7 +79,7 @@ def delete_all_entities(session):
     session.query(ItemInstance).delete()
     session.query(Minable).delete()
     session.query(Interaction).delete()
-    session.query(PlayerSkills).delete()
+    session.query(PlayerSkill).delete()
     session.query(PlayerSkillTeaching).delete()
     session.query(Player).delete()
     session.query(PlayerStats).delete()
@@ -94,9 +94,9 @@ def get_player_with_name(session, name):
 
 def get_player_skill(session, player_id, skill_name):
     get_skill_statement = (
-        select(PlayerSkills)
-        .where(PlayerSkills.player_id == player_id)
-        .where(PlayerSkills.skill_name == skill_name)
+        select(PlayerSkill)
+        .where(PlayerSkill.player_id == player_id)
+        .where(PlayerSkill.skill_name == skill_name)
     )
     return session.scalars(get_skill_statement).one_or_none()
 
