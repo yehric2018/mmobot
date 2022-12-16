@@ -1,5 +1,6 @@
 import os
 
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from dotenv import load_dotenv
@@ -23,7 +24,11 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 
 engine = create_engine(connection_str)
 
-scheduler = BlockingScheduler()
+jobstores = {
+    'default': SQLAlchemyJobStore(engine=engine)
+}
+
+scheduler = BlockingScheduler(jobstores=jobstores)
 
 
 @scheduler.scheduled_job(IntervalTrigger(minutes=5))

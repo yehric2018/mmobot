@@ -6,6 +6,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 
+from mmobot.jobs import initialize_scheduler
 from mmobot.commands import (
     attack_logic,
     drop_logic,
@@ -37,6 +38,10 @@ connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
 )
 
 engine = create_engine(connection_str)
+
+
+event_scheduler = initialize_scheduler(engine)
+event_scheduler.start()
 
 
 intents = discord.Intents.default()
