@@ -4,9 +4,7 @@ import discord
 
 from discord.ext import commands
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
 
-from mmobot.jobs import initialize_scheduler
 from mmobot.commands import (
     attack_logic,
     drop_logic,
@@ -22,32 +20,19 @@ from mmobot.commands import (
     teach_logic,
     unequip_logic,
 )
+from mmobot.db import initialize_engine
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
-MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
-MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
-MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
-
-connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
-    MYSQL_USERNAME,
-    MYSQL_PASSWORD,
-    MYSQL_HOSTNAME,
-    MYSQL_DATABASE_NAME
-)
-
-engine = create_engine(connection_str)
-
-
-event_scheduler = initialize_scheduler(engine)
-event_scheduler.start()
 
 
 intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 bot = commands.Bot(command_prefix='!', intents=intents)
+
+
+engine = initialize_engine()
 
 
 @bot.event
@@ -67,7 +52,7 @@ async def on_member_join(member):
 
 @bot.command(name='attack')
 async def attack_command(context, *args):
-    await attack_logic(context, args, engine)
+    await attack_logic(bot, context, args, engine)
 
 
 @bot.command(name='drop')

@@ -19,5 +19,10 @@ class ItemInstance(Entity):
         'polymorphic_identity': 'item'
     }
 
+    def drop_into_zone(self, zone):
+        assert self.zone is None and self.player_id is not None
+        self.zone = zone
+        self.player_id = None
+
     def __repr__(self):
         return f'ItemInstance(id={self.id})'

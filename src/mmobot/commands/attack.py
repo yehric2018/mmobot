@@ -1,15 +1,15 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-
 from mmobot.db.models import Entity, Minable, Player
 from mmobot.utils.battle import attack_command_pvp
 from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.mining import attack_command_mining
+from mmobot.utils.players import handle_incapacitation
 
 
-async def attack_logic(context, args, engine):
+async def attack_logic(bot, context, args, engine):
     if context.channel.category.name != 'World':
         return
     if len(args) != 1:
@@ -17,14 +17,18 @@ async def attack_logic(context, args, engine):
         await context.send(message)
         return
 
-    if is_mention(args[0]):
-        with Session(engine) as session:
-            get_attacker_statement = (
-                select(Player)
-                .where(Player.discord_id == context.author.id)
-                .where(Player.is_active)
-            )
-            attacker = session.scalars(get_attacker_statement).one()
+    with Session(engine) as session:
+        get_player_statement = (
+            select(Player)
+            .where(Player.discord_id == context.author.id)
+            .where(Player.is_active)
+        )
+        player = session.scalars(get_player_statement).one_or_none()
+        if player is None or player.stats.hp == 0:
+            # The player is incapacitated, so nothing will happen.
+            return
+
+        if is_mention(args[0]):
             get_defender_statement = (
                 select(Player)
                 .where(Player.discord_id == args[0][2:-1])
@@ -34,24 +38,18 @@ async def attack_logic(context, args, engine):
             if defender is None:
                 await context.send(f'Could not find target {args[0]}')
                 return
-            elif attacker == defender:
+            elif player == defender:
                 await context.send('You cannot attack yourself!')
                 return
 
-            await attack_command_pvp(context, attacker, defender)
+            await attack_command_pvp(context, player, defender)
             session.commit()
-        return
+            await handle_incapacitation(player, engine, bot)
+            await handle_incapacitation(defender, engine, bot)
+            return
 
-    if is_entity_id(args[0]):
-        target_id = convert_alphanum_to_int(args[0][1:])
-        with Session(engine) as session:
-            get_player_statement = (
-                select(Player)
-                .where(Player.discord_id == context.author.id)
-                .where(Player.is_active)
-            )
-            player = session.scalars(get_player_statement).one()
-
+        if is_entity_id(args[0]):
+            target_id = convert_alphanum_to_int(args[0][1:])
             get_target_statement = (
                 select(Entity)
                 .where(Entity.id == target_id)
@@ -66,4 +64,4 @@ async def attack_logic(context, args, engine):
                 await attack_command_mining(context, player, target, session)
                 session.commit()
                 return
-    await context.send(f'Could not find target {args[0]}')
+        await context.send(f'Could not find target {args[0]}')

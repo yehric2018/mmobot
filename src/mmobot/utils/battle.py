@@ -17,19 +17,12 @@ async def attack_command_pvp(context, attacker, defender):
         else:
             message += f'{attacker.name} landed a hit on {defender.name}, '
         message += f'dealing {hit_damage} damage\n'
-        defender.stats.hp -= hit_damage
-        if defender.stats.hp < 60:
-            message += f'{defender.name} is wounded\n'
-        elif defender.stats.hp < 30:
-            message += f'{defender.name} is gravely wounded\n'
-        elif defender.stats.hp == 0:
-            message += f'{defender.name} is incapacitated\n'
+        defender.stats.hp = max(defender.stats.hp - hit_damage, 0)
+        defending_member = context.message.mentions[0]
+        await defending_member.send(f'You have {defender.stats.hp} HP remaining')
     else:
         message += f'{defender.name} evaded the attack\n'
     await context.send(message)
-
-    defending_member = context.message.mentions[0]
-    await defending_member.send(f'You have {defender.stats.hp} HP remaining')
 
 
 def calculate_hit_chance(attacker, defender):

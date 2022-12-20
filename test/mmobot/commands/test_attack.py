@@ -99,7 +99,7 @@ async def test_commandAttack_mining(attack_context, session, monkeypatch):
     session.commit()
     mock_random = MockRandomInt([20, 1])
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
-    await attack_logic(attack_context, ['/k'], engine)
+    await attack_logic(None, attack_context, ['/k'], engine)
 
     assert len(attack_context.channel.messages) == 2
     expected_message1 = 'Mining [ /k ]...'
