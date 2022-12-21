@@ -7,11 +7,13 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import move_logic
 from mmobot.db.models.player import Player
+from mmobot.db.models.player_stats import PlayerStats
 from mmobot.test.db import (
     add_player,
     delete_all_entities,
     get_player_with_name,
     init_test_engine,
+    update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel, MockThread
 
@@ -34,11 +36,13 @@ def moving_member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
+    stats = PlayerStats(hp=100)
     add_player(session, Player(
         id=1,
         name='player',
         discord_id=100,
         is_active=True,
+        stats=stats,
         zone='town-square'
     ))
     yield
@@ -178,6 +182,18 @@ async def test_commandMove_noArgsProvided(move_context):
     expected_message = 'Please specify a location to move to! For example: !move hawaii'
     assert move_context.channel.messages[0] == expected_message
     assert len(move_context.guild.channels[1].messages) == 0
+
+
+@pytest.mark.asyncio
+async def test_commandMove_incapacitated(move_context, session):
+    update_player(session, 1, {'stats.hp': 0})
+    await move_logic(move_context, ['marketplace'], engine)
+    assert len(move_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert move_context.channel.messages[0] == expected_message
+
+    player = get_player_with_name(session, 'player')
+    assert player.zone == 'town-square'
 
 
 @pytest.mark.asyncio

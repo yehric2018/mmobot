@@ -41,6 +41,10 @@ async def give_logic(context, args, engine):
             return
         giving_player_statement = select(Player).where(Player.name == giver_name)
         giving_player = session.scalars(giving_player_statement).one()
+        if giving_player.stats.hp == 0:
+            message = f'<@{giving_player.discord_id}> You are incapacitated.'
+            await context.send(message)
+            return
 
         giving_item_instance = None
 

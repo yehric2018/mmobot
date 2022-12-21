@@ -3,7 +3,7 @@ import pytest_asyncio
 from sqlalchemy.orm import Session
 
 from mmobot.commands import give_logic
-from mmobot.db.models.player import Player
+from mmobot.db.models import Player, PlayerStats
 from mmobot.test.db import (
     add_item_instance,
     add_player,
@@ -41,11 +41,13 @@ def receiving_member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
+    stats = PlayerStats(hp=100)
     add_player(session, Player(
         id=1,
         name='giver',
         discord_id=100,
         is_active=True,
+        stats=stats,
         zone='marketplace'
     ))
     add_player(session, Player(
@@ -179,6 +181,15 @@ async def test_commandGive_oneArgProvided(giving_context, session, setup_item):
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.player_id == 1
+
+
+@pytest.mark.asyncio
+async def test_commandGive_incapacitated(giving_context, session):
+    update_player(session, 1, {'stats.hp': 0})
+    await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
+    assert len(giving_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert giving_context.channel.messages[0] == expected_message
 
 
 @pytest.mark.asyncio

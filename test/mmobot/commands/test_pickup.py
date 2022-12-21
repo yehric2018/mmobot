@@ -4,12 +4,14 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import pickup_logic
 from mmobot.db.models.player import Player
+from mmobot.db.models.player_stats import PlayerStats
 from mmobot.test.db import (
     add_player,
     add_weapon_instance_to_zone,
     delete_all_entities,
     get_item_instance_with_id,
     init_test_engine,
+    update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
@@ -33,7 +35,9 @@ def member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    add_player(session, Player(id=2222, name='player', discord_id=100, is_active=True))
+    stats = PlayerStats(hp=100)
+    player = Player(id=2222, name='player', discord_id=100, stats=stats, is_active=True)
+    add_player(session, player)
     yield
     delete_all_entities(session)
 
@@ -87,6 +91,15 @@ async def test_commandPickup_withEntityId(pickup_context, session, setup_item):
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.player_id == 2222
     assert item_instance.zone is None
+
+
+@pytest.mark.asyncio
+async def test_commandPickup_incapacitated(pickup_context, session):
+    update_player(session, 2222, {'stats.hp': 0})
+    await pickup_logic(pickup_context, ['/5k'], engine)
+    assert len(pickup_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert pickup_context.channel.messages[0] == expected_message
 
 
 @pytest.mark.asyncio

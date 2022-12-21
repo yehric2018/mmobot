@@ -42,7 +42,7 @@ def member():
 def prepare_database(session):
     delete_all_entities(session)
     add_to_database(session, Player(id=1, name='teacher', discord_id=200))
-    add_to_database(session, PlayerStats(id=1, skill_points=1))
+    add_to_database(session, PlayerStats(id=1, hp=100, skill_points=1))
     add_to_database(session, Player(
         id=2,
         name='learner',
@@ -225,7 +225,6 @@ async def test_commandLearn_useTeachingSkillMaxed(learn_context, session):
 
 
 @pytest.mark.asyncio
-@freeze_time(TEST_TIMESTAMP_STR)
 async def test_commandLearn_noArgsProvided(learn_context, session):
     await learn_logic(learn_context, [], engine)
     assert len(learn_context.channel.messages) == 1
@@ -240,7 +239,6 @@ async def test_commandLearn_noArgsProvided(learn_context, session):
 
 
 @pytest.mark.asyncio
-@freeze_time(TEST_TIMESTAMP_STR)
 async def test_commandLearn_invalidSecondArg(learn_context, session):
     await learn_logic(learn_context, ['fighting', 'stuff'], engine)
     assert len(learn_context.channel.messages) == 1
@@ -255,7 +253,6 @@ async def test_commandLearn_invalidSecondArg(learn_context, session):
 
 
 @pytest.mark.asyncio
-@freeze_time(TEST_TIMESTAMP_STR)
 async def test_commandLearn_invalidSkillName(learn_context, session):
     await learn_logic(learn_context, ['fake_skill'], engine)
     assert len(learn_context.channel.messages) == 1
@@ -268,8 +265,16 @@ async def test_commandLearn_invalidSkillName(learn_context, session):
 
 
 @pytest.mark.asyncio
-@freeze_time(TEST_TIMESTAMP_STR)
 async def test_commandLearn_notInZone(learn_context, non_zone_channel, session):
     learn_context.channel = non_zone_channel
     await learn_logic(learn_context, ['fighting'], engine)
     assert len(learn_context.channel.messages) == 0
+
+
+@pytest.mark.asyncio
+async def test_commandLearn_incapacitated(learn_context, non_zone_channel, session):
+    update_player(session, 2, {'stats.hp': 0})
+    await learn_logic(learn_context, ['fighting'], engine)
+    assert len(learn_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert learn_context.channel.messages[0] == expected_message

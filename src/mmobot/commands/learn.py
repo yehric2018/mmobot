@@ -33,6 +33,10 @@ async def learn_logic(context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(select_player_statement).one()
+        if player.stats.hp == 0:
+            message = f'<@{player.discord_id}> You are incapacitated.'
+            await context.send(message)
+            return
 
         skill = get_skill(session, player, skill_name)
         player_teachings = session.scalars(

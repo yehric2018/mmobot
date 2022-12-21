@@ -40,16 +40,21 @@ async def teach_logic(context, args, engine):
         )
 
     with Session(engine) as session:
-        learning_player = session.scalars(learning_player_statement).one_or_none()
-        if learning_player is None:
-            await context.send(f'Could not find player {args[0]} in current location')
-            return
         teaching_player_statement = (
             select(Player)
             .where(Player.discord_id == teacher_id)
             .where(Player.is_active)
         )
         teaching_player = session.scalars(teaching_player_statement).one()
+        if teaching_player.stats.hp == 0:
+            message = f'<@{teaching_player.discord_id}> You are incapacitated.'
+            await context.send(message)
+            return
+
+        learning_player = session.scalars(learning_player_statement).one_or_none()
+        if learning_player is None:
+            await context.send(f'Could not find player {args[0]} in current location')
+            return
 
         current_time = datetime.now()
         if teaching_player.last_taught + TEACHING_COOLDOWN > current_time:

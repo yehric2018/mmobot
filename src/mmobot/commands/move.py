@@ -16,17 +16,22 @@ async def move_logic(context, args, engine):
     member = context.author
     curr_channel = context.channel
     with Session(engine) as session:
-        get_zone_statement = (
-            select(Zone)
-            .where(Zone.channel_name == context.channel.name)
-        )
-        zone = session.scalars(get_zone_statement).one()
         get_player_statement = (
             select(Player)
             .where(Player.discord_id == context.author.id)
             .where(Player.is_active)
         )
         player = session.scalars(get_player_statement).one()
+        if player.stats.hp == 0:
+            message = f'<@{player.discord_id}> You are incapacitated.'
+            await context.send(message)
+            return
+
+        get_zone_statement = (
+            select(Zone)
+            .where(Zone.channel_name == context.channel.name)
+        )
+        zone = session.scalars(get_zone_statement).one()
         if zone.minizone_parent == zone_name:
             dest_channel = discord.utils.get(context.guild.channels, name=zone_name)
             player.zone = zone_name
