@@ -81,8 +81,8 @@ def setup_items():
 
             all_items.append(Item(
                 id=lines[0],
-                size=int(item_stats[0]),
-                weight=int(item_stats[1])
+                size=float(item_stats[0]),
+                weight=float(item_stats[1])
             ))
 
         with Session(engine) as session:
@@ -106,14 +106,14 @@ def setup_attire():
 
             attire = Attire(
                 id=lines[0],
-                size=int(item_stats[0]),
-                weight=int(item_stats[1]),
+                size=float(item_stats[0]),
+                weight=float(item_stats[1]),
                 coverage=int(armor_stats[0]),
                 armor=int(armor_stats[1]),
                 warmth=int(lines[3])
             )
             all_attire.append(attire)
-        
+
         with Session(engine) as session:
             for attire in all_attire:
                 session.merge(attire)
@@ -133,8 +133,8 @@ def setup_weapons():
             weapon = Weapon(
                 id=lines[0],
                 item_type='weapon',
-                size=int(item_stats[0]),
-                weight=int(item_stats[1]),
+                size=float(item_stats[0]),
+                weight=float(item_stats[1]),
                 weapon_type=lines[1],
                 lethality=int(lines[3])
             )
