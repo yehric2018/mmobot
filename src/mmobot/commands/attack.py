@@ -6,7 +6,7 @@ from mmobot.utils.battle import attack_command_pvp
 from mmobot.utils.discord import is_mention
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.mining import attack_command_mining
-from mmobot.utils.players import handle_incapacitation
+from mmobot.utils.players import handle_incapacitation, kill_player
 
 
 async def attack_logic(bot, context, args, engine):
@@ -23,9 +23,11 @@ async def attack_logic(bot, context, args, engine):
             .where(Player.discord_id == context.author.id)
             .where(Player.is_active)
         )
-        player = session.scalars(get_player_statement).one_or_none()
-        if player is None or player.stats.hp == 0:
+        player = session.scalars(get_player_statement).one()
+        if player.stats.hp == 0:
             # The player is incapacitated, so nothing will happen.
+            message = f'<@{player.discord_id}> You are incapacitated.'
+            await context.send(message)
             return
 
         if is_mention(args[0]):
@@ -40,6 +42,9 @@ async def attack_logic(bot, context, args, engine):
                 return
             elif player == defender:
                 await context.send('You cannot attack yourself!')
+                return
+            elif defender.stats.hp == 0:
+                await kill_player(defender.discord_id, engine, bot)
                 return
 
             await attack_command_pvp(context, player, defender)
@@ -63,5 +68,6 @@ async def attack_logic(bot, context, args, engine):
             if type(target) == Minable:
                 await attack_command_mining(context, player, target, session)
                 session.commit()
+                await handle_incapacitation(player, engine, bot)
                 return
         await context.send(f'Could not find target {args[0]}')

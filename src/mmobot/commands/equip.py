@@ -23,6 +23,11 @@ async def equip_logic(context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(get_player_statement).one()
+        if player.stats.hp == 0:
+            # The player is incapacitated, so nothing will happen.
+            message = f'<@{player.discord_id}> You are incapacitated.'
+            await context.send(message)
+            return
         if is_entity_id(item_reference):
             item_id = convert_alphanum_to_int(item_reference)
             equipped_item = find_item_with_id(player.inventory, item_id)

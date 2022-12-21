@@ -3,13 +3,14 @@ import pytest_asyncio
 from sqlalchemy.orm import Session
 
 from mmobot.commands import equip_logic
-from mmobot.db.models.player import Player
+from mmobot.db.models import Player, PlayerStats
 from mmobot.test.db import (
     add_player,
     add_weapon_instance,
     delete_all_entities,
     get_player_with_name,
-    init_test_engine
+    init_test_engine,
+    update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 
@@ -34,7 +35,8 @@ def member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    add_player(session, Player(id=1, name='player', discord_id=100, is_active=True))
+    stats = PlayerStats(hp=100)
+    add_player(session, Player(id=1, name='player', discord_id=100, stats=stats, is_active=True))
     yield
     delete_all_entities(session)
 
@@ -125,6 +127,15 @@ async def test_commandEquip_notInZone(
     equip_context.channel = non_zone_channel
     await equip_logic(equip_context, ['desert-scimitar'], engine)
     assert len(equip_context.channel.messages) == 0
+
+
+@pytest.mark.asyncio
+async def test_commandEquip_incapacitated(equip_context, session):
+    update_player(session, 1, {'stats.hp': 0})
+    await equip_logic(equip_context, ['desert-scimitar'], engine)
+    assert len(equip_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert equip_context.channel.messages[0] == expected_message
 
 
 @pytest.mark.asyncio

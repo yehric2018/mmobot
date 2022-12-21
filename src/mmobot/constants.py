@@ -1,6 +1,10 @@
-# Skills
 from datetime import timedelta
 
+# Stats
+
+HEALTHY_PLAYER_THRESHOLD = 30  # hp > 30 means player is generally healthy
+
+# Skills
 
 ALL_SKILLS = {
     'fighting': {

@@ -13,6 +13,7 @@ from mmobot.test.db import (
     delete_all_entities,
     get_player_with_name,
     init_test_engine,
+    update_player
 )
 from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
 from mmobot.test.random import MockRandomInt
@@ -114,3 +115,14 @@ async def test_commandAttack_mining(attack_context, session, monkeypatch):
         assert final_player.stats.endurance == 99
         assert len(final_player.inventory) == 2
         assert final_player.inventory[1].item_id == 'stone'
+
+
+@pytest.mark.asyncio
+async def test_commandAttack_incapacitated(attack_context, session):
+    update_player(session, 3333, {'stats.hp': 0})
+    session.commit()
+    await attack_logic(None, attack_context, ['/k'], engine)
+
+    assert len(attack_context.channel.messages) == 1
+    expected_message = '<@100> You are incapacitated.'
+    assert attack_context.channel.messages[0] == expected_message

@@ -64,8 +64,7 @@ async def handle_incapacitation(player, engine, client):
         for channel in client.get_all_channels():
             if channel.name == player.zone:
                 await channel.send(f'{player.name} is incapacitated')
-        await asyncio.sleep(10)
-        # await asyncio.sleep(120)
+        await asyncio.sleep(120)
         await kill_player(player.discord_id, engine, client)
 
 
