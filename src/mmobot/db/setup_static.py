@@ -4,12 +4,14 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+import yaml
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
 from mmobot.db.models import Attire, Base, Item, Weapon, Zone, ZonePath
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
+STATIC_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static')
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
@@ -120,30 +122,33 @@ def setup_attire():
             session.commit()
 
 
+def weapon_from_yml(weapon_yml):
+    return Weapon(
+        id=weapon_yml['id'],
+        item_type='weapon',
+        size=weapon_yml['size'],
+        weight=weapon_yml['weight'],
+        weapon_type=weapon_yml['weapon_type'],
+        lethality=weapon_yml['lethality']
+    )
+
+
 def setup_weapons():
-    weapons_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'weapons.db')
-    with open(os.path.join(weapons_path), 'r') as f:
-        file_text = f.read()
-        weapon_data = file_text.split(DB_ENTRY_SEPERATOR)
-        all_weapons = []
-        for data in weapon_data:
-            lines = data.split('\n')
-            item_stats = lines[2].split(',')
-
-            weapon = Weapon(
-                id=lines[0],
-                item_type='weapon',
-                size=float(item_stats[0]),
-                weight=float(item_stats[1]),
-                weapon_type=lines[1],
-                lethality=int(lines[3])
-            )
-            all_weapons.append(weapon)
-
-        with Session(engine) as session:
-            for weapon in all_weapons:
-                session.merge(weapon)
-            session.commit()
+    weapons_path = os.path.join(STATIC_PATH, 'items', 'weapons')
+    all_weapons = []
+    for weapon_filename in os.listdir(weapons_path):
+        with open(os.path.join(weapons_path, weapon_filename), 'r') as f:
+            try:
+                weapon_yml = yaml.safe_load(f)
+                weapon = weapon_from_yml(weapon_yml)
+                all_weapons.append(weapon)
+            except yaml.YAMLError as exc:
+                print(exc)
+    
+    with Session(engine) as session:
+        for weapon in all_weapons:
+            session.merge(weapon)
+        session.commit()
 
 
 Base.metadata.create_all(engine)

@@ -1,0 +1,15 @@
+---
+id: wooden-sword
+weapon_type: sword
+size: 20
+weight: 5
+lethality: 1
+recipes:
+- ingredients:
+  - id: wood
+    quantity: 7
+  tools: []
+  handheld: knife
+  skills:
+  - name: woodworking
+    level: 5

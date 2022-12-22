@@ -1,0 +1,7 @@
+---
+id: basic-pickaxe
+weapon_type: pickaxe
+size: 14
+weight: 20
+lethality: 10
+recipes: []

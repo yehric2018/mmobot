@@ -1,0 +1,19 @@
+---
+id: iron-sword
+weapon_type: sword
+size: 20
+weight: 30
+lethality: 40
+recipes:
+- ingredients:
+  - id: iron-billet
+    quantity: 1
+  tools:
+  - id: anvil
+    quantity: 1
+  handheld: hammer
+  skills:
+  - name: smithing
+    level: 30
+  - name: forging
+    level: 20
