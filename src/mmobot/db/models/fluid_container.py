@@ -12,7 +12,7 @@ class FluidContainer(Item):
     id = Column(String(40), ForeignKey('Items.id', ondelete='cascade'), primary_key=True)
     max_capacity = Column(Integer)
 
-    _mapper_args__ = {
+    __mapper_args__ = {
         'polymorphic_identity': 'fluid_container'
     }
 

@@ -21,6 +21,7 @@ from .interaction import Interaction
 from .minable import Minable
 from .player import Player
 from .item_instance import ItemInstance
+from .fluid_container_instance import FluidContainerInstance
 from .solid_food_instance import SolidFoodInstance
 from .weapon_instance import WeaponInstance
 
@@ -30,6 +31,7 @@ __all__ = [
     'Base',
     'Entity',
     'FluidContainer',
+    'FluidContainerInstance',
     'FluidFood',
     'Interaction',
     'Item',

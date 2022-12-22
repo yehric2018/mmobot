@@ -1,6 +1,7 @@
 import asyncio
 import os
 import random
+from datetime import datetime
 
 from dotenv import load_dotenv
 from sqlalchemy import select
@@ -110,6 +111,7 @@ async def kill_player(player_discord_id, engine, client):
                 await afterlife_channel.send(f'{player.name} has arrived')
 
                 player.is_active = False
+                player.deathday = datetime.now()
                 clear_inventory(player)
                 session.commit()
                 return
