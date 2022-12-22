@@ -1,7 +1,10 @@
 from .base import Base
 
 from .item import Item
+from .nonsolid import Nonsolid
 from .attire import Attire
+from .fluid_food import FluidFood
+from .poison import Poison
 from .resource import Resource
 from .solid_food import SolidFood
 from .weapon import Weapon
@@ -25,14 +28,17 @@ __all__ = [
     'Attire',
     'Base',
     'Entity',
+    'FluidFood',
     'Interaction',
     'Item',
     'ItemInstance',
     'Minable',
+    'Nonsolid',
     'PlayerSkill',
     'PlayerSkillTeaching',
     'PlayerStats',
     'Player',
+    'Poison',
     'Resource',
     'SolidFood',
     'SolidFoodInstance',
