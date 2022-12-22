@@ -1,5 +1,6 @@
 from .attack import attack_logic
 from .drop import drop_logic
+from .eat import eat_logic
 from .equip import equip_logic
 from .give import give_logic
 from .here import here_logic
@@ -15,6 +16,7 @@ from .unequip import unequip_logic
 __all__ = [
     'attack_logic',
     'drop_logic',
+    'eat_logic',
     'equip_logic',
     'give_logic',
     'here_logic',

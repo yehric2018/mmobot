@@ -5,6 +5,7 @@ from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy import select
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
@@ -55,3 +56,11 @@ class Player(Entity):
 
     def __repr__(self):
         return f'Player(name={self.name})'
+
+    def select_with_discord_id(session, discord_id):
+        get_player_statement = (
+            select(Player)
+            .where(Player.discord_id == discord_id)
+            .where(Player.is_active)
+        )
+        return session.scalars(get_player_statement).one_or_none()
