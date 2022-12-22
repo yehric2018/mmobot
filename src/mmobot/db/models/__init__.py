@@ -2,6 +2,7 @@ from .base import Base
 
 from .item import Item
 from .attire import Attire
+from .resource import Resource
 from .weapon import Weapon
 from .zone import Zone
 from .zone_path import ZonePath
@@ -30,6 +31,7 @@ __all__ = [
     'PlayerSkillTeaching',
     'PlayerStats',
     'Player',
+    'Resource',
     'Weapon',
     'WeaponInstance',
     'Zone',

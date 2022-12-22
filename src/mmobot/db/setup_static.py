@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import yaml
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
-from mmobot.db.models import Attire, Base, Item, Weapon, Zone, ZonePath
+from mmobot.db.models import Attire, Base, Item, Resource, Weapon, Zone, ZonePath
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -71,26 +71,32 @@ def setup_zones():
         session.commit()
 
 
+def resource_from_yml(resource_yml):
+    return Resource(
+        id=resource_yml['id'],
+        size=resource_yml['size'],
+        weight=resource_yml['weight']
+    )
+
+def setup_resources():
+    resources_path = os.path.join(STATIC_PATH, 'items', 'resources')
+    all_resources = []
+    for resource_filename in os.listdir(resources_path):
+        with open(os.path.join(resources_path, resource_filename), 'r') as f:
+            try:
+                resource_yml = yaml.safe_load(f)
+                resource = resource_from_yml(resource_yml)
+                all_resources.append(resource)
+            except yaml.YAMLError as exc:
+                print(exc)
+    
+    with Session(engine) as session:
+        for resource in all_resources:
+            session.merge(resource)
+        session.commit()
+
 def setup_items():
-    items_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'items.db')
-    with open(os.path.join(items_path), 'r') as f:
-        file_text = f.read()
-        item_data = file_text.split(DB_ENTRY_SEPERATOR)
-        all_items = []
-        for data in item_data:
-            lines = data.split('\n')
-            item_stats = lines[1].split(',')
-
-            all_items.append(Item(
-                id=lines[0],
-                size=float(item_stats[0]),
-                weight=float(item_stats[1])
-            ))
-
-        with Session(engine) as session:
-            for item in all_items:
-                session.merge(item)
-            session.commit()
+    setup_resources()
     setup_attire()
     setup_weapons()
 
