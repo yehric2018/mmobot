@@ -150,3 +150,15 @@ async def test_commandEat_itemNotEatable(eat_context, session):
     assert player.stats.hp == 50
     assert player.stats.endurance == 50
     assert len(player.inventory) == 2
+
+
+@pytest.mark.asyncio
+async def test_commandEat_hpDoesNotSurpassMax(eat_context, session):
+    # TODO: Implement this functionality and test it
+    pass
+
+
+@pytest.mark.asyncio
+async def test_commandEat_enduranceDoesNotSurpassMax(eat_context, session):
+    # TODO: Implement this functionality and test it
+    pass

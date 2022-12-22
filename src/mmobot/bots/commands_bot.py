@@ -2,12 +2,13 @@ import os
 
 import discord
 
-from discord.ext import commands, tasks
+from discord.ext import commands
 from dotenv import load_dotenv
 
 from mmobot.commands import (
     attack_logic,
     drop_logic,
+    eat_logic,
     equip_logic,
     give_logic,
     here_logic,
@@ -21,10 +22,6 @@ from mmobot.commands import (
     unequip_logic,
 )
 from mmobot.db import initialize_engine
-from mmobot.jobs.cron import (
-    decrement_hp,
-    increment_skill_points
-)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -41,9 +38,6 @@ engine = initialize_engine()
 
 @bot.event
 async def on_ready():
-    all_tasks = []
-    all_tasks.append(decrement_hp_task.start())
-    all_tasks.append(increment_skill_points_task.start())
     print(f'{bot.user.name} has connected to Discord!')
 
 
@@ -65,6 +59,11 @@ async def attack_command(context, *args):
 @bot.command(name='drop')
 async def drop_command(context, *args):
     await drop_logic(context, args, engine)
+
+
+@bot.command(name='eat')
+async def eat_command(context, *args):
+    await eat_logic(context, args, engine)
 
 
 @bot.command(name='equip')
@@ -132,18 +131,6 @@ async def on_error(event, *args, **kwargs):
     with open('err.log', 'a') as f:
         if event == 'on_message':
             f.write(f'Unhandled message: {args[0]}\n')
-
-
-@tasks.loop(hours=2)
-async def decrement_hp_task():
-    if decrement_hp_task.current_loop != 0:
-        await decrement_hp(bot, engine)
-
-
-@tasks.loop(hours=12)
-async def increment_skill_points_task():
-    if increment_skill_points_task.current_loop != 0:
-        await increment_skill_points(engine)
 
 
 bot.run(TOKEN)
