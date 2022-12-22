@@ -3,6 +3,7 @@ from .base import Base
 from .item import Item
 from .attire import Attire
 from .resource import Resource
+from .solid_food import SolidFood
 from .weapon import Weapon
 from .zone import Zone
 from .zone_path import ZonePath
@@ -16,6 +17,7 @@ from .interaction import Interaction
 from .minable import Minable
 from .player import Player
 from .item_instance import ItemInstance
+from .solid_food_instance import SolidFoodInstance
 from .weapon_instance import WeaponInstance
 
 
@@ -32,6 +34,8 @@ __all__ = [
     'PlayerStats',
     'Player',
     'Resource',
+    'SolidFood',
+    'SolidFoodInstance',
     'Weapon',
     'WeaponInstance',
     'Zone',

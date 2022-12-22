@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import yaml
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
-from mmobot.db.models import Attire, Base, Item, Resource, Weapon, Zone, ZonePath
+from mmobot.db.models import Attire, Base, Resource, SolidFood, Weapon, Zone, ZonePath
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -99,6 +99,7 @@ def setup_items():
     setup_resources()
     setup_attire()
     setup_weapons()
+    setup_solid_food()
 
 
 def setup_attire():
@@ -154,6 +155,40 @@ def setup_weapons():
     with Session(engine) as session:
         for weapon in all_weapons:
             session.merge(weapon)
+        session.commit()
+
+
+def solid_food_from_yml(food_yml):
+    return SolidFood(
+        id=food_yml['id'],
+        size=food_yml['size'],
+        weight=food_yml['weight'],
+        hp_recover=food_yml['hp_recover'],
+        endurance_recover=food_yml['endurance_recover'],
+        impairment=food_yml['impairment'],
+        impairment_duration=food_yml['impairment_duration'],
+        hp_relief=food_yml['hp_relief'],
+        relief_duration=food_yml['relief_duration'],
+        endurance_boost=food_yml['endurance_boost'],
+        boost_duration=food_yml['boost_duration']
+    )
+
+
+def setup_solid_food():
+    food_path = os.path.join(STATIC_PATH, 'items', 'solid_food')
+    all_food = []
+    for food_filename in os.listdir(food_path):
+        with open(os.path.join(food_path, food_filename), 'r') as f:
+            try:
+                food_yml = yaml.safe_load(f)
+                solid_food = solid_food_from_yml(food_yml)
+                all_food.append(solid_food)
+            except yaml.YAMLError as exc:
+                print(exc)
+    
+    with Session(engine) as session:
+        for food in all_food:
+            session.merge(food)
         session.commit()
 
 

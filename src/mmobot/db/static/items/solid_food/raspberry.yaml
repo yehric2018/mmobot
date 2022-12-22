@@ -1,0 +1,13 @@
+---
+id: raspberry
+size: 1
+weight: 1
+hp_recover: 1
+endurance_recover: 1
+impairment: 0
+impairment_duration: 0
+hp_relief: 0
+relief_duration: 0
+endurance_boost: 0
+boost_duration: 0
+recipes: []
