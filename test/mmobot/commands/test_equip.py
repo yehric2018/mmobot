@@ -1,9 +1,9 @@
 import pytest
-import pytest_asyncio
 from sqlalchemy.orm import Session
 
 from mmobot.commands import equip_logic
 from mmobot.db.models import Player, PlayerStats
+from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,
     add_weapon_instance,
@@ -12,7 +12,7 @@ from mmobot.test.db import (
     init_test_engine,
     update_player
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext
 
 
 MESSAGE_EQUIP_SUCCESS = 'You have equipped: desert-scimitar'
@@ -25,11 +25,6 @@ engine = init_test_engine()
 @pytest.fixture()
 def session():
     return Session(engine)
-
-
-@pytest.fixture
-def member():
-    return MockMember(100, 'player')
 
 
 @pytest.fixture(autouse=True)
@@ -47,29 +42,9 @@ def setup_item(session, prepare_database):
     add_weapon_instance(session, 208, 1, 'knights-armor')
 
 
-@pytest_asyncio.fixture
-async def channel(member):
-    channel = MockTextChannel(1, 'town-square', category='World')
-    await channel.set_permissions(member, read_messages=True, send_messages=True)
-    return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
-
-
 @pytest.fixture
-def guild(channel, non_zone_channel):
-    guild = MockGuild()
-    guild.add_channel(channel)
-    guild.add_channel(non_zone_channel)
-    return guild
-
-
-@pytest.fixture
-def equip_context(member, channel, guild):
-    return MockContext(member, channel, guild)
+def equip_context(member, town_square_channel, test_guild):
+    return MockContext(member, town_square_channel, test_guild)
 
 
 @pytest.mark.asyncio
@@ -134,7 +109,7 @@ async def test_commandEquip_incapacitated(equip_context, session):
     update_player(session, 1, {'stats.hp': 0})
     await equip_logic(equip_context, ['desert-scimitar'], engine)
     assert len(equip_context.channel.messages) == 1
-    expected_message = '<@100> You are incapacitated.'
+    expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert equip_context.channel.messages[0] == expected_message
 
 

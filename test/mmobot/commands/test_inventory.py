@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 from sqlalchemy.orm import Session
 
 from mmobot.commands import inventory_logic
@@ -11,7 +10,7 @@ from mmobot.test.db import (
     init_test_engine,
     update_player
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext
 
 
 SINGLE_ITEM_INVENTORY_MESSAGE = '''\
@@ -45,33 +44,8 @@ def player(session):
 
 
 @pytest.fixture
-def member():
-    return MockMember(100, 'player')
-
-
-@pytest_asyncio.fixture
-async def channel(member):
-    channel = MockTextChannel(1, 'town-square', category='World')
-    await channel.set_permissions(member, read_messages=True, send_messages=True)
-    return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
-
-
-@pytest.fixture
-def guild(channel, non_zone_channel):
-    guild = MockGuild()
-    guild.add_channel(channel)
-    guild.add_channel(non_zone_channel)
-    return guild
-
-
-@pytest.fixture
-def inventory_context(member, channel, guild):
-    return MockContext(member, channel, guild)
+def inventory_context(member, town_square_channel, test_guild):
+    return MockContext(member, town_square_channel, test_guild)
 
 
 @pytest.mark.asyncio

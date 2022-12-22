@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from mmobot.commands import move_logic
 from mmobot.db.models.player import Player
 from mmobot.db.models.player_stats import PlayerStats
+from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,
     delete_all_entities,
@@ -189,7 +190,7 @@ async def test_commandMove_incapacitated(move_context, session):
     update_player(session, 1, {'stats.hp': 0})
     await move_logic(move_context, ['marketplace'], engine)
     assert len(move_context.channel.messages) == 1
-    expected_message = '<@100> You are incapacitated.'
+    expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert move_context.channel.messages[0] == expected_message
 
     player = get_player_with_name(session, 'player')

@@ -1,9 +1,8 @@
 import pytest
-import pytest_asyncio
 
 from mmobot.commands import navigation_logic
 from mmobot.test.db import init_test_engine
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext
 
 
 REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
@@ -26,37 +25,8 @@ engine = init_test_engine()
 
 
 @pytest.fixture
-def member():
-    return MockMember(1, 'member')
-
-
-@pytest_asyncio.fixture
-async def zone_channel(member):
-    channel = MockTextChannel(11, 'town-square', category='World')
-    await channel.set_permissions(
-        member,
-        read_messages=True,
-        send_messages=False
-    )
-    return channel
-
-
-@pytest.fixture
-def non_zone_channel():
-    return MockTextChannel(13, 'general')
-
-
-@pytest.fixture
-def guild(zone_channel, non_zone_channel):
-    guild = MockGuild()
-    guild.add_channel(zone_channel)
-    guild.add_channel(non_zone_channel)
-    return guild
-
-
-@pytest.fixture
-def navigation_context(member, zone_channel, guild):
-    return MockContext(member, zone_channel, guild)
+def navigation_context(member, town_square_channel, test_guild):
+    return MockContext(member, town_square_channel, test_guild)
 
 
 @pytest.mark.asyncio

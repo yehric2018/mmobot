@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import teach_logic
 from mmobot.db.models import Player, PlayerSkill, PlayerStats
+from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -186,7 +187,7 @@ async def test_commandTeach_incapacitated(teaching_context, session):
     update_player(session, 1, {'stats.hp': 0})
     await teach_logic(teaching_context, ['learner', 'fighting'], engine)
     assert len(teaching_context.channel.messages) == 1
-    expected_message = '<@100> You are incapacitated.'
+    expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert teaching_context.channel.messages[0] == expected_message
     assert len(get_player_skill_teachings(session, 1, 'fighting')) == 0
 

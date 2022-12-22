@@ -1,5 +1,4 @@
 import pytest
-import pytest_asyncio
 from sqlalchemy.orm import Session
 
 from mmobot.commands import drop_logic
@@ -13,7 +12,7 @@ from mmobot.test.db import (
     init_test_engine,
     update_player
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext
 
 
 MESSAGE_DROP_SUCCESS = 'You have dropped: desert-scimitar'
@@ -25,11 +24,6 @@ engine = init_test_engine()
 @pytest.fixture()
 def session():
     return Session(engine)
-
-
-@pytest.fixture
-def member():
-    return MockMember(100, 'player')
 
 
 @pytest.fixture(autouse=True)
@@ -45,29 +39,9 @@ def setup_item(session, prepare_database):
     add_weapon_instance(session, 200, 2222, 'desert-scimitar')
 
 
-@pytest_asyncio.fixture
-async def channel(member):
-    channel = MockTextChannel(1, 'town-square', category='World')
-    await channel.set_permissions(member, read_messages=True, send_messages=True)
-    return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
-
-
 @pytest.fixture
-def guild(channel, non_zone_channel):
-    guild = MockGuild()
-    guild.add_channel(channel)
-    guild.add_channel(non_zone_channel)
-    return guild
-
-
-@pytest.fixture
-def drop_context(member, channel, guild):
-    return MockContext(member, channel, guild)
+def drop_context(member, town_square_channel, test_guild):
+    return MockContext(member, town_square_channel, test_guild)
 
 
 @pytest.mark.asyncio

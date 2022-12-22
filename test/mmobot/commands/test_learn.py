@@ -1,12 +1,13 @@
 import datetime
 
 import pytest
-import pytest_asyncio
 from freezegun import freeze_time
 from sqlalchemy.orm import Session
 
 from mmobot.commands.learn import learn_logic
 from mmobot.db.models import Player, PlayerSkill, PlayerSkillTeaching, PlayerStats
+from mmobot.test.constants import TEST_PLAYER_DISCORD_NAME
+from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -16,7 +17,7 @@ from mmobot.test.db import (
     init_test_engine,
     update_player
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext
 
 
 engine = init_test_engine()
@@ -33,11 +34,6 @@ def session():
     return Session(engine)
 
 
-@pytest.fixture
-def member():
-    return MockMember(100, 'learner')
-
-
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
@@ -45,11 +41,11 @@ def prepare_database(session):
     add_to_database(session, PlayerStats(id=1, hp=100, skill_points=1))
     add_to_database(session, Player(
         id=2,
-        name='learner',
+        name=TEST_PLAYER_DISCORD_NAME,
         discord_id=100,
         is_active=True,
         stats_id=1,
-        zone='barracks'
+        zone='town-square'
     ))
     add_to_database(session, PlayerSkill(player_id=2, skill_name='fighting', skill_level=5))
     add_to_database(session, PlayerSkill(player_id=2, skill_name='masonry', skill_level=50))
@@ -57,29 +53,9 @@ def prepare_database(session):
     delete_all_entities(session)
 
 
-@pytest_asyncio.fixture
-async def channel(member):
-    channel = MockTextChannel(1, 'barracks', category='World')
-    await channel.set_permissions(member, read_messages=True, send_messages=True)
-    return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
-
-
 @pytest.fixture
-def guild(channel, non_zone_channel):
-    guild = MockGuild()
-    guild.add_channel(channel)
-    guild.add_channel(non_zone_channel)
-    return guild
-
-
-@pytest.fixture
-def learn_context(member, channel, guild):
-    return MockContext(member, channel, guild)
+def learn_context(member, town_square_channel, test_guild):
+    return MockContext(member, town_square_channel, test_guild)
 
 
 @pytest.mark.asyncio
@@ -88,7 +64,7 @@ async def test_commandLearn_useSkillPoints(learn_context, session):
     await learn_logic(learn_context, ['fighting'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == MESSAGE_LEARN_FIGHTING_SUCCESS
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 0
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -104,7 +80,7 @@ async def test_commandLearn_overrideTeaching(learn_context, session):
     await learn_logic(learn_context, ['fighting', 'points'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == MESSAGE_LEARN_FIGHTING_SUCCESS
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 0
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -117,7 +93,7 @@ async def test_commandLearn_useSkillPointsSkillNotLearned(learn_context, session
     await learn_logic(learn_context, ['weaving'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == 'Learned weaving!'
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 0
     skill = get_player_skill(session, 2, 'weaving')
     assert skill is not None
@@ -130,7 +106,7 @@ async def test_commandLearn_useSkillPointsSkillMaxed(learn_context, session):
     await learn_logic(learn_context, ['masonry'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == MESSAGE_LEARN_MASONRY_MAXED
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'masonry')
     assert skill is not None
@@ -145,7 +121,7 @@ async def test_commandLearn_useSkillPointsOutOfPoints(learn_context, session):
     assert len(learn_context.channel.messages) == 1
     expected_message = 'You do not have any skill points remaining.'
     assert learn_context.channel.messages[0] == expected_message
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 0
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -161,7 +137,7 @@ async def test_commandLearn_useTeaching(learn_context, session):
     await learn_logic(learn_context, ['fighting'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == MESSAGE_LEARN_FIGHTING_FROM_TEACHER
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -178,7 +154,7 @@ async def test_commandLearn_useTeachingSkillNotLearned(learn_context, session):
     await learn_logic(learn_context, ['weaving'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == 'Learned weaving from teacher!'
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'weaving')
     assert skill is not None
@@ -199,7 +175,7 @@ async def test_commandLearn_useTeachingOnCooldown(learn_context, session):
     expected_message += 'To use skill points instead, supply learn arguments like this:' \
         ' **!learn skill points**'
     assert learn_context.channel.messages[0] == expected_message
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -216,7 +192,7 @@ async def test_commandLearn_useTeachingSkillMaxed(learn_context, session):
     await learn_logic(learn_context, ['masonry'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == MESSAGE_LEARN_MASONRY_MAXED
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'masonry')
     assert skill is not None
@@ -231,7 +207,7 @@ async def test_commandLearn_noArgsProvided(learn_context, session):
     expected_message = 'Please supply learn arguments like this: **!learn skill**\n'
     expected_message += 'To use skill points: **!learn skill points**'
     assert learn_context.channel.messages[0] == expected_message
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -245,7 +221,7 @@ async def test_commandLearn_invalidSecondArg(learn_context, session):
     expected_message = 'Please supply learn arguments like this: **!learn skill**\n'
     expected_message += 'To use skill points: **!learn skill points**'
     assert learn_context.channel.messages[0] == expected_message
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -257,7 +233,7 @@ async def test_commandLearn_invalidSkillName(learn_context, session):
     await learn_logic(learn_context, ['fake_skill'], engine)
     assert len(learn_context.channel.messages) == 1
     assert learn_context.channel.messages[0] == 'Skill fake_skill does not exist'
-    player = get_player_with_name(session, 'learner')
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.stats.skill_points == 1
     skill = get_player_skill(session, 2, 'fighting')
     assert skill is not None
@@ -276,5 +252,5 @@ async def test_commandLearn_incapacitated(learn_context, non_zone_channel, sessi
     update_player(session, 2, {'stats.hp': 0})
     await learn_logic(learn_context, ['fighting'], engine)
     assert len(learn_context.channel.messages) == 1
-    expected_message = '<@100> You are incapacitated.'
+    expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert learn_context.channel.messages[0] == expected_message

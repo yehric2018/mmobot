@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import give_logic
 from mmobot.db.models import Player, PlayerStats
+from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_item_instance,
     add_player,
@@ -48,14 +49,14 @@ def prepare_database(session):
         discord_id=100,
         is_active=True,
         stats=stats,
-        zone='marketplace'
+        zone='town-square'
     ))
     add_player(session, Player(
         id=2,
         name='receiver',
         discord_id=101,
         is_active=True,
-        zone='marketplace'
+        zone='town-square'
     ))
     yield
     delete_all_entities(session)
@@ -68,15 +69,10 @@ def setup_item(session, prepare_database):
 
 @pytest_asyncio.fixture
 async def channel(giving_member, receiving_member):
-    channel = MockTextChannel(1, 'marketplace', category='World')
+    channel = MockTextChannel(1, 'town-square', category='World')
     await channel.set_permissions(giving_member, read_messages=True, send_messages=True)
     await channel.set_permissions(receiving_member, read_messages=True, send_messages=True)
     return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
 
 
 @pytest.fixture
@@ -188,7 +184,7 @@ async def test_commandGive_incapacitated(giving_context, session):
     update_player(session, 1, {'stats.hp': 0})
     await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
-    expected_message = '<@100> You are incapacitated.'
+    expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert giving_context.channel.messages[0] == expected_message
 
 
@@ -208,7 +204,7 @@ async def test_commandGive_recieverNotInZone(
         read_messages=False,
         send_messages=False
     )
-    update_player(session, 2, {'zone': 'town-square'})
+    update_player(session, 2, {'zone': 'marketplace'})
     await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'Could not find player receiver in current location'
