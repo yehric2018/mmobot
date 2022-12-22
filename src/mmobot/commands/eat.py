@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Player, SolidFood
+from mmobot.db.models import FluidContainerInstance, FluidFood, Player, SolidFood
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.players import find_item_with_id, find_item_with_name
 
@@ -8,7 +8,7 @@ from mmobot.utils.players import find_item_with_id, find_item_with_name
 async def eat_logic(context, args, engine):
     if context.channel.category.name != 'World':
         return
-    if len(args) != 1:
+    if len(args) < 1:
         message = 'Please indicate what item you would like to eat, for example: !eat food'
         await context.send(message)
         return
@@ -33,16 +33,21 @@ async def eat_logic(context, args, engine):
             await context.send(message)
             return
 
-        ate_food_message = f'<@{player.discord_id}> ate {eat_item.item_id}'
         if isinstance(eat_item.item, SolidFood):
-            await context.send(ate_food_message)
             await eat_solid_food(context, session, player, eat_item)
+            session.commit()
+        elif isinstance(eat_item, FluidContainerInstance):
+            if len(args) >= 2 and args[1].isnumeric() and int(args[1]) > 0:
+                await eat_from_container(context, player, eat_item, units=int(args[1]))
+            else:
+                await eat_from_container(context, player, eat_item)
             session.commit()
         else:
             await context.send(f'<@{player.discord_id}> You cannot eat {eat_item.item_id}!')
 
 
 async def eat_solid_food(context, session, player, food_instance):
+    await context.send(f'<@{player.discord_id}> ate {food_instance.item_id}')
     food_item = food_instance.item
     hp_recover = min(player.stats.max_hp - player.stats.hp, food_item.hp_recover)
     endurance_recover = min(
@@ -62,3 +67,38 @@ async def eat_solid_food(context, session, player, food_instance):
     elif endurance_recover < 0:
         await context.send(f'Lost {- endurance_recover} endurance')
     session.delete(food_instance)
+
+
+async def eat_from_container(context, player, container_instance, units=1):
+    if container_instance.nonsolid_id is None:
+        await context.send(f'<@{player.discord_id}> {container_instance.id} is empty')
+        return
+    elif not isinstance(container_instance.nonsolid, FluidFood):
+        message = f'<@{player.discord_id}> You cannot eat {container_instance.nonsolid_id}'
+        await context.send(message)
+        return
+
+    assert units > 0
+    await context.send(f'<@{player.discord_id}> ate {container_instance.nonsolid_id}')
+    food = container_instance.nonsolid
+    units = min(units, container_instance.units)
+    hp_recover = min(player.stats.max_hp - player.stats.hp, units * food.hp_recover)
+    endurance_recover = min(
+        player.stats.max_endurance - player.stats.endurance,
+        units * food.endurance_recover
+    )
+
+    player.stats.hp += hp_recover
+    player.stats.endurance += endurance_recover
+
+    if hp_recover > 0:
+        await context.send(f'Recovered {hp_recover} HP')
+    elif hp_recover < 0:
+        await context.send(f'Lost {- hp_recover} HP')
+    if endurance_recover > 0:
+        await context.send(f'Recovered {endurance_recover} endurance')
+    elif endurance_recover < 0:
+        await context.send(f'Lost {- endurance_recover} endurance')
+    container_instance.units -= units
+    if container_instance.units == 0:
+        container_instance.nonsolid_id = None
