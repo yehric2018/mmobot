@@ -88,13 +88,6 @@ def setup_items():
     setup_weapons()
     setup_solid_food()
 
-def resource_from_yml(resource_yml):
-    return Resource(
-        id=resource_yml['id'],
-        size=resource_yml['size'],
-        weight=resource_yml['weight']
-    )
-
 def setup_resources():
     resources_path = os.path.join(STATIC_PATH, 'items', 'resources')
     all_resources = []
@@ -102,7 +95,7 @@ def setup_resources():
         with open(os.path.join(resources_path, resource_filename), 'r') as f:
             try:
                 resource_yml = yaml.safe_load(f)
-                resource = resource_from_yml(resource_yml)
+                resource = Resource.from_yaml(resource_yml)
                 all_resources.append(resource)
             except yaml.YAMLError as exc:
                 print(exc)
@@ -138,18 +131,6 @@ def setup_attire():
                 session.merge(attire)
             session.commit()
 
-
-def weapon_from_yml(weapon_yml):
-    return Weapon(
-        id=weapon_yml['id'],
-        item_type='weapon',
-        size=weapon_yml['size'],
-        weight=weapon_yml['weight'],
-        weapon_type=weapon_yml['weapon_type'],
-        lethality=weapon_yml['lethality']
-    )
-
-
 def setup_weapons():
     weapons_path = os.path.join(STATIC_PATH, 'items', 'weapons')
     all_weapons = []
@@ -157,7 +138,7 @@ def setup_weapons():
         with open(os.path.join(weapons_path, weapon_filename), 'r') as f:
             try:
                 weapon_yml = yaml.safe_load(f)
-                weapon = weapon_from_yml(weapon_yml)
+                weapon = Weapon.from_yaml(weapon_yml)
                 all_weapons.append(weapon)
             except yaml.YAMLError as exc:
                 print(exc)
@@ -167,23 +148,6 @@ def setup_weapons():
             session.merge(weapon)
         session.commit()
 
-
-def solid_food_from_yml(food_yml):
-    return SolidFood(
-        id=food_yml['id'],
-        size=food_yml['size'],
-        weight=food_yml['weight'],
-        hp_recover=food_yml['hp_recover'],
-        endurance_recover=food_yml['endurance_recover'],
-        impairment=food_yml['impairment'],
-        impairment_duration=food_yml['impairment_duration'],
-        hp_relief=food_yml['hp_relief'],
-        relief_duration=food_yml['relief_duration'],
-        endurance_boost=food_yml['endurance_boost'],
-        boost_duration=food_yml['boost_duration']
-    )
-
-
 def setup_solid_food():
     food_path = os.path.join(STATIC_PATH, 'items', 'solid_foods')
     all_food = []
@@ -191,7 +155,7 @@ def setup_solid_food():
         with open(os.path.join(food_path, food_filename), 'r') as f:
             try:
                 food_yml = yaml.safe_load(f)
-                solid_food = solid_food_from_yml(food_yml)
+                solid_food = SolidFood.from_yaml(food_yml)
                 all_food.append(solid_food)
             except yaml.YAMLError as exc:
                 print(exc)
@@ -206,21 +170,6 @@ def setup_nonsolids():
     setup_fluid_food()
     setup_poisons()
 
-def fluid_food_from_yml(food_yml):
-    return FluidFood(
-        id=food_yml['id'],
-        size=food_yml['size'],
-        weight=food_yml['weight'],
-        hp_recover=food_yml['hp_recover'],
-        endurance_recover=food_yml['endurance_recover'],
-        impairment=food_yml['impairment'],
-        impairment_duration=food_yml['impairment_duration'],
-        hp_relief=food_yml['hp_relief'],
-        relief_duration=food_yml['relief_duration'],
-        endurance_boost=food_yml['endurance_boost'],
-        boost_duration=food_yml['boost_duration']
-    )
-
 def setup_fluid_food():
     food_path = os.path.join(STATIC_PATH, 'nonsolids', 'fluid_foods')
     all_food = []
@@ -228,7 +177,7 @@ def setup_fluid_food():
         with open(os.path.join(food_path, food_filename), 'r') as f:
             try:
                 food_yml = yaml.safe_load(f)
-                fluid_food = fluid_food_from_yml(food_yml)
+                fluid_food = FluidFood.from_yaml(food_yml)
                 all_food.append(fluid_food)
             except yaml.YAMLError as exc:
                 print(exc)
@@ -238,15 +187,6 @@ def setup_fluid_food():
             session.merge(food)
         session.commit()
 
-def poison_from_yml(poison_yml):
-    return Poison(
-        id=poison_yml['id'],
-        size=poison_yml['size'],
-        weight=poison_yml['weight'],
-        damage=poison_yml['damage'],
-        duration=poison_yml['duration']
-    )
-
 def setup_poisons():
     poison_path = os.path.join(STATIC_PATH, 'nonsolids', 'poisons')
     all_poisons = []
@@ -254,7 +194,7 @@ def setup_poisons():
         with open(os.path.join(poison_path, poison_filename), 'r') as f:
             try:
                 poison_yml = yaml.safe_load(f)
-                poison = poison_from_yml(poison_yml)
+                poison = Poison.from_yaml(poison_yml)
                 all_poisons.append(poison)
             except yaml.YAMLError as exc:
                 print(exc)

@@ -17,3 +17,10 @@ class Resource(Item):
 
     def __repr__(self):
         return f'Resource(id={self.id})'
+    
+    def from_yaml(yaml):
+        return Resource(
+            id=yaml['id'],
+            size=yaml['size'],
+            weight=yaml['weight']
+        )

@@ -25,3 +25,18 @@ class FluidFood(Nonsolid):
 
     def __repr__(self):
         return f'FluidFood(id={self.id})'
+    
+    def from_yaml(yaml):
+        return FluidFood(
+            id=yaml['id'],
+            size=yaml['size'],
+            weight=yaml['weight'],
+            hp_recover=yaml['hp_recover'],
+            endurance_recover=yaml['endurance_recover'],
+            impairment=yaml['impairment'],
+            impairment_duration=yaml['impairment_duration'],
+            hp_relief=yaml['hp_relief'],
+            relief_duration=yaml['relief_duration'],
+            endurance_boost=yaml['endurance_boost'],
+            boost_duration=yaml['boost_duration']
+        )

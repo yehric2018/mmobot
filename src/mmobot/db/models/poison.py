@@ -19,3 +19,12 @@ class Poison(Nonsolid):
 
     def __repr__(self):
         return f'Poison(id={self.id})'
+    
+    def from_yaml(yaml):
+        return Poison(
+            id=yaml['id'],
+            size=yaml['size'],
+            weight=yaml['weight'],
+            damage=yaml['damage'],
+            duration=yaml['duration']
+        )

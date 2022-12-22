@@ -19,3 +19,12 @@ class Weapon(Item):
 
     def __repr__(self):
         return f'Weapon(id={self.id})'
+    
+    def from_yaml(yaml):
+        return Weapon(
+            id=yaml['id'],
+            size=yaml['size'],
+            weight=yaml['weight'],
+            weapon_type=yaml['weapon_type'],
+            lethality=yaml['lethality']
+        )
