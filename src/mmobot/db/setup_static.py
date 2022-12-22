@@ -10,6 +10,7 @@ from mmobot.constants import DB_ENTRY_SEPERATOR
 from mmobot.db.models import (
     Attire,
     Base,
+    FluidContainer,
     FluidFood,
     Poison,
     Resource,
@@ -87,6 +88,8 @@ def setup_items():
     setup_attire()
     setup_weapons()
     setup_solid_food()
+    setup_fluid_containers()
+
 
 def setup_resources():
     resources_path = os.path.join(STATIC_PATH, 'items', 'resources')
@@ -99,11 +102,12 @@ def setup_resources():
                 all_resources.append(resource)
             except yaml.YAMLError as exc:
                 print(exc)
-    
+
     with Session(engine) as session:
         for resource in all_resources:
             session.merge(resource)
         session.commit()
+
 
 def setup_attire():
     attire_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'attire.db')
@@ -131,6 +135,7 @@ def setup_attire():
                 session.merge(attire)
             session.commit()
 
+
 def setup_weapons():
     weapons_path = os.path.join(STATIC_PATH, 'items', 'weapons')
     all_weapons = []
@@ -142,11 +147,12 @@ def setup_weapons():
                 all_weapons.append(weapon)
             except yaml.YAMLError as exc:
                 print(exc)
-    
+
     with Session(engine) as session:
         for weapon in all_weapons:
             session.merge(weapon)
         session.commit()
+
 
 def setup_solid_food():
     food_path = os.path.join(STATIC_PATH, 'items', 'solid_foods')
@@ -159,16 +165,35 @@ def setup_solid_food():
                 all_food.append(solid_food)
             except yaml.YAMLError as exc:
                 print(exc)
-    
+
     with Session(engine) as session:
         for food in all_food:
             session.merge(food)
         session.commit()
 
 
+def setup_fluid_containers():
+    container_path = os.path.join(STATIC_PATH, 'items', 'fluid_containers')
+    all_containers = []
+    for container_filename in os.listdir(container_path):
+        with open(os.path.join(container_path, container_filename), 'r') as f:
+            try:
+                container_yml = yaml.safe_load(f)
+                container = FluidContainer.from_yaml(container_yml)
+                all_containers.append(container)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+    with Session(engine) as session:
+        for container in all_containers:
+            session.merge(container)
+        session.commit()
+
+
 def setup_nonsolids():
     setup_fluid_food()
     setup_poisons()
+
 
 def setup_fluid_food():
     food_path = os.path.join(STATIC_PATH, 'nonsolids', 'fluid_foods')
@@ -186,6 +211,7 @@ def setup_fluid_food():
         for food in all_food:
             session.merge(food)
         session.commit()
+
 
 def setup_poisons():
     poison_path = os.path.join(STATIC_PATH, 'nonsolids', 'poisons')

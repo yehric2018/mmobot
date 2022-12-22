@@ -123,6 +123,8 @@ def update_player(session, id, data):
         player.last_learned = data['last_learned']
     if 'last_taught' in data:
         player.last_taught = data['last_taught']
+    if 'stats.endurance' in data:
+        player.stats.endurance = data['stats.endurance']
     if 'stats.hp' in data:
         player.stats.hp = data['stats.hp']
     if 'stats.skill_points' in data:

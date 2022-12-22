@@ -6,25 +6,23 @@ from sqlalchemy import String
 from mmobot.db.models import Item
 
 
-class Weapon(Item):
-    __tablename__ = 'Weapons'
+class FluidContainer(Item):
+    __tablename__ = 'FluidContainers'
 
     id = Column(String(40), ForeignKey('Items.id', ondelete='cascade'), primary_key=True)
-    weapon_type = Column(String(20))
-    lethality = Column(Integer)
+    max_capacity = Column(Integer)
 
-    __mapper_args__ = {
-        'polymorphic_identity': 'weapon'
+    _mapper_args__ = {
+        'polymorphic_identity': 'fluid_container'
     }
 
     def __repr__(self):
-        return f'Weapon(id={self.id})'
+        return f'FluidContainer(id={self.id})'
 
     def from_yaml(yaml):
-        return Weapon(
+        return FluidContainer(
             id=yaml['id'],
             size=yaml['size'],
             weight=yaml['weight'],
-            weapon_type=yaml['weapon_type'],
-            lethality=yaml['lethality']
+            max_capacity=yaml['max_capacity']
         )

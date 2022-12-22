@@ -1,0 +1,15 @@
+---
+id: stone-bowl
+size: 3
+weight: 1
+max_capacity: 3
+recipes:
+- ingredients:
+  - id: stone
+    quantity: 3
+  tools: []
+  handheld: knife
+  endurance: 30
+  skills:
+  - name: carving
+    level: 20

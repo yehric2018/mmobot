@@ -44,14 +44,21 @@ async def eat_logic(context, args, engine):
 
 async def eat_solid_food(context, session, player, food_instance):
     food_item = food_instance.item
-    player.stats.hp += food_item.hp_recover
-    player.stats.endurance += food_item.endurance_recover
-    if food_item.hp_recover > 0:
-        await context.send(f'Recovered {food_item.hp_recover} HP')
-    elif food_item.hp_recover < 0:
-        await context.send(f'Lost {-food_item.hp_recover} HP')
-    if food_item.endurance_recover > 0:
-        await context.send(f'Recovered {food_item.endurance_recover} endurance')
-    elif food_item.endurance_recover < 0:
-        await context.send(f'Lost {-food_item.endurance_recover} endurance')
+    hp_recover = min(player.stats.max_hp - player.stats.hp, food_item.hp_recover)
+    endurance_recover = min(
+        player.stats.max_endurance - player.stats.endurance,
+        food_item.endurance_recover
+    )
+
+    player.stats.hp += hp_recover
+    player.stats.endurance += endurance_recover
+
+    if hp_recover > 0:
+        await context.send(f'Recovered {hp_recover} HP')
+    elif hp_recover < 0:
+        await context.send(f'Lost {- hp_recover} HP')
+    if endurance_recover > 0:
+        await context.send(f'Recovered {endurance_recover} endurance')
+    elif endurance_recover < 0:
+        await context.send(f'Lost {- endurance_recover} endurance')
     session.delete(food_instance)

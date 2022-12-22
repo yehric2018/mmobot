@@ -12,6 +12,7 @@ recipes:
   - id: anvil
     quantity: 1
   handheld: hammer
+  endurance: 70
   skills:
   - name: smithing
     level: 30

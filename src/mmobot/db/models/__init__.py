@@ -3,6 +3,7 @@ from .base import Base
 from .item import Item
 from .nonsolid import Nonsolid
 from .attire import Attire
+from .fluid_container import FluidContainer
 from .fluid_food import FluidFood
 from .poison import Poison
 from .resource import Resource
@@ -28,6 +29,7 @@ __all__ = [
     'Attire',
     'Base',
     'Entity',
+    'FluidContainer',
     'FluidFood',
     'Interaction',
     'Item',

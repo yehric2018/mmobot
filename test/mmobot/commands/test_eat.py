@@ -117,7 +117,7 @@ async def test_commandEat_noArgsProvided(eat_context):
 
 @pytest.mark.asyncio
 async def test_commandEat_incapacitated(eat_context, session):
-    update_player(session, 2222, {'stats.hp': 0})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.hp': 0})
     await eat_logic(eat_context, [TEST_ITEM_ENTITY_REFERENCE], engine)
     assert len(eat_context.channel.messages) == 1
     assert eat_context.channel.messages[0] == MESSAGE_TEST_PLAYER_INCAPACITATED
@@ -154,11 +154,27 @@ async def test_commandEat_itemNotEatable(eat_context, session):
 
 @pytest.mark.asyncio
 async def test_commandEat_hpDoesNotSurpassMax(eat_context, session):
-    # TODO: Implement this functionality and test it
-    pass
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.hp': 100})
+    await eat_logic(eat_context, [RASPBERRY_ID], engine)
+    assert len(eat_context.channel.messages) == 2
+    assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY
+    assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_ENDURANCE
+
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.stats.hp == 100
+    assert player.stats.endurance == 51
+    assert len(player.inventory) == 1
 
 
 @pytest.mark.asyncio
 async def test_commandEat_enduranceDoesNotSurpassMax(eat_context, session):
-    # TODO: Implement this functionality and test it
-    pass
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 100})
+    await eat_logic(eat_context, [RASPBERRY_ID], engine)
+    assert len(eat_context.channel.messages) == 2
+    assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY
+    assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_HP
+
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.stats.hp == 51
+    assert player.stats.endurance == 100
+    assert len(player.inventory) == 1
