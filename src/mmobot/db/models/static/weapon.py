@@ -11,7 +11,8 @@ class Weapon(Item):
 
     id = Column(String(40), ForeignKey('Items.id', ondelete='cascade'), primary_key=True)
     weapon_type = Column(String(20))
-    lethality = Column(Integer)
+    lethality = Column(Integer, default=0)
+    craft = Column(Integer, default=0)
 
     __mapper_args__ = {
         'polymorphic_identity': 'weapon'
@@ -26,5 +27,6 @@ class Weapon(Item):
             size=yaml['size'],
             weight=yaml['weight'],
             weapon_type=yaml['weapon_type'],
-            lethality=yaml['lethality']
+            lethality=yaml['lethality'],
+            craft=yaml['craft']
         )

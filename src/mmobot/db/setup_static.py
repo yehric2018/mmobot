@@ -15,6 +15,7 @@ from mmobot.db.models import (
     Poison,
     Resource,
     SolidFood,
+    Tool,
     Weapon,
     Zone,
     ZonePath
@@ -85,6 +86,7 @@ def setup_zones():
 
 def setup_items():
     setup_resources()
+    setup_tools()
     setup_attire()
     setup_weapons()
     setup_solid_food()
@@ -106,6 +108,24 @@ def setup_resources():
     with Session(engine) as session:
         for resource in all_resources:
             session.merge(resource)
+        session.commit()
+
+
+def setup_tools():
+    tools_path = os.path.join(DATA_PATH, 'items', 'tools')
+    all_tools = []
+    for tool_filename in os.listdir(tools_path):
+        with open(os.path.join(tools_path, tool_filename), 'r') as f:
+            try:
+                tool_yml = yaml.safe_load(f)
+                tool = Tool.from_yaml(tool_yml)
+                all_tools.append(tool)
+            except yaml.YAMLError as exc:
+                print(exc)
+
+    with Session(engine) as session:
+        for tool in all_tools:
+            session.merge(tool)
         session.commit()
 
 

@@ -1,16 +1,17 @@
 ---
 id: handaxe
-weapon_type: knife
+weapon_type: axe
 size: 5
 weight: 3
 lethality: 6
+craft: 40
 recipes:
 - ingredients:
   - id: stone
     quantity: 1
   tools:
   - anvil
-  handheld: knife
-  endurance: 70
+  handheld: hammer
+  endurance: 120
   skills:
     knapping: 5

@@ -2,4 +2,18 @@
 id: copper-coin
 size: 1
 weight: 1
-recipes: []
+recipes:
+- products:
+  - id: copper-coin
+    quantity: 4
+  ingredients:
+  - id: copper-ingot
+    quantity: 1
+  tools:
+    - forge
+    - coin-mold
+  handheld: tongs
+  endurance: 40
+  skills:
+    smithing: 15
+    coining: 5

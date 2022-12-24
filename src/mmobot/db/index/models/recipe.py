@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
 
+MAX_EXTRA_SKILL = 70
+EXTRA_SKILL_REDUCTION_SCALE = 0.01
+
+
 @dataclass
 class Recipe:
     products: list
@@ -27,9 +31,9 @@ class Recipe:
 
     def get_crafting_skill(self, player_skills):
         '''
-        Return a number from 0 to 70 representing the amount of surplus skill this player has
-        for crafting this recipe. If the player does not have sufficient skills to craft the
-        recipe, return -1.
+        Return a number from 0 to MAX_EXTRA_SKILL representing the amount of surplus skill this
+        player has for crafting this recipe. If the player does not have sufficient skills to craft
+        the recipe, return -1.
         '''
         skill_count = len(self.skills)
         crafting_skill = 0
@@ -41,7 +45,31 @@ class Recipe:
                 skill_count -= 1
         if skill_count > 0:
             return -1
-        return min(crafting_skill, 70)
+        return min(crafting_skill, MAX_EXTRA_SKILL)
+
+    def get_endurance_cost(self, player, tools=[], handheld=None, crafting_skill=None):
+        '''
+        Returns the endurance cost of crafting this recipe based on the given player's
+        stats and skills, along with the tools/handhelds used for crafting the recipe. This
+        computes the cost assuming that the correct ingredients are provided.
+
+        Args:
+            player - the player that will be doing the crafting
+            tools - the list of tools provided for crafting
+            handheld - the item the player currently has equipped
+            crafting_skill - previously computed from the player's skills in the method above
+        '''
+        if crafting_skill is None:
+            crafting_skill = self.get_crafting_skill(player.skills)
+        assert crafting_skill >= 0
+        endurance_cost = self.base_endurance
+        for tool in tools:
+            if tool.item.tool_type in self.tools:
+                endurance_cost -= tool.item.craft
+        if handheld is not None:
+            endurance_cost -= handheld.item.craft
+        skill_deduction = int(endurance_cost * EXTRA_SKILL_REDUCTION_SCALE * crafting_skill)
+        return endurance_cost - skill_deduction
 
     def from_yaml(item_id, yaml):
         endurance = yaml['endurance'] if 'endurance' in yaml else 0

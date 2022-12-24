@@ -8,6 +8,7 @@ from .static.fluid_food import FluidFood
 from .static.poison import Poison
 from .static.resource import Resource
 from .static.solid_food import SolidFood
+from .static.tool import Tool
 from .static.weapon import Weapon
 from .zone import Zone
 from .zone_path import ZonePath
@@ -23,6 +24,7 @@ from .player import Player
 from .item_instance import ItemInstance
 from .fluid_container_instance import FluidContainerInstance
 from .solid_food_instance import SolidFoodInstance
+from .tool_instance import ToolInstance
 from .weapon_instance import WeaponInstance
 
 
@@ -46,6 +48,8 @@ __all__ = [
     'Resource',
     'SolidFood',
     'SolidFoodInstance',
+    'Tool',
+    'ToolInstance',
     'Weapon',
     'WeaponInstance',
     'Zone',

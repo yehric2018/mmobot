@@ -1,0 +1,8 @@
+---
+id: iron-hammer
+weapon_type: hammer
+size: 14
+weight: 30
+lethality: 15
+craft: 75
+recipes: []
