@@ -1,5 +1,10 @@
 from dataclasses import dataclass
 
+from mmobot.db.models import FluidContainerInstance
+
+
+TYPE_ITEM = 'item'
+TYPE_NONSOLID = 'nonsolid'
 
 MAX_EXTRA_SKILL = 70
 EXTRA_SKILL_REDUCTION_SCALE = 0.01
@@ -27,7 +32,31 @@ class Recipe:
                 ingredient_counter[ingredient.item_id] -= 1
                 if ingredient_counter[ingredient.item_id] == 0:
                     del ingredient_counter[ingredient.item_id]
+            elif (isinstance(ingredient, FluidContainerInstance)
+                    and ingredient.nonsolid_id in ingredient_counter):
+                ingredient_counter[ingredient.nonsolid_id] -= ingredient.units
+                if ingredient_counter[ingredient.nonsolid_id] <= 0:
+                    del ingredient_counter[ingredient.nonsolid_id]
         return ingredient_counter
+
+    def is_missing_container(self, ingredients):
+        '''
+        Returns False if this recipe is not for a nonsolid, or if the ingredients list
+        includes an empty container with enough space for the recipe. If it is a nonsolid
+        recipe that doesn't provide such a container, return True.
+
+        This assumes there will be at most one nonsolid product for the recipe.
+
+        Args: ingredients - list of ItemInstances.
+        '''
+        for product in self.products:
+            if 'type' in product and product['type'] == TYPE_NONSOLID:
+                for ingredient in ingredients:
+                    if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
+                            and ingredient.item.max_capacity >= product['quantity']):
+                        return False
+                return True
+        return False
 
     def get_crafting_skill(self, player_skills):
         '''
@@ -105,8 +134,9 @@ class Recipe:
                     del ingredient_counter[item_instance.item_id]
 
     def from_yaml(item_id, yaml):
+        main_item = {'id': item_id, 'type': TYPE_ITEM, 'quantity': 1}
         endurance = yaml['endurance'] if 'endurance' in yaml else 0
-        products = yaml['products'] if 'products' in yaml else [{'id': item_id, 'quantity': 1}]
+        products = yaml['products'] if 'products' in yaml else [main_item]
         tools = yaml['tools'] if 'tools' in yaml else []
         handheld = yaml['handheld'] if 'handheld' in yaml else None
         skills = yaml['skills'] if 'skills' in yaml else {}

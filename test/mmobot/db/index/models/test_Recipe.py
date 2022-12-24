@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 from mmobot.db.index.models import Recipe
 from mmobot.db.models import (
+    FluidContainer,
+    FluidContainerInstance,
     ItemInstance,
     PlayerSkill,
     Tool,
@@ -24,25 +26,32 @@ DATA_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'data')
 
 TEST_HANDAXE_FILEPATH = os.path.join(DATA_PATH, 'test', 'handaxe.yaml')
 TEST_COIN_FILEPATH = os.path.join(DATA_PATH, 'test', 'copper-coin.yaml')
+TEST_LIQUID_FILEPATH = os.path.join(DATA_PATH, 'test', 'strange-liquid.yaml')
 TEST_ANVIL_FILEPATH = os.path.join(DATA_PATH, 'test', 'iron-anvil.yaml')
 TEST_HAMMER_FILEPATH = os.path.join(DATA_PATH, 'test', 'iron-hammer.yaml')
+TEST_BOWL_FILEPATH = os.path.join(DATA_PATH, 'test', 'stone-bowl.yaml')
 
 TEST_HANDAXE_ID = 'handaxe'
-TEST_HANDAXE_RECIPE_PRODUCT = {'id': TEST_HANDAXE_ID, 'quantity': 1}
+TEST_HANDAXE_RECIPE_PRODUCT = {'id': TEST_HANDAXE_ID, 'type': 'item', 'quantity': 1}
 TEST_HANDAXE_RECIPE_INGREDIENT = {'id': 'stone', 'quantity': 1}
 TEST_HANDAXE_RECIPE_TOOLS = ['anvil']
 TEST_HANDAXE_RECIPE_HANDHELD = 'hammer'
 TEST_HANDAXE_RECIPE_ENDURANCE = 120
 TEST_HANDAXE_RECIPE_SKILL_KNAPPING = 5
+TEST_HANDAXE_INGREDIENT_LIST = [ItemInstance(id=TEST_ITEM_ENTITY_NUMBER, item_id='stone')]
 
 TEST_COIN_ID = 'copper-coin'
-TEST_COIN_RECIPE_PRODUCT = {'id': TEST_COIN_ID, 'quantity': 4}
+TEST_COIN_RECIPE_PRODUCT = {'id': TEST_COIN_ID, 'type': 'item', 'quantity': 4}
 TEST_COIN_RECIPE_INGREDIENT = {'id': 'copper-ingot', 'quantity': 1}
 TEST_COIN_RECIPE_ENDRUANCE = 40
 TEST_COIN_RECIPE_SKILL_SMITHING = 15
 TEST_COIN_RECIPE_SKILL_COINING = 5
 
-TEST_HANDAXE_INGREDIENT_LIST = [ItemInstance(id=TEST_ITEM_ENTITY_NUMBER, item_id='stone')]
+TEST_LIQUID_ID = 'strange-liquid'
+TEST_LIQUID_RECIPE_PRODUCT = {'id': TEST_LIQUID_ID, 'type': 'nonsolid', 'quantity': 3}
+TEST_LIQUID_RECIPE_INGREDIENT = {'id': 'water', 'quantity': 3}
+TEST_LIQUID_RECIPE_ENDURANCE = 40
+TEST_LIQUID_RECIPE_SKILL_SMITHING = 15
 
 
 @pytest.fixture
@@ -74,6 +83,20 @@ def coin_recipe(coin_yaml):
 
 
 @pytest.fixture
+def liquid_yaml():
+    with open(TEST_LIQUID_FILEPATH, 'r') as f:
+        try:
+            return yaml.safe_load(f)
+        except yaml.YAMLError as exc:
+            assert f'Encountered yaml error: {exc}' is False
+
+
+@pytest.fixture
+def liquid_recipe(liquid_yaml):
+    return Recipe.from_yaml(liquid_yaml['id'], liquid_yaml['recipes'][0])
+
+
+@pytest.fixture
 def iron_anvil():
     with open(TEST_ANVIL_FILEPATH, 'r') as f:
         try:
@@ -87,6 +110,15 @@ def iron_hammer():
     with open(TEST_HAMMER_FILEPATH, 'r') as f:
         try:
             return Weapon.from_yaml(yaml.safe_load(f))
+        except yaml.YAMLError as exc:
+            assert f'Encountered yaml error: {exc}' is False
+
+
+@pytest.fixture
+def stone_bowl():
+    with open(TEST_BOWL_FILEPATH, 'r') as f:
+        try:
+            return FluidContainer.from_yaml(yaml.safe_load(f))
         except yaml.YAMLError as exc:
             assert f'Encountered yaml error: {exc}' is False
 
@@ -134,6 +166,19 @@ def test_Recipe_fromYaml_withProducts_noToolsOrHandhelds(coin_yaml):
     assert recipe.skills['coining'] == 5
 
 
+def test_Recipe_fromYaml_nonsolid(liquid_yaml):
+    recipe = Recipe.from_yaml(liquid_yaml['id'], liquid_yaml['recipes'][0])
+    assert recipe.base_endurance == TEST_LIQUID_RECIPE_ENDURANCE
+    assert len(recipe.products) == 1
+    assert recipe.products[0] == TEST_LIQUID_RECIPE_PRODUCT
+    assert len(recipe.ingredients) == 1
+    assert recipe.ingredients[0] == TEST_LIQUID_RECIPE_INGREDIENT
+    assert len(recipe.tools) == 0
+    assert recipe.handheld is None
+    assert len(recipe.skills) == 1
+    assert recipe.skills['smithing'] == 15
+
+
 def test_Recipe_getMissingIngredients_matchReturnsEmpty(handaxe_recipe):
     assert len(handaxe_recipe.get_missing_ingredients(TEST_HANDAXE_INGREDIENT_LIST)) == 0
 
@@ -147,6 +192,57 @@ def test_Recipe_getMissingIngredients_missingIngredientReturnsNonempty(handaxe_r
 def test_Recipe_getMissingIngredients_surplusIngredientsReturnsEmpty(handaxe_recipe):
     ingredients = TEST_HANDAXE_INGREDIENT_LIST + [ItemInstance(id=50, item_id='stone')]
     assert len(handaxe_recipe.get_missing_ingredients(ingredients)) == 0
+
+
+def test_Recipe_getMissingIngredients_nonsolidMatch(liquid_recipe):
+    ingredient_list = [
+        FluidContainerInstance(id='stone-bowl', nonsolid_id='water', units=3)
+    ]
+    assert len(liquid_recipe.get_missing_ingredients(ingredient_list)) == 0
+
+
+def test_Recipe_getMissingIngredients_nonsolidMissingIngredient(liquid_recipe):
+    ingredient_list = []
+    missing_ingredients = liquid_recipe.get_missing_ingredients(ingredient_list)
+    assert len(missing_ingredients) == 1
+    assert missing_ingredients['water'] == 3
+
+
+def test_Recipe_getMissingIngredients_nonsolidNotEnoughLiquid(liquid_recipe):
+    ingredient_list = [
+        FluidContainerInstance(id='stone-bowl', nonsolid_id='water', units=2)
+    ]
+    missing_ingredients = liquid_recipe.get_missing_ingredients(ingredient_list)
+    assert len(missing_ingredients) == 1
+    assert missing_ingredients['water'] == 1
+
+
+def test_Recipe_getMissingIngredients_nonsolidSplitAcrossContainers(liquid_recipe):
+    ingredient_list = [
+        FluidContainerInstance(id='stone-bowl', nonsolid_id='water', units=2),
+        FluidContainerInstance(id='stone-bowl-2', nonsolid_id='water', units=2)
+    ]
+    assert len(liquid_recipe.get_missing_ingredients(ingredient_list)) == 0
+
+
+def test_Recipe_isMissingContainer_solid(coin_recipe):
+    assert coin_recipe.is_missing_container([]) is False
+
+
+def test_Recipe_isMissingContainer_nonsolidHasContainer(liquid_recipe, stone_bowl):
+    ingredient_list = [
+        FluidContainerInstance(id='stone-bowl', item=stone_bowl, nonsolid_id='water', units=2),
+        FluidContainerInstance(id='stone-bowl-2', item=stone_bowl, nonsolid_id=None, units=0)
+    ]
+    assert liquid_recipe.is_missing_container(ingredient_list) is False
+
+
+def test_Recipe_isMissingContainer_nonsolidHasNoContainer(liquid_recipe, stone_bowl):
+    ingredient_list = [
+        FluidContainerInstance(id='stone-bowl', item=stone_bowl, nonsolid_id='water', units=2),
+        FluidContainerInstance(id='stone-bowl-2', item=stone_bowl, nonsolid_id='water', units=2)
+    ]
+    assert liquid_recipe.is_missing_container(ingredient_list) is True
 
 
 def test_Recipe_getCraftingSkill_barelySufficientSkill(coin_recipe, coin_crafter_skills):

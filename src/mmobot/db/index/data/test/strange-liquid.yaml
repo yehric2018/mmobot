@@ -1,0 +1,15 @@
+---
+id: strange-liquid
+size: 1
+weight: 1
+recipes:
+- products:
+  - id: strange-liquid
+    type: nonsolid
+    quantity: 3
+  ingredients:
+  - id: water
+    quantity: 3
+  endurance: 40
+  skills:
+    smithing: 15
