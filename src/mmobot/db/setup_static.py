@@ -4,19 +4,12 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-import yaml
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
+from mmobot.db.index import ItemIndex
 from mmobot.db.models import (
     Attire,
     Base,
-    FluidContainer,
-    FluidFood,
-    Poison,
-    Resource,
-    SolidFood,
-    Tool,
-    Weapon,
     Zone,
     ZonePath
 )
@@ -42,9 +35,10 @@ engine = create_engine(connection_str)
 
 
 def setup():
+    item_index = ItemIndex()
+    with Session(engine) as session:
+        item_index.load_to_database(session)
     setup_zones()
-    setup_items()
-    setup_nonsolids()
 
 
 def setup_zones():
@@ -84,51 +78,6 @@ def setup_zones():
         session.commit()
 
 
-def setup_items():
-    setup_resources()
-    setup_tools()
-    setup_attire()
-    setup_weapons()
-    setup_solid_food()
-    setup_fluid_containers()
-
-
-def setup_resources():
-    resources_path = os.path.join(DATA_PATH, 'items', 'resources')
-    all_resources = []
-    for resource_filename in os.listdir(resources_path):
-        with open(os.path.join(resources_path, resource_filename), 'r') as f:
-            try:
-                resource_yml = yaml.safe_load(f)
-                resource = Resource.from_yaml(resource_yml)
-                all_resources.append(resource)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for resource in all_resources:
-            session.merge(resource)
-        session.commit()
-
-
-def setup_tools():
-    tools_path = os.path.join(DATA_PATH, 'items', 'tools')
-    all_tools = []
-    for tool_filename in os.listdir(tools_path):
-        with open(os.path.join(tools_path, tool_filename), 'r') as f:
-            try:
-                tool_yml = yaml.safe_load(f)
-                tool = Tool.from_yaml(tool_yml)
-                all_tools.append(tool)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for tool in all_tools:
-            session.merge(tool)
-        session.commit()
-
-
 def setup_attire():
     attire_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'attire.db')
     with open(os.path.join(attire_path), 'r') as f:
@@ -154,101 +103,6 @@ def setup_attire():
             for attire in all_attire:
                 session.merge(attire)
             session.commit()
-
-
-def setup_weapons():
-    weapons_path = os.path.join(DATA_PATH, 'items', 'weapons')
-    all_weapons = []
-    for weapon_filename in os.listdir(weapons_path):
-        with open(os.path.join(weapons_path, weapon_filename), 'r') as f:
-            try:
-                weapon_yml = yaml.safe_load(f)
-                weapon = Weapon.from_yaml(weapon_yml)
-                all_weapons.append(weapon)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for weapon in all_weapons:
-            session.merge(weapon)
-        session.commit()
-
-
-def setup_solid_food():
-    food_path = os.path.join(DATA_PATH, 'items', 'solid_foods')
-    all_food = []
-    for food_filename in os.listdir(food_path):
-        with open(os.path.join(food_path, food_filename), 'r') as f:
-            try:
-                food_yml = yaml.safe_load(f)
-                solid_food = SolidFood.from_yaml(food_yml)
-                all_food.append(solid_food)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for food in all_food:
-            session.merge(food)
-        session.commit()
-
-
-def setup_fluid_containers():
-    container_path = os.path.join(DATA_PATH, 'items', 'fluid_containers')
-    all_containers = []
-    for container_filename in os.listdir(container_path):
-        with open(os.path.join(container_path, container_filename), 'r') as f:
-            try:
-                container_yml = yaml.safe_load(f)
-                container = FluidContainer.from_yaml(container_yml)
-                all_containers.append(container)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for container in all_containers:
-            session.merge(container)
-        session.commit()
-
-
-def setup_nonsolids():
-    setup_fluid_food()
-    setup_poisons()
-
-
-def setup_fluid_food():
-    food_path = os.path.join(DATA_PATH, 'nonsolids', 'fluid_foods')
-    all_food = []
-    for food_filename in os.listdir(food_path):
-        with open(os.path.join(food_path, food_filename), 'r') as f:
-            try:
-                food_yml = yaml.safe_load(f)
-                fluid_food = FluidFood.from_yaml(food_yml)
-                all_food.append(fluid_food)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for food in all_food:
-            session.merge(food)
-        session.commit()
-
-
-def setup_poisons():
-    poison_path = os.path.join(DATA_PATH, 'nonsolids', 'poisons')
-    all_poisons = []
-    for poison_filename in os.listdir(poison_path):
-        with open(os.path.join(poison_path, poison_filename), 'r') as f:
-            try:
-                poison_yml = yaml.safe_load(f)
-                poison = Poison.from_yaml(poison_yml)
-                all_poisons.append(poison)
-            except yaml.YAMLError as exc:
-                print(exc)
-
-    with Session(engine) as session:
-        for poison in all_poisons:
-            session.merge(poison)
-        session.commit()
 
 
 Base.metadata.create_all(engine)

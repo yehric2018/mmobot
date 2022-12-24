@@ -149,21 +149,18 @@ def test_Recipe_getMissingIngredients_surplusIngredientsReturnsEmpty(handaxe_rec
     assert len(handaxe_recipe.get_missing_ingredients(ingredients)) == 0
 
 
-def test_Recipe_getCraftingSkill_barelySufficientSkill(coin_yaml, coin_crafter_skills):
-    recipe = Recipe.from_yaml(coin_yaml['id'], coin_yaml['recipes'][0])
-    assert recipe.get_crafting_skill(coin_crafter_skills) == 0
+def test_Recipe_getCraftingSkill_barelySufficientSkill(coin_recipe, coin_crafter_skills):
+    assert coin_recipe.get_crafting_skill(coin_crafter_skills) == 0
 
 
-def test_Recipe_getCraftingSkill_insufficientSkill(coin_yaml, coin_crafter_skills):
-    recipe = Recipe.from_yaml(coin_yaml['id'], coin_yaml['recipes'][0])
-    assert recipe.get_crafting_skill(coin_crafter_skills[:1]) == -1
+def test_Recipe_getCraftingSkill_insufficientSkill(coin_recipe, coin_crafter_skills):
+    assert coin_recipe.get_crafting_skill(coin_crafter_skills[:1]) == -1
 
 
-def test_Recipe_getCraftingSkill_surplusSkill(coin_yaml, coin_crafter_skills):
+def test_Recipe_getCraftingSkill_surplusSkill(coin_recipe, coin_crafter_skills):
     coin_crafter_skills[0].skill_level = 50
     coin_crafter_skills[1].skill_level = 10
-    recipe = Recipe.from_yaml(coin_yaml['id'], coin_yaml['recipes'][0])
-    assert recipe.get_crafting_skill(coin_crafter_skills) == 40
+    assert coin_recipe.get_crafting_skill(coin_crafter_skills) == 40
 
 
 def test_Recipe_getEnduranceCost_minimumComponents(handaxe_recipe, handaxe_crafter):

@@ -71,6 +71,39 @@ class Recipe:
         skill_deduction = int(endurance_cost * EXTRA_SKILL_REDUCTION_SCALE * crafting_skill)
         return endurance_cost - skill_deduction
 
+    def apply_recipe(self, player, endurance_cost, tools=[], handheld=None):
+        '''
+        Apply this recipe, which will do the following:
+        - Reduce the endurance (and maybe HP) of the player by endurance_cost
+        - Remove all the current items in the player's inventory
+        - TODO: Reduce the remaining uses of all the tools and handheld used, handle
+          breaking of items
+        - Return an instance of the newly crafted item
+        Calling this method assumes the following have already been asserted:
+        - All the necessary ingredients are in the player's inventory
+        - The player has sufficient skill to craft the recipe
+        - The given endurance_cost was already calculated
+
+        Args:
+            session - current database session
+            player - the player that will be doing the crafting
+            endurance_cost - precomputed from Recipe.get_endurance_cost
+            tools - the list of tools provided for crafting
+            handheld - the item the player currently has equipped
+        '''
+        actual_endurance_cost = min(endurance_cost, player.stats.endurance)
+        hp_cost = endurance_cost - actual_endurance_cost
+        player.stats.endurance -= actual_endurance_cost
+        player.stats.hp -= hp_cost
+
+        ingredient_counter = self._get_ingredient_counter()
+        for item_instance in player.inventory:
+            if item_instance.item_id in ingredient_counter:
+                item_instance.player_id = None
+                ingredient_counter[item_instance.item_id] -= 1
+                if ingredient_counter[item_instance.item_id] == 0:
+                    del ingredient_counter[item_instance.item_id]
+
     def from_yaml(item_id, yaml):
         endurance = yaml['endurance'] if 'endurance' in yaml else 0
         products = yaml['products'] if 'products' in yaml else [{'id': item_id, 'quantity': 1}]

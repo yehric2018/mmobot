@@ -27,6 +27,6 @@ class Weapon(Item):
             size=yaml['size'],
             weight=yaml['weight'],
             weapon_type=yaml['weapon_type'],
-            lethality=yaml['lethality'],
-            craft=yaml['craft']
+            lethality=yaml['lethality'] if 'lethality' in yaml else 0,
+            craft=yaml['craft'] if 'craft' in yaml else 0
         )
