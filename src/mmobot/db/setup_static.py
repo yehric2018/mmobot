@@ -22,7 +22,7 @@ from mmobot.db.models import (
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
-STATIC_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static')
+DATA_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'data')
 MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
 MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
 MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
@@ -49,7 +49,7 @@ def setup():
 def setup_zones():
     all_zones = []
     all_zone_paths = []
-    with open(os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'zones.db'), 'r') as f:
+    with open(os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'zones.db'), 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
         for data in zone_data:
@@ -60,7 +60,7 @@ def setup_zones():
                 minizone_name = lines[i][1:]
                 all_zones.append(Zone(channel_name=minizone_name, minizone_parent=zone_name))
 
-    zone_paths_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'zone-paths.db')
+    zone_paths_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'zone-paths.db')
     with open(zone_paths_path, 'r') as f:
         file_text = f.read()
         zone_data = file_text.split(DB_ENTRY_SEPERATOR)
@@ -92,7 +92,7 @@ def setup_items():
 
 
 def setup_resources():
-    resources_path = os.path.join(STATIC_PATH, 'items', 'resources')
+    resources_path = os.path.join(DATA_PATH, 'items', 'resources')
     all_resources = []
     for resource_filename in os.listdir(resources_path):
         with open(os.path.join(resources_path, resource_filename), 'r') as f:
@@ -110,7 +110,7 @@ def setup_resources():
 
 
 def setup_attire():
-    attire_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'static', 'attire.db')
+    attire_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'attire.db')
     with open(os.path.join(attire_path), 'r') as f:
         file_text = f.read()
         attire_data = file_text.split(DB_ENTRY_SEPERATOR)
@@ -137,7 +137,7 @@ def setup_attire():
 
 
 def setup_weapons():
-    weapons_path = os.path.join(STATIC_PATH, 'items', 'weapons')
+    weapons_path = os.path.join(DATA_PATH, 'items', 'weapons')
     all_weapons = []
     for weapon_filename in os.listdir(weapons_path):
         with open(os.path.join(weapons_path, weapon_filename), 'r') as f:
@@ -155,7 +155,7 @@ def setup_weapons():
 
 
 def setup_solid_food():
-    food_path = os.path.join(STATIC_PATH, 'items', 'solid_foods')
+    food_path = os.path.join(DATA_PATH, 'items', 'solid_foods')
     all_food = []
     for food_filename in os.listdir(food_path):
         with open(os.path.join(food_path, food_filename), 'r') as f:
@@ -173,7 +173,7 @@ def setup_solid_food():
 
 
 def setup_fluid_containers():
-    container_path = os.path.join(STATIC_PATH, 'items', 'fluid_containers')
+    container_path = os.path.join(DATA_PATH, 'items', 'fluid_containers')
     all_containers = []
     for container_filename in os.listdir(container_path):
         with open(os.path.join(container_path, container_filename), 'r') as f:
@@ -196,7 +196,7 @@ def setup_nonsolids():
 
 
 def setup_fluid_food():
-    food_path = os.path.join(STATIC_PATH, 'nonsolids', 'fluid_foods')
+    food_path = os.path.join(DATA_PATH, 'nonsolids', 'fluid_foods')
     all_food = []
     for food_filename in os.listdir(food_path):
         with open(os.path.join(food_path, food_filename), 'r') as f:
@@ -214,7 +214,7 @@ def setup_fluid_food():
 
 
 def setup_poisons():
-    poison_path = os.path.join(STATIC_PATH, 'nonsolids', 'poisons')
+    poison_path = os.path.join(DATA_PATH, 'nonsolids', 'poisons')
     all_poisons = []
     for poison_filename in os.listdir(poison_path):
         with open(os.path.join(poison_path, poison_filename), 'r') as f:

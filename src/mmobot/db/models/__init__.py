@@ -1,14 +1,14 @@
 from .base import Base
 
-from .item import Item
-from .nonsolid import Nonsolid
-from .attire import Attire
-from .fluid_container import FluidContainer
-from .fluid_food import FluidFood
-from .poison import Poison
-from .resource import Resource
-from .solid_food import SolidFood
-from .weapon import Weapon
+from .static.item import Item
+from .static.nonsolid import Nonsolid
+from .static.attire import Attire
+from .static.fluid_container import FluidContainer
+from .static.fluid_food import FluidFood
+from .static.poison import Poison
+from .static.resource import Resource
+from .static.solid_food import SolidFood
+from .static.weapon import Weapon
 from .zone import Zone
 from .zone_path import ZonePath
 

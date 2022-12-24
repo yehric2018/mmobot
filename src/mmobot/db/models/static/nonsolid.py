@@ -2,21 +2,21 @@ from sqlalchemy import Column
 from sqlalchemy import Float
 from sqlalchemy import String
 
-from .base import Base
+from ..base import Base
 
 
-class Item(Base):
-    __tablename__ = 'Items'
+class Nonsolid(Base):
+    __tablename__ = 'Nonsolids'
 
     id = Column(String(40), primary_key=True)
-    item_type = Column(String(20))
+    nonsolid_type = Column(String(20))
     size = Column(Float)
     weight = Column(Float)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'item',
-        'polymorphic_on': item_type
+        'polymorphic_identity': 'nonsolid',
+        'polymorphic_on': nonsolid_type
     }
 
     def __repr__(self):
-        return f'Item(name={self.name})'
+        return f'Nonsolid(id={self.id})'
