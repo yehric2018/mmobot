@@ -13,5 +13,4 @@ recipes:
   handheld: knife
   endurance: 70
   skills:
-  - name: knapping
-    level: 5
+    knapping: 5

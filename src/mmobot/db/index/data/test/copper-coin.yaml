@@ -11,7 +11,5 @@ recipes:
     quantity: 1
   endurance: 40
   skills:
-  - name: smithing
-    level: 15
-  - name: coining
-    level: 5
+    smithing: 15
+    coining: 5
