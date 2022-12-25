@@ -63,9 +63,9 @@ def find_best_recipe(goal_item, recipes, player, ingredients, tools, handheld):
     
     if best_recipe is None:
         if missing_ingredients:
-            return {'error': f'Missing ingredients: {display_counter(missing_ingredients)}'}
+            return {'error': f'Missing ingredients for recipe(s).'}
         elif missing_container:
-            return {'error': 'Missing empty container to store contents'}
+            return {'error': 'Missing empty container to store final contents.'}
         elif insufficient_skill:
             return {'error': 'Insufficient skill to craft'}
         return {'error': 'Unknown error, please try again'}
@@ -74,12 +74,3 @@ def find_best_recipe(goal_item, recipes, player, ingredients, tools, handheld):
         'recipe': best_recipe,
         'cost': best_endurance_cost
     }
-
-
-def display_counter(ingredients):
-    output_list = []
-    for ingredient in ingredients:
-        ingredient_id = ingredient['id']
-        ingredient_quantity = ingredient['quantity']
-        output_list.append(f'{ingredient_id} x{ingredient_quantity}')
-    return ', '.join(output_list)

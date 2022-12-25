@@ -67,6 +67,11 @@ def handaxe_yaml():
 
 
 @pytest.fixture
+def handaxe(handaxe_yaml):
+    return Weapon.from_yaml(handaxe_yaml)
+
+
+@pytest.fixture
 def handaxe_recipe(handaxe_yaml):
     return Recipe.from_yaml(handaxe_yaml['id'], handaxe_yaml['recipes'][0])
 
@@ -274,6 +279,11 @@ def test_Recipe_getEnduranceCost_provideTool(iron_anvil, handaxe_recipe, handaxe
 def test_Recipe_getEnduranceCost_provideHandheld(iron_hammer, handaxe_recipe, handaxe_crafter):
     weapon = WeaponInstance(id=1, item=iron_hammer)
     assert handaxe_recipe.get_endurance_cost(handaxe_crafter, handheld=weapon) == 45
+
+
+def test_Recipe_getEnduranceCost_handheldWrongType(handaxe, handaxe_recipe, handaxe_crafter):
+    weapon = WeaponInstance(id=1, item=handaxe)
+    assert handaxe_recipe.get_endurance_cost(handaxe_crafter, handheld=weapon) == 120
 
 
 def test_Recipe_getEnduranceCost_extraSkill(coin_recipe, coin_crafter_skills, handaxe_crafter):

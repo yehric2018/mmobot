@@ -13,3 +13,20 @@ recipes:
   endurance: 40
   skills:
     smithing: 15
+- products:
+  - id: strange-liquid
+    type: nonsolid
+    quantity: 3
+  ingredients:
+  - id: stone
+    quantity: 1
+  - id: iron-ore
+    quantity: 1
+  - id: water
+    quantity: 1
+  tools:
+  - anvil
+  handheld: hammer
+  endurance: 100
+  skills:
+    skill: 15

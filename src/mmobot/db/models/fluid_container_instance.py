@@ -12,7 +12,7 @@ class FluidContainerInstance(ItemInstance):
 
     id = Column(Integer, ForeignKey('ItemInstances.id', ondelete='cascade'), primary_key=True)
     nonsolid_id = Column(String(40), ForeignKey('Nonsolids.id'))
-    units = Column(Integer)
+    units = Column(Integer, default=0)
     poison_id = Column(String(40), ForeignKey('Poisons.id'))
 
     nonsolid = relationship(

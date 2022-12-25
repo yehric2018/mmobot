@@ -101,7 +101,7 @@ class Recipe:
         for tool in tools:
             if tool.item.tool_type in self.tools:
                 endurance_cost -= tool.item.craft
-        if handheld is not None:
+        if handheld is not None and handheld.item.weapon_type == self.handheld:
             endurance_cost -= handheld.item.craft
         skill_deduction = int(endurance_cost * EXTRA_SKILL_REDUCTION_SCALE * crafting_skill)
         return endurance_cost - skill_deduction
