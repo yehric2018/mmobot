@@ -32,13 +32,6 @@ class ItemIndex:
             session.merge(self.index[item])
         session.commit()
 
-    def _get_recipes(yaml):
-        recipes = []
-        if 'recipes' in yaml:
-            for recipe in yaml['recipes']:
-                recipes.append(Recipe.from_yaml(yaml['id'], recipe))
-        return recipes
-
     def _setup_index(self):
         self._setup_items()
         self._setup_nonsolids()
@@ -129,3 +122,10 @@ class ItemIndex:
                     self.index[poison_yaml['id']] = Poison.from_yaml(poison_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
+    
+    def _get_recipes(yaml):
+        recipes = []
+        if 'recipes' in yaml:
+            for recipe in yaml['recipes']:
+                recipes.append(Recipe.from_yaml(yaml['id'], recipe))
+        return recipes

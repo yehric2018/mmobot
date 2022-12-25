@@ -1,6 +1,12 @@
 from dataclasses import dataclass
 
-from mmobot.db.models import FluidContainerInstance
+from mmobot.db.models import (
+    ItemInstance,
+    FluidContainerInstance,
+    SolidFoodInstance,
+    ToolInstance,
+    WeaponInstance
+)
 
 
 TYPE_ITEM = 'item'
@@ -100,14 +106,14 @@ class Recipe:
         skill_deduction = int(endurance_cost * EXTRA_SKILL_REDUCTION_SCALE * crafting_skill)
         return endurance_cost - skill_deduction
 
-    def apply_recipe(self, player, endurance_cost, tools=[], handheld=None):
+    def apply(self, player, item_index, endurance_cost, ingredients=[], tools=[], handheld=None):
         '''
         Apply this recipe, which will do the following:
         - Reduce the endurance (and maybe HP) of the player by endurance_cost
         - Remove all the current items in the player's inventory
         - TODO: Reduce the remaining uses of all the tools and handheld used, handle
           breaking of items
-        - Return an instance of the newly crafted item
+        - Add the newly created item(s) to the player's inventory
         Calling this method assumes the following have already been asserted:
         - All the necessary ingredients are in the player's inventory
         - The player has sufficient skill to craft the recipe
@@ -116,6 +122,7 @@ class Recipe:
         Args:
             session - current database session
             player - the player that will be doing the crafting
+            item_index
             endurance_cost - precomputed from Recipe.get_endurance_cost
             tools - the list of tools provided for crafting
             handheld - the item the player currently has equipped
@@ -125,8 +132,30 @@ class Recipe:
         player.stats.endurance -= actual_endurance_cost
         player.stats.hp -= hp_cost
 
+        container = None
+
+        for product in self.products:
+            if product['type'] == 'nonsolid':
+                container = self._find_compatible_container(ingredients)
+                container.nonsolid_id = product['id']
+                container.units = product['quantity']
+                break
+        if container is None:
+            for product in self.products:
+                item = item_index.index[product['id']]
+                if item.item_type == 'weapon':
+                    instance = WeaponInstance(item_id=product['id'])
+                elif item.item_type == 'tool':
+                    instance = ToolInstance(item_id=product['id'])
+                elif item.item_type == 'solid_food':
+                    instance = SolidFoodInstance(item_id=product['id'])
+                else:
+                    instance = ItemInstance(item_id=product['id'])
+                for i in range(product['quantity']):
+                    player.inventory.append(instance)
+
         ingredient_counter = self._get_ingredient_counter()
-        for item_instance in player.inventory:
+        for item_instance in ingredients:
             if item_instance.item_id in ingredient_counter:
                 item_instance.player_id = None
                 ingredient_counter[item_instance.item_id] -= 1
@@ -154,3 +183,17 @@ class Recipe:
         for ingredient in self.ingredients:
             ingredient_counter[ingredient['id']] = ingredient['quantity']
         return ingredient_counter
+
+    def _find_compatible_container(self, ingredients):
+        '''
+        Returns the first empty container in the inventory that can hold the product of
+        this recipe. Returns None if no container is found (this should never happen if we
+        ran is_missing_container before).
+        '''
+        for product in self.products:
+            if 'type' in product and product['type'] == TYPE_NONSOLID:
+                for ingredient in ingredients:
+                    if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
+                            and ingredient.item.max_capacity >= product['quantity']):
+                        return ingredient
+        return None

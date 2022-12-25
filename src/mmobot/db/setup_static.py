@@ -35,6 +35,7 @@ engine = create_engine(connection_str)
 
 
 def setup():
+    # TODO: Load in using MockItemIndex for tests so we don't need to load in as many  items
     item_index = ItemIndex()
     with Session(engine) as session:
         item_index.load_to_database(session)

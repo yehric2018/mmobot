@@ -19,6 +19,7 @@ from mmobot.test.constants import (
     TEST_ITEM_ENTITY_NUMBER,
     TEST_PLAYER
 )
+from mmobot.test.mock import MockItemIndex
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -52,6 +53,8 @@ TEST_LIQUID_RECIPE_PRODUCT = {'id': TEST_LIQUID_ID, 'type': 'nonsolid', 'quantit
 TEST_LIQUID_RECIPE_INGREDIENT = {'id': 'water', 'quantity': 3}
 TEST_LIQUID_RECIPE_ENDURANCE = 40
 TEST_LIQUID_RECIPE_SKILL_SMITHING = 15
+
+item_index = MockItemIndex()
 
 
 @pytest.fixture
