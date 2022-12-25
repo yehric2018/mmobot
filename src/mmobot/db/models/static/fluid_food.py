@@ -25,7 +25,7 @@ class FluidFood(Nonsolid):
 
     def __repr__(self):
         return f'FluidFood(id={self.id})'
-    
+
     def from_yaml(yaml):
         return FluidFood(
             id=yaml['id'],
@@ -40,6 +40,6 @@ class FluidFood(Nonsolid):
             endurance_boost=FluidFood._handle_field(yaml, 'endurance_boost'),
             boost_duration=FluidFood._handle_field(yaml, 'boost_duration')
         )
-    
+
     def _handle_field(yaml, key):
         return yaml[key] if key in yaml else 0

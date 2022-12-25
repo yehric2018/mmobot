@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Nonsolid, Player
+from mmobot.db.models import Player
 from mmobot.utils.crafting import find_best_recipe, separate_crafting_components
 
 
 async def craft_logic(context, args, engine, item_index, use_hp=False):
     if context.channel.category.name != 'World':
         return
-    
+
     goal_item_id = args[0]
     discord_id = context.author.id
     if goal_item_id not in item_index.index:
@@ -16,7 +16,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
     elif len(item_index.recipes[goal_item_id]) == 0:
         await context.send(f'<@{discord_id}> You cannot craft {goal_item_id}.')
         return
-    
+
     goal_item = item_index.items[goal_item_id]
     with Session(engine) as session:
         player = Player.select_with_discord_id(session, discord_id)
@@ -27,7 +27,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
             bad_reference = components['error']
             await context.send(f'<@{discord_id}> Invalid reference ID: {bad_reference}')
             return
-        
+
         best_recipe_finder = find_best_recipe(
             goal_item,
             item_index.recipes[goal_item_id],
@@ -40,7 +40,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
             error_message = best_recipe_finder['error']
             await context.send(f'<@{discord_id} {error_message}')
             return
-        
+
         best_recipe = best_recipe_finder['recipe']
         endurance_cost = best_recipe_finder['cost']
 
@@ -54,7 +54,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
                 message = f'<@{discord_id}> You do not have enough endurance/hp to craft.'
                 await context.send(message)
                 return
-        
+
         best_recipe.apply(player, endurance_cost)
         session.commit()
         await context.send('<@{discord_id}> Successfully crafted {}!')

@@ -51,7 +51,8 @@ class Recipe:
         includes an empty container with enough space for the recipe. If it is a nonsolid
         recipe that doesn't provide such a container, return True.
 
-        This assumes there will be at most one nonsolid product for the recipe.
+        This assumes there will be at most one nonsolid product for the recipe. It is best to
+        only call this when you know the product(s) will be nonsolid
 
         Args: ingredients - list of ItemInstances.
         '''
@@ -161,6 +162,7 @@ class Recipe:
                 ingredient_counter[item_instance.item_id] -= 1
                 if ingredient_counter[item_instance.item_id] == 0:
                     del ingredient_counter[item_instance.item_id]
+        assert len(ingredient_counter) == 0
 
     def from_yaml(item_id, yaml):
         main_item = {'id': item_id, 'type': TYPE_ITEM, 'quantity': 1}

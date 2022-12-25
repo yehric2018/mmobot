@@ -60,16 +60,16 @@ def find_best_recipe(goal_item, recipes, player, ingredients, tools, handheld):
         if endurance_cost < best_endurance_cost:
             best_recipe = recipe
             best_endurance_cost = endurance_cost
-    
+
     if best_recipe is None:
         if missing_ingredients:
-            return {'error': f'Missing ingredients for recipe(s).'}
+            return {'error': 'Missing ingredients for recipe(s).'}
         elif missing_container:
             return {'error': 'Missing empty container to store final contents.'}
         elif insufficient_skill:
             return {'error': 'Insufficient skill to craft'}
         return {'error': 'Unknown error, please try again'}
-    
+
     return {
         'recipe': best_recipe,
         'cost': best_endurance_cost

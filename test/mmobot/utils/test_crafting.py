@@ -1,5 +1,6 @@
 import pytest
 
+from mmobot.db.index.models import Recipe
 from mmobot.db.models import (
     FluidContainerInstance,
     ItemInstance,
@@ -30,13 +31,23 @@ def recipes_liquid():
 
 
 @pytest.fixture
+def recipes_solid():
+    stone_item = {'id': 'stone', 'quantity': 1}
+    iron_item = {'id': 'iron-ore', 'quantity': 1}
+    return [
+        Recipe.from_yaml('solid-item', {'ingredients': [stone_item], 'endurance': 20}),
+        Recipe.from_yaml('solid-item', {'ingredients': [iron_item], 'endurance': 20})
+    ]
+
+
+@pytest.fixture
 def inventory():
     return [
         ItemInstance(id=1, item_id='stone'),
         ItemInstance(id=3, item_id='iron-ore'),
         FluidContainerInstance(id=4, item_id='stone-bowl', nonsolid_id='water', units=3),
-        FluidContainerInstance(id=9, 
-                item_id='stone-bowl', item=item_index.index['stone-bowl'], units=0),
+        FluidContainerInstance(id=9, item_id='stone-bowl',
+                               item=item_index.index['stone-bowl'], units=0),
         WeaponInstance(id=2, item_id='iron-hammer', item=item_index.index['iron-hammer']),
         ItemInstance(id=200, item_id='not-included'),
     ]
@@ -90,7 +101,28 @@ def test_separateCraftingComponents_success(inventory, zone, skills):
     assert components['skills'][0] == skills[0]
 
 
-def test_findBestRecipe_success(recipes_liquid, inventory, skills, zone):
+def test_findBestRecipe_successSolid(recipes_solid, inventory, skills, zone):
+    references = ['/1', '/2']
+    player = Player(
+        id=100,
+        equipped_weapon_id=2,
+        inventory=inventory,
+        skills=skills,
+        zone=zone
+    )
+    components = separate_crafting_components(references, player)
+    actual = find_best_recipe(None, recipes_solid, player,
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
+    assert 'error' not in actual
+    assert 'recipe' in actual
+    assert actual['recipe'] == recipes_solid[0]
+    assert 'cost' in actual
+    assert actual['cost'] == 20
+
+
+def test_findBestRecipe_successNonsolid(recipes_liquid, inventory, skills, zone):
     references = ['/1', '/3', '/4', '/6', '/9']
     player = Player(
         id=100,
@@ -101,7 +133,9 @@ def test_findBestRecipe_success(recipes_liquid, inventory, skills, zone):
     )
     components = separate_crafting_components(references, player)
     actual = find_best_recipe(item_index.index['strange-liquid'], recipes_liquid, player,
-            components['ingredients'], components['tools'], components['handheld'])
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
     assert 'error' not in actual
     assert 'recipe' in actual
     assert actual['recipe'] == recipes_liquid[1]
@@ -121,9 +155,12 @@ def test_findBestRecipe_bothRecipesWork(recipes_liquid, inventory, skills, zone)
         zone=zone
     )
     components = separate_crafting_components(references, player)
-    assert recipes_liquid[0].get_endurance_cost(player, components['tools'], components['handheld']) == 40
+    assert recipes_liquid[0].get_endurance_cost(player, components['tools'],
+                                                components['handheld']) == 40
     actual = find_best_recipe(item_index.index['strange-liquid'], recipes_liquid, player,
-            components['ingredients'], components['tools'], components['handheld'])
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
     assert 'error' not in actual
     assert 'recipe' in actual
     assert actual['recipe'] == recipes_liquid[1]
@@ -142,7 +179,9 @@ def test_findBestRecipe_missingIngredient(recipes_liquid, inventory, skills, zon
     )
     components = separate_crafting_components(references, player)
     actual = find_best_recipe(item_index.index['strange-liquid'], recipes_liquid[1:], player,
-            components['ingredients'], components['tools'], components['handheld'])
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
     assert 'error' in actual
     assert actual['error'] == MESSAGE_MISSING_INGREDIENTS
 
@@ -158,7 +197,9 @@ def test_findBestRecipe_missingEmptyContainer(recipes_liquid, inventory, skills,
     )
     components = separate_crafting_components(references, player)
     actual = find_best_recipe(item_index.index['strange-liquid'], recipes_liquid[1:], player,
-            components['ingredients'], components['tools'], components['handheld'])
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
     assert 'error' in actual
     assert actual['error'] == MESSAGE_EMPTY_CONTAINER
 
@@ -175,6 +216,8 @@ def test_findBestRecipe_missingSkills(recipes_liquid, inventory, skills, zone):
     )
     components = separate_crafting_components(references, player)
     actual = find_best_recipe(item_index.index['strange-liquid'], recipes_liquid[1:], player,
-            components['ingredients'], components['tools'], components['handheld'])
+                              components['ingredients'],
+                              components['tools'],
+                              components['handheld'])
     assert 'error' in actual
     assert actual['error'] == MESSAGE_MISSING_SKILLS
