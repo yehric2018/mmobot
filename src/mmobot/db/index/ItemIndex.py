@@ -53,8 +53,9 @@ class ItemIndex:
             with open(os.path.join(resources_path, resource_filename), 'r') as f:
                 try:
                     resource_yaml = yaml.safe_load(f)
-                    self.index[resource_yaml['id']] = Resource.from_yaml(resource_yaml)
-                    self.recipes[resource_yaml['id']] = ItemIndex._get_recipes(resource_yaml)
+                    resource = Resource.from_yaml(resource_yaml)
+                    self.index[resource.id] = resource
+                    self.recipes[resource.id] = ItemIndex._get_recipes(resource, resource_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -64,8 +65,9 @@ class ItemIndex:
             with open(os.path.join(tools_path, tool_filename), 'r') as f:
                 try:
                     tool_yaml = yaml.safe_load(f)
-                    self.index[tool_yaml['id']] = Tool.from_yaml(tool_yaml)
-                    self.recipes[tool_yaml['id']] = ItemIndex._get_recipes(tool_yaml)
+                    tool = Tool.from_yaml(tool_yaml)
+                    self.index[tool.id] = tool
+                    self.recipes[tool.id] = ItemIndex._get_recipes(tool, tool_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -75,8 +77,9 @@ class ItemIndex:
             with open(os.path.join(weapons_path, weapon_filename), 'r') as f:
                 try:
                     weapon_yaml = yaml.safe_load(f)
-                    self.index[weapon_yaml['id']] = Weapon.from_yaml(weapon_yaml)
-                    self.recipes[weapon_yaml['id']] = ItemIndex._get_recipes(weapon_yaml)
+                    weapon = Weapon.from_yaml(weapon_yaml)
+                    self.index[weapon.id] = weapon
+                    self.recipes[weapon.id] = ItemIndex._get_recipes(weapon, weapon_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -86,8 +89,9 @@ class ItemIndex:
             with open(os.path.join(food_path, food_filename), 'r') as f:
                 try:
                     food_yaml = yaml.safe_load(f)
-                    self.index[food_yaml['id']] = SolidFood.from_yaml(food_yaml)
-                    self.recipes[food_yaml['id']] = ItemIndex._get_recipes(food_yaml)
+                    food = SolidFood.from_yaml(food_yaml)
+                    self.index[food.id] = food
+                    self.recipes[food.id] = ItemIndex._get_recipes(food, food_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -97,8 +101,9 @@ class ItemIndex:
             with open(os.path.join(container_path, container_filename), 'r') as f:
                 try:
                     container_yaml = yaml.safe_load(f)
-                    self.index[container_yaml['id']] = FluidContainer.from_yaml(container_yaml)
-                    self.recipes[container_yaml['id']] = ItemIndex._get_recipes(container_yaml)
+                    container = FluidContainer.from_yaml(container_yaml)
+                    self.index[container.id] = container
+                    self.recipes[container.id] = ItemIndex._get_recipes(container, container_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -108,8 +113,9 @@ class ItemIndex:
             with open(os.path.join(food_path, food_filename), 'r') as f:
                 try:
                     food_yaml = yaml.safe_load(f)
-                    self.index[food_yaml['id']] = FluidFood.from_yaml(food_yaml)
-                    self.recipes[food_yaml['id']] = ItemIndex._get_recipes(food_yaml)
+                    food = FluidFood.from_yaml(food_yaml)
+                    self.index[food.id] = food
+                    self.recipes[food.id] = ItemIndex._get_recipes(food, food_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 
@@ -122,10 +128,10 @@ class ItemIndex:
                     self.index[poison_yaml['id']] = Poison.from_yaml(poison_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
-    
-    def _get_recipes(yaml):
+
+    def _get_recipes(item, yaml):
         recipes = []
         if 'recipes' in yaml:
             for recipe in yaml['recipes']:
-                recipes.append(Recipe.from_yaml(yaml['id'], recipe))
+                recipes.append(Recipe.from_yaml(item, recipe))
         return recipes

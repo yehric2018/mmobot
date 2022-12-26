@@ -8,8 +8,14 @@ from mmobot.db.index.models import Recipe
 from mmobot.db.models import (
     FluidContainer,
     FluidContainerInstance,
+    FluidFood,
     ItemInstance,
+    Player,
     PlayerSkill,
+    PlayerStats,
+    Resource,
+    SolidFood,
+    SolidFoodInstance,
     Tool,
     ToolInstance,
     Weapon,
@@ -17,9 +23,9 @@ from mmobot.db.models import (
 )
 from mmobot.test.constants import (
     TEST_ITEM_ENTITY_NUMBER,
-    TEST_PLAYER
+    TEST_ITEM_ENTITY_NUMBER_2,
+    TEST_ITEM_ENTITY_NUMBER_3
 )
-from mmobot.test.mock import MockItemIndex
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
@@ -54,8 +60,6 @@ TEST_LIQUID_RECIPE_INGREDIENT = {'id': 'water', 'quantity': 3}
 TEST_LIQUID_RECIPE_ENDURANCE = 40
 TEST_LIQUID_RECIPE_SKILL_SMITHING = 15
 
-item_index = MockItemIndex()
-
 
 @pytest.fixture
 def handaxe_yaml():
@@ -72,8 +76,8 @@ def handaxe(handaxe_yaml):
 
 
 @pytest.fixture
-def handaxe_recipe(handaxe_yaml):
-    return Recipe.from_yaml(handaxe_yaml['id'], handaxe_yaml['recipes'][0])
+def handaxe_recipe(handaxe, handaxe_yaml):
+    return Recipe.from_yaml(handaxe, handaxe_yaml['recipes'][0])
 
 
 @pytest.fixture
@@ -86,8 +90,13 @@ def coin_yaml():
 
 
 @pytest.fixture
-def coin_recipe(coin_yaml):
-    return Recipe.from_yaml(coin_yaml['id'], coin_yaml['recipes'][0])
+def coin(coin_yaml):
+    return Resource.from_yaml(coin_yaml)
+
+
+@pytest.fixture
+def coin_recipe(coin, coin_yaml):
+    return Recipe.from_yaml(coin, coin_yaml['recipes'][0])
 
 
 @pytest.fixture
@@ -100,8 +109,13 @@ def liquid_yaml():
 
 
 @pytest.fixture
-def liquid_recipe(liquid_yaml):
-    return Recipe.from_yaml(liquid_yaml['id'], liquid_yaml['recipes'][0])
+def liquid(liquid_yaml):
+    return FluidFood.from_yaml(liquid_yaml)
+
+
+@pytest.fixture
+def liquid_recipe(liquid, liquid_yaml):
+    return Recipe.from_yaml(liquid, liquid_yaml['recipes'][0])
 
 
 @pytest.fixture
@@ -141,18 +155,38 @@ def coin_crafter_skills():
 
 @pytest.fixture
 def handaxe_crafter():
-    player = TEST_PLAYER
-    player.skills = [
-        PlayerSkill(skill_name='knapping', skill_level=TEST_HANDAXE_RECIPE_SKILL_KNAPPING)
+    return Player(
+        stats=PlayerStats(hp=100, endurance=100),
+        skills=[
+            PlayerSkill(skill_name='knapping', skill_level=TEST_HANDAXE_RECIPE_SKILL_KNAPPING)
+        ],
+        inventory=[] + TEST_HANDAXE_INGREDIENT_LIST
+    )
+
+
+@pytest.fixture
+def ingredients_with_bowl():
+    return [
+        FluidContainerInstance(
+            id=TEST_ITEM_ENTITY_NUMBER_2,
+            item_id='bowl',
+            item=FluidContainer(id='bowl', max_capacity=3),
+            units=0
+        ),
+        FluidContainerInstance(
+            id=TEST_ITEM_ENTITY_NUMBER_3,
+            item_id='bowl',
+            item=FluidContainer(id='bowl', max_capacity=3),
+            units=0
+        )
     ]
-    return player
 
 
-def test_Recipe_fromYaml_simpleRecipe(handaxe_yaml):
-    recipe = Recipe.from_yaml(handaxe_yaml['id'], handaxe_yaml['recipes'][0])
+def test_Recipe_fromYaml_simpleRecipe(handaxe, handaxe_yaml):
+    recipe = Recipe.from_yaml(handaxe, handaxe_yaml['recipes'][0])
     assert recipe.base_endurance == TEST_HANDAXE_RECIPE_ENDURANCE
-    assert len(recipe.products) == 1
-    assert recipe.products[0] == TEST_HANDAXE_RECIPE_PRODUCT
+    assert recipe.product is not None
+    assert recipe.product == handaxe
     assert len(recipe.ingredients) == 1
     assert recipe.ingredients[0] == TEST_HANDAXE_RECIPE_INGREDIENT
     assert recipe.tools == TEST_HANDAXE_RECIPE_TOOLS
@@ -161,10 +195,10 @@ def test_Recipe_fromYaml_simpleRecipe(handaxe_yaml):
     assert recipe.skills['knapping'] == TEST_HANDAXE_RECIPE_SKILL_KNAPPING
 
 
-def test_Recipe_fromYaml_withProducts_noToolsOrHandhelds(coin_yaml):
-    recipe = Recipe.from_yaml(coin_yaml['id'], coin_yaml['recipes'][0])
-    assert len(recipe.products) == 1
-    assert recipe.products[0] == TEST_COIN_RECIPE_PRODUCT
+def test_Recipe_fromYaml_withProducts_noToolsOrHandhelds(coin, coin_yaml):
+    recipe = Recipe.from_yaml(coin, coin_yaml['recipes'][0])
+    assert recipe.product == coin
+    assert recipe.quantity == 4
     assert len(recipe.ingredients) == 1
     assert recipe.ingredients[0] == TEST_COIN_RECIPE_INGREDIENT
     assert len(recipe.tools) == 0
@@ -174,11 +208,11 @@ def test_Recipe_fromYaml_withProducts_noToolsOrHandhelds(coin_yaml):
     assert recipe.skills['coining'] == 5
 
 
-def test_Recipe_fromYaml_nonsolid(liquid_yaml):
-    recipe = Recipe.from_yaml(liquid_yaml['id'], liquid_yaml['recipes'][0])
+def test_Recipe_fromYaml_nonsolid(liquid, liquid_yaml):
+    recipe = Recipe.from_yaml(liquid, liquid_yaml['recipes'][0])
     assert recipe.base_endurance == TEST_LIQUID_RECIPE_ENDURANCE
-    assert len(recipe.products) == 1
-    assert recipe.products[0] == TEST_LIQUID_RECIPE_PRODUCT
+    assert recipe.product == liquid
+    assert recipe.quantity == 3
     assert len(recipe.ingredients) == 1
     assert recipe.ingredients[0] == TEST_LIQUID_RECIPE_INGREDIENT
     assert len(recipe.tools) == 0
@@ -291,3 +325,195 @@ def test_Recipe_getEnduranceCost_extraSkill(coin_recipe, coin_crafter_skills, ha
     coin_crafter_skills[1].skill_level = 10
     handaxe_crafter.skills = coin_crafter_skills
     assert coin_recipe.get_endurance_cost(handaxe_crafter) == 24
+
+
+def test_Recipe_apply_weaponRecipeNoCost(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.apply(handaxe_crafter, 0, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 100
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+
+
+def test_Recipe_apply_recipeWithCost(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+
+
+def test_Recipe_apply_recipeWithHPCost(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.apply(handaxe_crafter, 140, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 60
+    assert handaxe_crafter.stats.endurance == 0
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+
+
+def test_Recipe_apply_toolRecipe(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.product = Tool(id=TEST_HANDAXE_ID)
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], ToolInstance)
+
+
+def test_Recipe_apply_fluidContainerRecipe(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.product = FluidContainer(id=TEST_HANDAXE_ID)
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
+    assert handaxe_crafter.inventory[1].units == 0
+
+
+def test_Recipe_apply_solidFoodRecipe(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.product = SolidFood(id=TEST_HANDAXE_ID)
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], SolidFoodInstance)
+
+
+def test_Recipe_apply_resourceRecipe(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.product = Resource(id=TEST_HANDAXE_ID)
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 2
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
+    assert isinstance(handaxe_crafter.inventory[1], ItemInstance)
+    assert not isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+    assert not isinstance(handaxe_crafter.inventory[1], ToolInstance)
+    assert not isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
+    assert not isinstance(handaxe_crafter.inventory[1], SolidFoodInstance)
+
+
+def test_Recipe_apply_recipeWithQuantity(handaxe_crafter, handaxe_recipe):
+    handaxe_recipe.quantity = 4
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 5
+    assert handaxe_crafter.inventory[0].player_id is None
+    for i in range(1, 5):
+        assert handaxe_crafter.inventory[i].item_id == TEST_HANDAXE_ID
+        assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+
+
+def test_Recipe_apply_nonsolidRecipe(handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
+    handaxe_recipe.product = FluidFood(id=TEST_HANDAXE_ID)
+    ingredients = TEST_HANDAXE_INGREDIENT_LIST + ingredients_with_bowl
+    handaxe_crafter.inventory = ingredients
+    assert len(handaxe_crafter.inventory) == 3
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 3
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
+    assert handaxe_crafter.inventory[1].item_id == 'bowl'
+    assert handaxe_crafter.inventory[1].nonsolid_id == TEST_HANDAXE_ID
+    assert handaxe_crafter.inventory[1].units == 1
+    assert handaxe_crafter.inventory[2].units == 0
+
+
+def test_Recipe_apply_nonsolidWithQuantity(handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
+    handaxe_recipe.product = FluidFood(id=TEST_HANDAXE_ID)
+    handaxe_recipe.quantity = 3
+    ingredients = TEST_HANDAXE_INGREDIENT_LIST + ingredients_with_bowl
+    handaxe_crafter.inventory = ingredients
+    assert len(handaxe_crafter.inventory) == 3
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 3
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
+    assert handaxe_crafter.inventory[1].item_id == 'bowl'
+    assert handaxe_crafter.inventory[1].nonsolid_id == TEST_HANDAXE_ID
+    assert handaxe_crafter.inventory[1].units == 3
+    assert handaxe_crafter.inventory[2].units == 0
+
+
+def test_Recipe_apply_nonsolidHasFull(handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
+    handaxe_recipe.product = FluidFood(id=TEST_HANDAXE_ID)
+    ingredients = TEST_HANDAXE_INGREDIENT_LIST + ingredients_with_bowl
+    ingredients[1].units = 1
+    ingredients[1].nonsolid_id = 'full'
+    handaxe_crafter.inventory = ingredients
+    assert len(handaxe_crafter.inventory) == 3
+    assert handaxe_crafter.inventory[2].units == 0
+
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 3
+    assert handaxe_crafter.inventory[0].player_id is None
+
+    assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
+    assert handaxe_crafter.inventory[1].item_id == 'bowl'
+    assert handaxe_crafter.inventory[1].nonsolid_id == 'full'
+    assert handaxe_crafter.inventory[1].units == 1
+
+    assert isinstance(handaxe_crafter.inventory[2], FluidContainerInstance)
+    assert handaxe_crafter.inventory[2].item_id == 'bowl'
+    assert handaxe_crafter.inventory[2].nonsolid_id == TEST_HANDAXE_ID
+    assert handaxe_crafter.inventory[2].units == 1
+
+
+def test_Recipe_apply_nonsolidIngredient(handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
+    handaxe_recipe.ingredients.append({'id': 'water', 'quantity': 2})
+    ingredients = TEST_HANDAXE_INGREDIENT_LIST + ingredients_with_bowl
+    ingredients[1].units = 3
+    ingredients[1].nonsolid_id = 'water'
+    handaxe_crafter.inventory = ingredients
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 4
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].units == 1
+    assert handaxe_crafter.inventory[1].nonsolid_id == 'water'
+    assert handaxe_crafter.inventory[2].units == 0
+    assert isinstance(handaxe_crafter.inventory[3], WeaponInstance)
+    assert handaxe_crafter.inventory[3].item_id == TEST_HANDAXE_ID
+
+
+def test_Recipe_apply_nonsolidIngredientMultipleContainers(
+        handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
+    handaxe_recipe.ingredients.append({'id': 'water', 'quantity': 2})
+    ingredients = TEST_HANDAXE_INGREDIENT_LIST + ingredients_with_bowl
+    ingredients[1].units = 1
+    ingredients[1].nonsolid_id = 'water'
+    ingredients[2].units = 1
+    ingredients[2].nonsolid_id = 'water'
+    handaxe_crafter.inventory = ingredients
+    handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
+    assert handaxe_crafter.stats.hp == 100
+    assert handaxe_crafter.stats.endurance == 60
+    assert len(handaxe_crafter.inventory) == 4
+    assert handaxe_crafter.inventory[0].player_id is None
+    assert handaxe_crafter.inventory[1].units == 0
+    assert handaxe_crafter.inventory[1].nonsolid_id is None
+    assert handaxe_crafter.inventory[2].units == 0
+    assert handaxe_crafter.inventory[2].nonsolid_id is None
+    assert isinstance(handaxe_crafter.inventory[3], WeaponInstance)
+    assert handaxe_crafter.inventory[3].item_id == TEST_HANDAXE_ID

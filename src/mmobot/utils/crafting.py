@@ -1,4 +1,15 @@
-from mmobot.db.models import Nonsolid, ToolInstance
+from mmobot.db.models import (
+    FluidContainer,
+    FluidContainerInstance,
+    ItemInstance,
+    Nonsolid,
+    SolidFood,
+    SolidFoodInstance,
+    Tool,
+    ToolInstance,
+    Weapon,
+    WeaponInstance
+)
 from mmobot.utils.players import find_item_with_id
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 
@@ -74,3 +85,15 @@ def find_best_recipe(goal_item, recipes, player, ingredients, tools, handheld):
         'recipe': best_recipe,
         'cost': best_endurance_cost
     }
+
+
+def create_item_instance(item, condition=99999):
+    if isinstance(item, Weapon):
+        return WeaponInstance(item_id=item.id)
+    elif isinstance(item, Tool):
+        return ToolInstance(item_id=item.id)
+    elif isinstance(item, SolidFood):
+        return SolidFoodInstance(item_id=item.id)
+    elif isinstance(item, FluidContainer):
+        return FluidContainerInstance(item_id=item.id, units=0)
+    return ItemInstance(item_id=item.id)

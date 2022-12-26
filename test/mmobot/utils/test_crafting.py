@@ -2,17 +2,27 @@ import pytest
 
 from mmobot.db.index.models import Recipe
 from mmobot.db.models import (
+    FluidContainer,
     FluidContainerInstance,
     ItemInstance,
     Player,
     PlayerSkill,
+    Resource,
+    SolidFood,
+    SolidFoodInstance,
+    Tool,
     ToolInstance,
+    Weapon,
     WeaponInstance,
     Zone
 )
 from mmobot.test.db import init_test_engine
 from mmobot.test.mock import MockItemIndex
-from mmobot.utils.crafting import find_best_recipe, separate_crafting_components
+from mmobot.utils.crafting import (
+    create_item_instance,
+    find_best_recipe,
+    separate_crafting_components
+)
 
 
 engine = init_test_engine()
@@ -34,9 +44,10 @@ def recipes_liquid():
 def recipes_solid():
     stone_item = {'id': 'stone', 'quantity': 1}
     iron_item = {'id': 'iron-ore', 'quantity': 1}
+    solid_item = Resource(id='solid-item', size=2, weight=2)
     return [
-        Recipe.from_yaml('solid-item', {'ingredients': [stone_item], 'endurance': 20}),
-        Recipe.from_yaml('solid-item', {'ingredients': [iron_item], 'endurance': 20})
+        Recipe.from_yaml(solid_item, {'ingredients': [stone_item], 'endurance': 20}),
+        Recipe.from_yaml(solid_item, {'ingredients': [iron_item], 'endurance': 20})
     ]
 
 
@@ -221,3 +232,37 @@ def test_findBestRecipe_missingSkills(recipes_liquid, inventory, skills, zone):
                               components['handheld'])
     assert 'error' in actual
     assert actual['error'] == MESSAGE_MISSING_SKILLS
+
+
+def test_createItemInstance_weapon():
+    instance = create_item_instance(Weapon(id='test'))
+    assert isinstance(instance, WeaponInstance) is True
+    assert instance.item_id == 'test'
+
+
+def test_createItemInstance_tool():
+    instance = create_item_instance(Tool(id='test'))
+    assert isinstance(instance, ToolInstance) is True
+    assert instance.item_id == 'test'
+
+
+def test_createItemInstance_fluidContainer():
+    instance = create_item_instance(FluidContainer(id='test'))
+    assert isinstance(instance, FluidContainerInstance) is True
+    assert instance.item_id == 'test'
+
+
+def test_createItemInstance_solidFood():
+    instance = create_item_instance(SolidFood(id='test'))
+    assert isinstance(instance, SolidFoodInstance) is True
+    assert instance.item_id == 'test'
+
+
+def test_createItemInstance_resource():
+    instance = create_item_instance(Resource(id='test'))
+    assert isinstance(instance, ItemInstance) is True
+    assert isinstance(instance, WeaponInstance) is False
+    assert isinstance(instance, ToolInstance) is False
+    assert isinstance(instance, FluidContainerInstance) is False
+    assert isinstance(instance, SolidFoodInstance) is False
+    assert instance.item_id == 'test'

@@ -1,12 +1,11 @@
 ---
 id: strange-liquid
+type: fluid_food
 size: 1
 weight: 1
+hp_recover: 5
 recipes:
-- products:
-  - id: strange-liquid
-    type: nonsolid
-    quantity: 3
+- quantity: 3
   ingredients:
   - id: water
     quantity: 3
@@ -14,9 +13,7 @@ recipes:
   skills:
     smithing: 15
 - products:
-  - id: strange-liquid
-    type: nonsolid
-    quantity: 3
+  quantity: 3
   ingredients:
   - id: stone
     quantity: 1

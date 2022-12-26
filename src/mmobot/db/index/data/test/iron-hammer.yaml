@@ -1,5 +1,6 @@
 ---
 id: iron-hammer
+type: weapon
 weapon_type: hammer
 size: 14
 weight: 30

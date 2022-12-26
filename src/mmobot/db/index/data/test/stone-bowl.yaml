@@ -1,5 +1,6 @@
 ---
 id: stone-bowl
+type: fluid_container
 size: 3
 weight: 1
 max_capacity: 3

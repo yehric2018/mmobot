@@ -1,12 +1,11 @@
 from dataclasses import dataclass
 
 from mmobot.db.models import (
-    ItemInstance,
+    Item,
     FluidContainerInstance,
-    SolidFoodInstance,
-    ToolInstance,
-    WeaponInstance
+    Nonsolid,
 )
+from mmobot.utils.crafting import create_item_instance
 
 
 TYPE_ITEM = 'item'
@@ -18,7 +17,9 @@ EXTRA_SKILL_REDUCTION_SCALE = 0.01
 
 @dataclass
 class Recipe:
-    products: list
+    product: Item
+    quantity: int
+    side_products: list
     base_endurance: int
     ingredients: list
     tools: list
@@ -48,22 +49,16 @@ class Recipe:
     def is_missing_container(self, ingredients):
         '''
         Returns False if this recipe is not for a nonsolid, or if the ingredients list
-        includes an empty container with enough space for the recipe. If it is a nonsolid
+        includes an empty container with enough space for the product. If it is a nonsolid
         recipe that doesn't provide such a container, return True.
 
-        This assumes there will be at most one nonsolid product for the recipe. It is best to
-        only call this when you know the product(s) will be nonsolid
+        TODO: Might be good to add some logic here later to account for nonsolids in the
+        list of extra products.
 
         Args: ingredients - list of ItemInstances.
         '''
-        for product in self.products:
-            if 'type' in product and product['type'] == TYPE_NONSOLID:
-                for ingredient in ingredients:
-                    if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
-                            and ingredient.item.max_capacity >= product['quantity']):
-                        return False
-                return True
-        return False
+        return (isinstance(self.product, Nonsolid)
+                and self._find_compatible_container(ingredients) is None)
 
     def get_crafting_skill(self, player_skills):
         '''
@@ -107,12 +102,12 @@ class Recipe:
         skill_deduction = int(endurance_cost * EXTRA_SKILL_REDUCTION_SCALE * crafting_skill)
         return endurance_cost - skill_deduction
 
-    def apply(self, player, item_index, endurance_cost, ingredients=[], tools=[], handheld=None):
+    def apply(self, player, endurance_cost, ingredients=[], tools=[], handheld=None):
         '''
         Apply this recipe, which will do the following:
         - Reduce the endurance (and maybe HP) of the player by endurance_cost
         - Remove all the current items in the player's inventory
-        - TODO: Reduce the remaining uses of all the tools and handheld used, handle
+        - TODO: Reduce the remaining uses/condition of all the tools and handheld used, handle
           breaking of items
         - Add the newly created item(s) to the player's inventory
         Calling this method assumes the following have already been asserted:
@@ -133,46 +128,49 @@ class Recipe:
         player.stats.endurance -= actual_endurance_cost
         player.stats.hp -= hp_cost
 
-        container = None
-
-        for product in self.products:
-            if product['type'] == 'nonsolid':
-                container = self._find_compatible_container(ingredients)
-                container.nonsolid_id = product['id']
-                container.units = product['quantity']
-                break
-        if container is None:
-            for product in self.products:
-                item = item_index.index[product['id']]
-                if item.item_type == 'weapon':
-                    instance = WeaponInstance(item_id=product['id'])
-                elif item.item_type == 'tool':
-                    instance = ToolInstance(item_id=product['id'])
-                elif item.item_type == 'solid_food':
-                    instance = SolidFoodInstance(item_id=product['id'])
-                else:
-                    instance = ItemInstance(item_id=product['id'])
-                for i in range(product['quantity']):
-                    player.inventory.append(instance)
+        if isinstance(self.product, Nonsolid):
+            container = self._find_compatible_container(ingredients)
+            container.nonsolid_id = self.product.id
+            container.units = self.quantity
+        else:
+            instance = create_item_instance(self.product)
+            for _ in range(self.quantity):
+                player.inventory.append(instance)
 
         ingredient_counter = self._get_ingredient_counter()
         for item_instance in ingredients:
-            if item_instance.item_id in ingredient_counter:
+            item_id = item_instance.item_id
+            if item_id in ingredient_counter:
                 item_instance.player_id = None
-                ingredient_counter[item_instance.item_id] -= 1
-                if ingredient_counter[item_instance.item_id] == 0:
-                    del ingredient_counter[item_instance.item_id]
+                ingredient_counter[item_id] -= 1
+                if ingredient_counter[item_id] == 0:
+                    del ingredient_counter[item_id]
+            elif (isinstance(item_instance, FluidContainerInstance)
+                    and item_instance.nonsolid_id in ingredient_counter):
+                nonsolid_id = item_instance.nonsolid_id
+                units_used = min(
+                    item_instance.units,
+                    ingredient_counter[nonsolid_id]
+                )
+                item_instance.units -= units_used
+                ingredient_counter[nonsolid_id] -= units_used
+                if item_instance.units == 0:
+                    item_instance.nonsolid_id = None
+                if ingredient_counter[nonsolid_id] == 0:
+                    del ingredient_counter[nonsolid_id]
         assert len(ingredient_counter) == 0
 
-    def from_yaml(item_id, yaml):
-        main_item = {'id': item_id, 'type': TYPE_ITEM, 'quantity': 1}
+    def from_yaml(item, yaml):
         endurance = yaml['endurance'] if 'endurance' in yaml else 0
-        products = yaml['products'] if 'products' in yaml else [main_item]
+        quantity = yaml['quantity'] if 'quantity' in yaml else 1
+        side_products = yaml['side_products'] if 'side_products' in yaml else []
         tools = yaml['tools'] if 'tools' in yaml else []
         handheld = yaml['handheld'] if 'handheld' in yaml else None
         skills = yaml['skills'] if 'skills' in yaml else {}
         return Recipe(
-            products=products,
+            product=item,
+            quantity=quantity,
+            side_products=side_products,
             base_endurance=endurance,
             ingredients=yaml['ingredients'],
             tools=tools,
@@ -192,10 +190,9 @@ class Recipe:
         this recipe. Returns None if no container is found (this should never happen if we
         ran is_missing_container before).
         '''
-        for product in self.products:
-            if 'type' in product and product['type'] == TYPE_NONSOLID:
-                for ingredient in ingredients:
-                    if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
-                            and ingredient.item.max_capacity >= product['quantity']):
-                        return ingredient
+        if isinstance(self.product, Nonsolid):
+            for ingredient in ingredients:
+                if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
+                        and ingredient.item.max_capacity >= self.quantity):
+                    return ingredient
         return None
