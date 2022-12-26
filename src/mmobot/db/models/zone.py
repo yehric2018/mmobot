@@ -1,5 +1,5 @@
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy import String
+from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import select
 from sqlalchemy.orm import relationship
 
 from .base import Base
@@ -18,3 +18,7 @@ class Zone(Base):
 
     def __repr__(self):
         return f'Zone({self.channel_name})'
+
+    def select_with_channel_name(session, channel_name):
+        get_zone_statement = select(Zone).where(Zone.channel_name == channel_name)
+        return session.scalars(get_zone_statement).one_or_none()

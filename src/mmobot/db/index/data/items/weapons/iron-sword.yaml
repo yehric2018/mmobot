@@ -9,12 +9,9 @@ recipes:
   - id: iron-billet
     quantity: 1
   tools:
-  - id: anvil
-    quantity: 1
+  - anvil
   handheld: hammer
-  endurance: 70
+  endurance: 140
   skills:
-  - name: smithing
-    level: 30
-  - name: forging
-    level: 20
+    smithing: 30
+    forging: 15

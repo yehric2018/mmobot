@@ -14,7 +14,7 @@ from mmobot.utils.players import find_item_with_id
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 
 
-def separate_crafting_components(references, player):
+def separate_crafting_components(references, player, zone):
     entity_ids = set()
     for reference in references:
         if not is_entity_id(reference):
@@ -25,7 +25,7 @@ def separate_crafting_components(references, player):
     else:
         handheld = None
     tools = []
-    for tool in player.zone.loot:
+    for tool in zone.loot:
         if tool.id in entity_ids and isinstance(tool, ToolInstance):
             tools.append(tool)
             entity_ids.remove(tool.id)

@@ -17,7 +17,6 @@ class Entity(Base):
         Sequence('entity_id_seq', start=5000, increment=1),
         primary_key=True
     )
-
     entity_type = Column(String(20))
     zone = Column(String(40), ForeignKey('Zones.channel_name'))
 

@@ -133,14 +133,14 @@ class Recipe:
             container.nonsolid_id = self.product.id
             container.units = self.quantity
         else:
-            instance = create_item_instance(self.product)
+            product_instance = create_item_instance(self.product)
             for _ in range(self.quantity):
-                player.inventory.append(instance)
+                player.inventory.append(product_instance)
 
         ingredient_counter = self._get_ingredient_counter()
         for item_instance in ingredients:
-            item_id = item_instance.item_id
-            if item_id in ingredient_counter:
+            if item_instance.item_id in ingredient_counter:
+                item_id = item_instance.item_id
                 item_instance.player_id = None
                 ingredient_counter[item_id] -= 1
                 if ingredient_counter[item_id] == 0:
