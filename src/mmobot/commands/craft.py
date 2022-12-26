@@ -45,7 +45,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
         )
         if 'error' in best_recipe_finder:
             error_message = best_recipe_finder['error']
-            await context.send(f'<@{discord_id} {error_message}')
+            await context.send(f'<@{discord_id}> {error_message}')
             return
 
         best_recipe = best_recipe_finder['recipe']

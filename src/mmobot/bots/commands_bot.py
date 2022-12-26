@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from mmobot.commands import (
     attack_logic,
+    craft_logic,
     drop_logic,
     eat_logic,
     equip_logic,
@@ -22,6 +23,7 @@ from mmobot.commands import (
     unequip_logic,
 )
 from mmobot.db import initialize_engine
+from mmobot.db.index import ItemIndex
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -34,6 +36,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 
 engine = initialize_engine()
+item_index = ItemIndex()
 
 
 @bot.event
@@ -54,6 +57,16 @@ async def on_member_join(member):
 @bot.command(name='attack')
 async def attack_command(context, *args):
     await attack_logic(bot, context, args, engine)
+
+
+@bot.command(name='craft')
+async def craft_command(context, *args):
+    await craft_logic(context, args, engine, item_index)
+
+
+@bot.command(name='craftx')
+async def craftx_command(context, *args):
+    await craft_logic(context, args, engine, item_index, use_hp=True)
 
 
 @bot.command(name='drop')

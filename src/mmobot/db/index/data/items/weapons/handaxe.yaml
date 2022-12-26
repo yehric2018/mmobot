@@ -1,0 +1,18 @@
+---
+id: handaxe
+type: weapon
+weapon_type: axe
+size: 5
+weight: 3
+lethality: 6
+craft: 40
+recipes:
+- ingredients:
+  - id: stone
+    quantity: 1
+  tools:
+  - anvil
+  handheld: hammer
+  endurance: 120
+  skills:
+    knapping: 5
