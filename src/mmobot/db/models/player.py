@@ -25,7 +25,6 @@ class Player(Agent):
     stats_id = Column(Integer, ForeignKey('PlayerStats.id'), unique=True, nullable=False)
     stats = relationship('PlayerStats', uselist=False)
     skills = relationship('PlayerSkill')
-
     inventory = relationship(
         'ItemInstance',
         order_by='ItemInstance.id',

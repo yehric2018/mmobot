@@ -6,7 +6,6 @@ from mmobot.commands import eat_logic
 from mmobot.db.models import (
     FluidContainerInstance,
     Player,
-    PlayerStats,
     SolidFoodInstance,
     WeaponInstance
 )
@@ -54,12 +53,11 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    stats = PlayerStats(hp=50, endurance=50, max_hp=100, max_endurance=100)
     player = Player(
         id=TEST_PLAYER_ENTITY_NUMBER,
         name=TEST_PLAYER_DISCORD_NAME,
         discord_id=TEST_PLAYER_DISCORD_ID,
-        stats=stats,
+        hp=50, endurance=50, max_hp=100, max_endurance=100,
         is_active=True
     )
     food_instance = SolidFoodInstance(
@@ -101,8 +99,8 @@ async def test_commandEat_solidWithName(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 2
 
 
@@ -115,36 +113,36 @@ async def test_commandEat_solidWithEntityId(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 2
 
 
 @pytest.mark.asyncio
 async def test_commandEat_solidHpDoesNotSurpassMax(eat_context, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.hp': 100})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'hp': 100})
     await eat_logic(eat_context, [RASPBERRY_ID], engine)
     assert len(eat_context.channel.messages) == 2
     assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY
     assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 100
-    assert player.stats.endurance == 51
+    assert player.hp == 100
+    assert player.endurance == 51
     assert len(player.inventory) == 2
 
 
 @pytest.mark.asyncio
 async def test_commandEat_solidEnduranceDoesNotSurpassMax(eat_context, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 100})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'endurance': 100})
     await eat_logic(eat_context, [RASPBERRY_ID], engine)
     assert len(eat_context.channel.messages) == 2
     assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY
     assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_HP
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 100
+    assert player.hp == 51
+    assert player.endurance == 100
     assert len(player.inventory) == 2
 
 
@@ -157,8 +155,8 @@ async def test_commandEat_containerWithoutUnits(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
 
@@ -172,8 +170,8 @@ async def test_commandEat_containerWithUnits(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_3_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 53
-    assert player.stats.endurance == 53
+    assert player.hp == 53
+    assert player.endurance == 53
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 0
     assert player.inventory[2].nonsolid_id is None
@@ -188,8 +186,8 @@ async def test_commandEat_containerTooManyUnits(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_3_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 53
-    assert player.stats.endurance == 53
+    assert player.hp == 53
+    assert player.endurance == 53
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 0
     assert player.inventory[2].nonsolid_id is None
@@ -210,8 +208,8 @@ async def test_commandEat_zeroUnitsProvided(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
 
@@ -225,8 +223,8 @@ async def test_commandEat_negativeUnitsProvided(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
 
@@ -240,37 +238,37 @@ async def test_commandEat_nonnumericUnitsProvided(eat_context, session):
     assert eat_context.channel.messages[2] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 51
+    assert player.hp == 51
+    assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
 
 
 @pytest.mark.asyncio
 async def test_commandEat_containerHpDoesNotSurpassMax(eat_context, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.hp': 100})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'hp': 100})
     await eat_logic(eat_context, [STONE_BOWL_ID], engine)
     assert len(eat_context.channel.messages) == 2
     assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY_JUICE
     assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_ENDURANCE
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 100
-    assert player.stats.endurance == 51
+    assert player.hp == 100
+    assert player.endurance == 51
     assert len(player.inventory) == 3
 
 
 @pytest.mark.asyncio
 async def test_commandEat_containerEnduranceDoesNotSurpassMax(eat_context, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 100})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'endurance': 100})
     await eat_logic(eat_context, [STONE_BOWL_ID], engine)
     assert len(eat_context.channel.messages) == 2
     assert eat_context.channel.messages[0] == MESSAGE_EAT_RASPBERRY_JUICE
     assert eat_context.channel.messages[1] == MESSAGE_RECOVER_1_HP
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 51
-    assert player.stats.endurance == 100
+    assert player.hp == 51
+    assert player.endurance == 100
     assert len(player.inventory) == 3
 
 
@@ -291,7 +289,7 @@ async def test_commandEat_noArgsProvided(eat_context):
 
 @pytest.mark.asyncio
 async def test_commandEat_incapacitated(eat_context, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.hp': 0})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'hp': 0})
     await eat_logic(eat_context, [TEST_ITEM_ENTITY_REFERENCE], engine)
     assert len(eat_context.channel.messages) == 1
     assert eat_context.channel.messages[0] == MESSAGE_TEST_PLAYER_INCAPACITATED
@@ -321,6 +319,6 @@ async def test_commandEat_itemNotEatable(eat_context, session):
     assert eat_context.channel.messages[0] == expected_message
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert player.stats.hp == 50
-    assert player.stats.endurance == 50
+    assert player.hp == 50
+    assert player.endurance == 50
     assert len(player.inventory) == 3

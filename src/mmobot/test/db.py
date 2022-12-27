@@ -129,6 +129,10 @@ def update_player(session, id, data):
         player.stats.hp = data['stats.hp']
     if 'stats.skill_points' in data:
         player.stats.skill_points = data['stats.skill_points']
+    if 'hp' in data:
+        player.hp = data['hp']
+    if 'endurance' in data:
+        player.endurance = data['endurance']
     if 'zone' in data:
         player.zone = data['zone']
     session.commit()

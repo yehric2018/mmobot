@@ -18,7 +18,7 @@ async def eat_logic(context, args, engine):
     with Session(engine) as session:
         player = Player.select_with_discord_id(session, discord_id)
         assert player is not None
-        if player.stats.hp == 0:
+        if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
@@ -49,14 +49,14 @@ async def eat_logic(context, args, engine):
 async def eat_solid_food(context, session, player, food_instance):
     await context.send(f'<@{player.discord_id}> ate {food_instance.item_id}')
     food_item = food_instance.item
-    hp_recover = min(player.stats.max_hp - player.stats.hp, food_item.hp_recover)
+    hp_recover = min(player.max_hp - player.hp, food_item.hp_recover)
     endurance_recover = min(
-        player.stats.max_endurance - player.stats.endurance,
+        player.max_endurance - player.endurance,
         food_item.endurance_recover
     )
 
-    player.stats.hp += hp_recover
-    player.stats.endurance += endurance_recover
+    player.hp += hp_recover
+    player.endurance += endurance_recover
 
     if hp_recover > 0:
         await context.send(f'Recovered {hp_recover} HP')
@@ -82,14 +82,14 @@ async def eat_from_container(context, player, container_instance, units=1):
     await context.send(f'<@{player.discord_id}> ate {container_instance.nonsolid_id}')
     food = container_instance.nonsolid
     units = min(units, container_instance.units)
-    hp_recover = min(player.stats.max_hp - player.stats.hp, units * food.hp_recover)
+    hp_recover = min(player.max_hp - player.hp, units * food.hp_recover)
     endurance_recover = min(
-        player.stats.max_endurance - player.stats.endurance,
+        player.max_endurance - player.endurance,
         units * food.endurance_recover
     )
 
-    player.stats.hp += hp_recover
-    player.stats.endurance += endurance_recover
+    player.hp += hp_recover
+    player.endurance += endurance_recover
 
     if hp_recover > 0:
         await context.send(f'Recovered {hp_recover} HP')
