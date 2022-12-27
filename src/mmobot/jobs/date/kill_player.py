@@ -32,7 +32,7 @@ async def kill_player(player_discord_id, client):
         player = session.scalars(get_player_statement).one_or_none()
         if player is None:
             return
-        if player.stats.hp > 0:
+        if player.hp > 0:
             return
         user = client.get_user(player_discord_id)
 

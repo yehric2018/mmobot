@@ -24,8 +24,7 @@ async def attack_logic(bot, context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(get_player_statement).one()
-        if player.stats.hp == 0:
-            # The player is incapacitated, so nothing will happen.
+        if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
@@ -43,7 +42,7 @@ async def attack_logic(bot, context, args, engine):
             elif player == defender:
                 await context.send('You cannot attack yourself!')
                 return
-            elif defender.stats.hp == 0:
+            elif defender.hp == 0:
                 await kill_player(defender.discord_id, engine, bot)
                 return
 

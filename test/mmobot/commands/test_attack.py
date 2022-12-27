@@ -32,19 +32,12 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    player_stats = PlayerStats(
-        hp=100,
-        endurance=100,
-        max_endurance=100,
-        luck=1,
-        strength=100
-    )
     player = Player(
         id=3333,
         name='player',
         is_active=True,
         discord_id=100,
-        stats=player_stats,
+        hp=100, endurance=100, max_endurance=100, strength=100,
         equipped_weapon_id=2222
     )
     add_player(session, player)
@@ -85,15 +78,15 @@ async def test_commandAttack_mining(attack_context, session, monkeypatch):
 
     with Session(engine) as validation_session:
         final_player = get_player_with_name(validation_session, 'player')
-        assert final_player.stats.hp == 100
-        assert final_player.stats.endurance == 99
+        assert final_player.hp == 100
+        assert final_player.endurance == 99
         assert len(final_player.inventory) == 2
         assert final_player.inventory[1].item_id == 'stone'
 
 
 @pytest.mark.asyncio
 async def test_commandAttack_incapacitated(attack_context, session):
-    update_player(session, 3333, {'stats.hp': 0})
+    update_player(session, 3333, {'hp': 0})
     session.commit()
     await attack_logic(None, attack_context, ['/k'], engine)
 

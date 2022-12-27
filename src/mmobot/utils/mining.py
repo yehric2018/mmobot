@@ -10,7 +10,7 @@ async def attack_command_mining(context, player, minable, session):
     minable_id = convert_int_to_alphanum(minable.id)
     await context.send(f'Mining [ /{minable_id} ]...')
     equipped_weapon = find_item_with_id(player.inventory, player.equipped_weapon_id)
-    resources = get_mining_outcome(player.stats, equipped_weapon, minable)
+    resources = get_mining_outcome(player, equipped_weapon, minable)
     if len(resources) == 0:
         await context.send('No resources mined!')
     else:
@@ -88,21 +88,20 @@ STANDARD_MINING_COMPOSITION = [
 ]
 
 
-def get_mining_outcome(player_stats, weapon_instance, minable):
-    endurance_ratio = player_stats.endurance / player_stats.max_endurance
-    mining_score = int(player_stats.strength * endurance_ratio)
+def get_mining_outcome(player, weapon_instance, minable):
+    endurance_ratio = player.endurance / player.max_endurance
+    mining_score = int(player.strength * endurance_ratio)
     if weapon_instance is None:
-        player_stats.hp -= 2
-        player_stats.endurance -= 4
+        player.hp -= 2
+        player.endurance -= 4
     else:
         weapon = weapon_instance.item
         if weapon.weapon_type == 'pickaxe':
             mining_score += weapon.lethality
-            player_stats.endurance -= 1
+            player.endurance -= 1
         else:
             mining_score += weapon.lethality // 4
-            player_stats.endurance -= 2
-    mining_score += player_stats.luck
+            player.endurance -= 2
     num_resources = random.randint(0, mining_score) // STRENGTH_PER_RESOURCE
 
     resources = []
