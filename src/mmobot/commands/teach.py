@@ -46,7 +46,7 @@ async def teach_logic(context, args, engine):
             .where(Player.is_active)
         )
         teaching_player = session.scalars(teaching_player_statement).one()
-        if teaching_player.stats.hp == 0:
+        if teaching_player.hp == 0:
             message = f'<@{teaching_player.discord_id}> You are incapacitated.'
             await context.send(message)
             return

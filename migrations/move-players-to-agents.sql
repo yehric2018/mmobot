@@ -38,3 +38,9 @@ ALTER TABLE [db].Players
     DROP COLUMN guarding_path,
     DROP COLUMN last_attack,
     DROP COLUMN last_location;
+
+-- Step 4: Move skill_points and stat_points columns from PlayerStats to Players
+-- We will reset everyone' skill_points and stat_points to 0 for now. :(
+ALTER TABLE [db].Players
+    ADD COLUMN stat_points INT DEFAULT 0,
+    ADD COLUMN skill_points INT DEFAULT 0;

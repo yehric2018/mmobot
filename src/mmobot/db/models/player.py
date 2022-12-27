@@ -33,6 +33,8 @@ class Player(Agent):
 
     last_learned = Column(DateTime, default=date.fromtimestamp(1))
     last_taught = Column(DateTime, default=date.fromtimestamp(1))
+    stat_points = Column(Integer, default=0)
+    skill_points = Column(Integer, default=0)
 
     # The equipped item fields implicitly point to WeaponInstances.
     # However, we do not set a foreign key to avoid creating a cycle.

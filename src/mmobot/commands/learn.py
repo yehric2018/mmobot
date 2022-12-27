@@ -33,7 +33,7 @@ async def learn_logic(context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(select_player_statement).one()
-        if player.stats.hp == 0:
+        if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
@@ -68,14 +68,14 @@ async def learn_logic(context, args, engine):
                 session.commit()
             return
 
-        if player.stats.skill_points == 0:
+        if player.skill_points == 0:
             await context.send('You do not have any skill points remaining.')
             return
         if skill.skill_level == ALL_SKILLS[skill_name]['max']:
             await context.send(f'Skill {skill_name} is already maxed.')
             return
         skill.skill_level += 1
-        player.stats.skill_points -= 1
+        player.skill_points -= 1
         session.commit()
 
         await context.send(f'Learned {skill_name}!')

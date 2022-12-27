@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from sqlalchemy.orm import Session
 
 from mmobot.commands import teach_logic
-from mmobot.db.models import Player, PlayerSkill, PlayerStats
+from mmobot.db.models import Player, PlayerSkill
 from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_to_database,
@@ -44,13 +44,12 @@ def learning_member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    stats = PlayerStats(hp=100)
     add_to_database(session, Player(
         id=1,
         name='teacher',
         discord_id=100,
         is_active=True,
-        stats=stats,
+        hp=100,
         zone='barracks'
     ))
     add_to_database(session, Player(
@@ -184,7 +183,7 @@ async def test_commandTeach_learnerNotInZone(teaching_context, learning_member, 
 
 @pytest.mark.asyncio
 async def test_commandTeach_incapacitated(teaching_context, session):
-    update_player(session, 1, {'stats.hp': 0})
+    update_player(session, 1, {'hp': 0})
     await teach_logic(teaching_context, ['learner', 'fighting'], engine)
     assert len(teaching_context.channel.messages) == 1
     expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
