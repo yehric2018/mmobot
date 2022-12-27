@@ -6,7 +6,6 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from mmobot.constants import STANCE_NORMAL
 from mmobot.db.models import Player
 from mmobot.utils.players import roll_initial_stats
 
@@ -43,7 +42,6 @@ async def name_logic(context, args, engine):
             ancestry=max_ancestry + 1,
             birthday=birthday,
             is_active=True,
-            stance=STANCE_NORMAL,
             zone='town-square',
             stats=roll_initial_stats()
         )

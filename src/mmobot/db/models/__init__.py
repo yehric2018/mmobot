@@ -18,6 +18,7 @@ from .player_skill_teaching import PlayerSkillTeaching
 from .player_stats import PlayerStats
 
 from .entity import Entity
+from .agent import Agent
 from .interaction import Interaction
 from .minable import Minable
 from .player import Player
@@ -29,6 +30,7 @@ from .weapon_instance import WeaponInstance
 
 
 __all__ = [
+    'Agent',
     'Attire',
     'Base',
     'Entity',
