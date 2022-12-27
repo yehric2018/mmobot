@@ -17,14 +17,8 @@ async def equip_logic(context, args, engine):
     item_reference = args[0]
     discord_id = context.author.id
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == discord_id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
-        if player.stats.hp == 0:
-            # The player is incapacitated, so nothing will happen.
+        player = Player.select_with_discord_id(session, discord_id)
+        if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return

@@ -40,12 +40,8 @@ async def teach_logic(context, args, engine):
         )
 
     with Session(engine) as session:
-        teaching_player_statement = (
-            select(Player)
-            .where(Player.discord_id == teacher_id)
-            .where(Player.is_active)
-        )
-        teaching_player = session.scalars(teaching_player_statement).one()
+        teaching_player = Player.select_with_discord_id(session, teacher_id)
+        assert teaching_player is not None
         if teaching_player.hp == 0:
             message = f'<@{teaching_player.discord_id}> You are incapacitated.'
             await context.send(message)

@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import equip_logic
-from mmobot.db.models import Player, PlayerStats
+from mmobot.db.models import Player
 from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,
@@ -30,8 +30,7 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    stats = PlayerStats(hp=100)
-    add_player(session, Player(id=1, name='player', discord_id=100, stats=stats, is_active=True))
+    add_player(session, Player(id=1, name='player', discord_id=100, hp=100, is_active=True))
     yield
     delete_all_entities(session)
 
@@ -106,7 +105,7 @@ async def test_commandEquip_notInZone(
 
 @pytest.mark.asyncio
 async def test_commandEquip_incapacitated(equip_context, session):
-    update_player(session, 1, {'stats.hp': 0})
+    update_player(session, 1, {'hp': 0})
     await equip_logic(equip_context, ['desert-scimitar'], engine)
     assert len(equip_context.channel.messages) == 1
     expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED

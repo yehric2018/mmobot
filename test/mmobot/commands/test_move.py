@@ -37,13 +37,12 @@ def moving_member():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    stats = PlayerStats(hp=100)
     add_player(session, Player(
         id=1,
         name='player',
         discord_id=100,
         is_active=True,
-        stats=stats,
+        hp=100,
         zone='town-square'
     ))
     yield
@@ -187,7 +186,7 @@ async def test_commandMove_noArgsProvided(move_context):
 
 @pytest.mark.asyncio
 async def test_commandMove_incapacitated(move_context, session):
-    update_player(session, 1, {'stats.hp': 0})
+    update_player(session, 1, {'hp': 0})
     await move_logic(move_context, ['marketplace'], engine)
     assert len(move_context.channel.messages) == 1
     expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED

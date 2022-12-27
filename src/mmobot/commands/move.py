@@ -22,7 +22,7 @@ async def move_logic(context, args, engine):
             .where(Player.is_active)
         )
         player = session.scalars(get_player_statement).one()
-        if player.stats.hp == 0:
+        if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return

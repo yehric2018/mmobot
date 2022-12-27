@@ -17,12 +17,7 @@ async def unequip_logic(context, args, engine):
     item_reference = args[0]
     discord_id = context.author.id
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == discord_id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
+        player = Player.select_with_discord_id(session, discord_id)
 
         did_unequip = False
         if is_entity_id(item_reference):
