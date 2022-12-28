@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Player, PlayerStats
+from mmobot.db.models import Player
 
 
 def recover_hp(engine):
@@ -13,9 +13,9 @@ def recover_hp(engine):
         get_player_statement = (
             select(Player)
             .where(Player.is_active)
-            .where(Player.stats.has(PlayerStats.hp < PlayerStats.max_hp))
+            .where(Player.hp < Player.max_hp)
         )
         for player in session.scalars(get_player_statement):
-            player.stats.hp += 1
+            player.hp += 1
 
         session.commit()

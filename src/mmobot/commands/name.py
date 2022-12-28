@@ -7,7 +7,6 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
-from mmobot.utils.players import roll_initial_stats
 
 
 async def name_logic(context, args, engine):
@@ -43,7 +42,12 @@ async def name_logic(context, args, engine):
             birthday=birthday,
             is_active=True,
             zone='town-square',
-            stats=roll_initial_stats()
+            hp=100,
+            endurance=100,
+            max_hp=100,
+            max_endurance=100,
+            strength=100,
+            mobility=100
         )
 
         try:

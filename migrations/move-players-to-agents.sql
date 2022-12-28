@@ -44,3 +44,16 @@ ALTER TABLE [db].Players
 ALTER TABLE [db].Players
     ADD COLUMN stat_points INT DEFAULT 0,
     ADD COLUMN skill_points INT DEFAULT 0;
+
+
+-- Step 5: Remove stats_id from Players, then drop the PlayerStats table.
+SELECT TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME
+    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE REFERENCED_TABLE_SCHEMA IS NOT NULL
+    AND TABLE_SCHEMA = '[db]'
+    AND TABLE_NAME = 'Players';
+ALTER TABLE [db].Players
+    DROP FOREIGN KEY Players_ibfk_2;
+ALTER TABLE [db].Players
+    DROP COLUMN stats_id;
+DROP TABLE [db].PlayerStats;

@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import move_logic
 from mmobot.db.models.player import Player
-from mmobot.db.models.player_stats import PlayerStats
 from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,

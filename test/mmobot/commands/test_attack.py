@@ -3,7 +3,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import attack_logic
-from mmobot.db.models import Minable, Player, PlayerStats
+from mmobot.db.models import Minable, Player
 from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,

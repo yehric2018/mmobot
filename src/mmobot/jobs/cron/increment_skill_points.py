@@ -13,7 +13,7 @@ async def increment_skill_points(engine):
     with Session(engine) as session:
         get_player_statement = select(Player).where(Player.is_active)
         for player in session.scalars(get_player_statement):
-            if player.stats.hp > HEALTHY_PLAYER_THRESHOLD:
-                player.stats.skill_points += 1
+            if player.hp > HEALTHY_PLAYER_THRESHOLD:
+                player.skill_points += 1
 
         session.commit()

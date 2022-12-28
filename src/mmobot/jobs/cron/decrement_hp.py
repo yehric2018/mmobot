@@ -3,7 +3,7 @@ import asyncio
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Player, PlayerStats
+from mmobot.db.models import Player
 from mmobot.utils.players import handle_incapacitation
 
 
@@ -17,11 +17,11 @@ async def decrement_hp(client, engine):
         get_player_statement = (
             select(Player)
             .where(Player.is_active)
-            .where(Player.stats.has(PlayerStats.hp > 0))
+            .where(Player.hp > 0)
         )
         for player in session.scalars(get_player_statement):
-            player.stats.hp -= 1
-            if player.stats.hp == 0:
+            player.hp -= 1
+            if player.hp == 0:
                 incapacitated_players.append(player)
 
         session.commit()

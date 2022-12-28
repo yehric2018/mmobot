@@ -12,7 +12,6 @@ from mmobot.db.models import (
     Player,
     PlayerSkill,
     PlayerSkillTeaching,
-    PlayerStats,
     WeaponInstance,
 )
 
@@ -82,7 +81,6 @@ def delete_all_entities(session):
     session.query(PlayerSkill).delete()
     session.query(PlayerSkillTeaching).delete()
     session.query(Player).delete()
-    session.query(PlayerStats).delete()
     session.query(Entity).delete()
     session.commit()
 
@@ -123,12 +121,6 @@ def update_player(session, id, data):
         player.last_learned = data['last_learned']
     if 'last_taught' in data:
         player.last_taught = data['last_taught']
-    if 'stats.endurance' in data:
-        player.stats.endurance = data['stats.endurance']
-    if 'stats.hp' in data:
-        player.stats.hp = data['stats.hp']
-    if 'stats.skill_points' in data:
-        player.stats.skill_points = data['stats.skill_points']
     if 'hp' in data:
         player.hp = data['hp']
     if 'endurance' in data:

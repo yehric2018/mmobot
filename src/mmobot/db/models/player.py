@@ -22,8 +22,6 @@ class Player(Agent):
     deathday = Column(DateTime)
     parent_name = Column(String(40))
 
-    stats_id = Column(Integer, ForeignKey('PlayerStats.id'), unique=True, nullable=False)
-    stats = relationship('PlayerStats', uselist=False)
     skills = relationship('PlayerSkill')
     inventory = relationship(
         'ItemInstance',

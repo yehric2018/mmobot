@@ -15,7 +15,6 @@ from .zone_path import ZonePath
 
 from .player_skills import PlayerSkill
 from .player_skill_teaching import PlayerSkillTeaching
-from .player_stats import PlayerStats
 
 from .entity import Entity
 from .agent import Agent
@@ -44,7 +43,6 @@ __all__ = [
     'Nonsolid',
     'PlayerSkill',
     'PlayerSkillTeaching',
-    'PlayerStats',
     'Player',
     'Poison',
     'Resource',

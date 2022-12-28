@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Player, PlayerStats
+from mmobot.db.models import Player
 
 
 def recover_endurance(engine):
@@ -13,9 +13,9 @@ def recover_endurance(engine):
         get_player_statement = (
             select(Player)
             .where(Player.is_active)
-            .where(Player.stats.has(PlayerStats.endurance < PlayerStats.max_endurance))
+            .where(Player.endurance < Player.max_endurance)
         )
         for player in session.scalars(get_player_statement):
-            player.stats.endurance += 1
+            player.endurance += 1
 
         session.commit()
