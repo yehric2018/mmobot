@@ -12,7 +12,6 @@ from mmobot.db.models import (
     ItemInstance,
     Player,
     PlayerSkill,
-    PlayerStats,
     Resource,
     SolidFood,
     SolidFoodInstance,
@@ -156,7 +155,7 @@ def coin_crafter_skills():
 @pytest.fixture
 def handaxe_crafter():
     return Player(
-        stats=PlayerStats(hp=100, endurance=100),
+        hp=100, endurance=100,
         skills=[
             PlayerSkill(skill_name='knapping', skill_level=TEST_HANDAXE_RECIPE_SKILL_KNAPPING)
         ],
@@ -329,8 +328,8 @@ def test_Recipe_getEnduranceCost_extraSkill(coin_recipe, coin_crafter_skills, ha
 
 def test_Recipe_apply_weaponRecipeNoCost(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.apply(handaxe_crafter, 0, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 100
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 100
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -339,8 +338,8 @@ def test_Recipe_apply_weaponRecipeNoCost(handaxe_crafter, handaxe_recipe):
 
 def test_Recipe_apply_recipeWithCost(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -349,8 +348,8 @@ def test_Recipe_apply_recipeWithCost(handaxe_crafter, handaxe_recipe):
 
 def test_Recipe_apply_recipeWithHPCost(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.apply(handaxe_crafter, 140, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 60
-    assert handaxe_crafter.stats.endurance == 0
+    assert handaxe_crafter.hp == 60
+    assert handaxe_crafter.endurance == 0
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -360,8 +359,8 @@ def test_Recipe_apply_recipeWithHPCost(handaxe_crafter, handaxe_recipe):
 def test_Recipe_apply_toolRecipe(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.product = Tool(id=TEST_HANDAXE_ID)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -371,8 +370,8 @@ def test_Recipe_apply_toolRecipe(handaxe_crafter, handaxe_recipe):
 def test_Recipe_apply_fluidContainerRecipe(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.product = FluidContainer(id=TEST_HANDAXE_ID)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -383,8 +382,8 @@ def test_Recipe_apply_fluidContainerRecipe(handaxe_crafter, handaxe_recipe):
 def test_Recipe_apply_solidFoodRecipe(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.product = SolidFood(id=TEST_HANDAXE_ID)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -394,8 +393,8 @@ def test_Recipe_apply_solidFoodRecipe(handaxe_crafter, handaxe_recipe):
 def test_Recipe_apply_resourceRecipe(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.product = Resource(id=TEST_HANDAXE_ID)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 2
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
@@ -409,8 +408,8 @@ def test_Recipe_apply_resourceRecipe(handaxe_crafter, handaxe_recipe):
 def test_Recipe_apply_recipeWithQuantity(handaxe_crafter, handaxe_recipe):
     handaxe_recipe.quantity = 4
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 5
     assert handaxe_crafter.inventory[0].player_id is None
     for i in range(1, 5):
@@ -424,8 +423,8 @@ def test_Recipe_apply_nonsolidRecipe(handaxe_crafter, handaxe_recipe, ingredient
     handaxe_crafter.inventory = ingredients
     assert len(handaxe_crafter.inventory) == 3
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 3
     assert handaxe_crafter.inventory[0].player_id is None
     assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
@@ -442,8 +441,8 @@ def test_Recipe_apply_nonsolidWithQuantity(handaxe_crafter, handaxe_recipe, ingr
     handaxe_crafter.inventory = ingredients
     assert len(handaxe_crafter.inventory) == 3
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 3
     assert handaxe_crafter.inventory[0].player_id is None
     assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
@@ -463,8 +462,8 @@ def test_Recipe_apply_nonsolidHasFull(handaxe_crafter, handaxe_recipe, ingredien
     assert handaxe_crafter.inventory[2].units == 0
 
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 3
     assert handaxe_crafter.inventory[0].player_id is None
 
@@ -486,8 +485,8 @@ def test_Recipe_apply_nonsolidIngredient(handaxe_crafter, handaxe_recipe, ingred
     ingredients[1].nonsolid_id = 'water'
     handaxe_crafter.inventory = ingredients
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 4
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].units == 1
@@ -507,8 +506,8 @@ def test_Recipe_apply_nonsolidIngredientMultipleContainers(
     ingredients[2].nonsolid_id = 'water'
     handaxe_crafter.inventory = ingredients
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=ingredients)
-    assert handaxe_crafter.stats.hp == 100
-    assert handaxe_crafter.stats.endurance == 60
+    assert handaxe_crafter.hp == 100
+    assert handaxe_crafter.endurance == 60
     assert len(handaxe_crafter.inventory) == 4
     assert handaxe_crafter.inventory[0].player_id is None
     assert handaxe_crafter.inventory[1].units == 0

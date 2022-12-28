@@ -51,19 +51,19 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
         best_recipe = best_recipe_finder['recipe']
         endurance_cost = best_recipe_finder['cost']
 
-        if endurance_cost > player.stats.endurance:
+        if endurance_cost > player.endurance:
             if not use_hp:
                 message = f'<@{discord_id}> You do not have enough endurance to craft.'
                 message += ' Use !craftx instead to use HP.'
                 await context.send(message)
                 return
-            elif endurance_cost > player.stats.endurance + player.stats.hp:
+            elif endurance_cost > player.endurance + player.hp:
                 message = f'<@{discord_id}> You do not have enough endurance/hp to craft.'
                 await context.send(message)
                 return
 
-        initial_endurance = player.stats.endurance
-        initial_hp = player.stats.hp
+        initial_endurance = player.endurance
+        initial_hp = player.hp
         best_recipe.apply(
             player,
             endurance_cost,
@@ -73,7 +73,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
         )
         session.commit()
         await context.send(f'<@{discord_id}> Successfully crafted {goal_item_id}!')
-        if player.stats.endurance < initial_endurance:
-            await context.send(f'Lost {initial_endurance - player.stats.endurance} endurance')
-        if player.stats.hp < initial_hp:
-            await context.send(f'Lost {initial_hp - player.stats.hp} HP')
+        if player.endurance < initial_endurance:
+            await context.send(f'Lost {int(initial_endurance - player.endurance)} endurance')
+        if player.hp < initial_hp:
+            await context.send(f'Lost {int(initial_hp - player.hp)} HP')

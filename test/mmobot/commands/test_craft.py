@@ -11,7 +11,6 @@ from mmobot.db.models import (
     ItemInstance,
     Player,
     PlayerSkill,
-    PlayerStats,
     ToolInstance,
     Weapon,
     WeaponInstance
@@ -84,13 +83,6 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    player_stats = PlayerStats(
-        hp=100,
-        endurance=100,
-        max_endurance=100,
-        luck=1,
-        strength=100
-    )
     billet = ItemInstance(
         id=TEST_ITEM_ENTITY_NUMBER,
         item_id='iron-billet',
@@ -117,7 +109,7 @@ def prepare_database(session):
         equipped_weapon_id=hammer.id,
         discord_id=TEST_PLAYER_DISCORD_ID,
         is_active=True,
-        stats=player_stats,
+        hp=100, endurance=100, max_endurance=100,
         skills=player_skills
     )
     add_to_database(session, player)
@@ -151,8 +143,8 @@ async def test_commandCraft_simpleRecipe(craft_context, session, iron_sword_args
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER_3
     assert player.inventory[0].item_id == 'iron-hammer'
     assert player.inventory[1].item_id == 'iron-sword'
-    assert player.stats.hp == 100
-    assert player.stats.endurance == 55
+    assert player.hp == 100
+    assert player.endurance == 55
 
 
 @pytest.mark.asyncio
@@ -253,37 +245,37 @@ async def test_commandCraft_insufficientSkill(craft_context, iron_sword_args, se
 
 @pytest.mark.asyncio
 async def test_commandCraft_notEnoughEndurance(craft_context, iron_sword_args, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 10})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'endurance': 10})
     await craft_logic(craft_context, iron_sword_args, engine, item_index)
     assert len(craft_context.channel.messages) == 1
     assert '!craftx' in craft_context.channel.messages[0]
     
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
-    assert player.stats.endurance == 10
-    assert player.stats.hp == 100
+    assert player.endurance == 10
+    assert player.hp == 100
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER
     assert player.inventory[1].id == TEST_ITEM_ENTITY_NUMBER_3
 
 
 @pytest.mark.asyncio
 async def test_commandCraft_notEnoughEnduranceOrHP(craft_context, iron_sword_args, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 10, 'stats.hp': 10})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'endurance': 10, 'hp': 10})
     await craft_logic(craft_context, iron_sword_args, engine, item_index, use_hp=True)
     assert len(craft_context.channel.messages) == 1
     assert craft_context.channel.messages[0] == MESSAGE_NOT_ENOUGH_HP
     
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
-    assert player.stats.endurance == 10
-    assert player.stats.hp == 10
+    assert player.endurance == 10
+    assert player.hp == 10
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER
     assert player.inventory[1].id == TEST_ITEM_ENTITY_NUMBER_3
 
 
 @pytest.mark.asyncio
 async def test_commandCraft_useHP(craft_context, iron_sword_args, session):
-    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'stats.endurance': 10})
+    update_player(session, TEST_PLAYER_ENTITY_NUMBER, {'endurance': 10})
     await craft_logic(craft_context, iron_sword_args, engine, item_index, use_hp=True)
     assert len(craft_context.channel.messages) == 3
     assert craft_context.channel.messages[0] == MESSAGE_IRON_SWORD_SUCCESS
@@ -295,5 +287,5 @@ async def test_commandCraft_useHP(craft_context, iron_sword_args, session):
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER_3
     assert player.inventory[0].item_id == 'iron-hammer'
     assert player.inventory[1].item_id == 'iron-sword'
-    assert player.stats.hp == 65
-    assert player.stats.endurance == 0
+    assert player.hp == 65
+    assert player.endurance == 0

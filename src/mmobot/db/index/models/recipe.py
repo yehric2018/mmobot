@@ -123,10 +123,10 @@ class Recipe:
             tools - the list of tools provided for crafting
             handheld - the item the player currently has equipped
         '''
-        actual_endurance_cost = min(endurance_cost, player.stats.endurance)
+        actual_endurance_cost = min(endurance_cost, player.endurance)
         hp_cost = endurance_cost - actual_endurance_cost
-        player.stats.endurance -= actual_endurance_cost
-        player.stats.hp -= hp_cost
+        player.endurance -= actual_endurance_cost
+        player.hp -= hp_cost
 
         if isinstance(self.product, Nonsolid):
             container = self._find_compatible_container(ingredients)
