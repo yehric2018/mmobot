@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
@@ -38,15 +37,9 @@ async def kill_player(player_discord_id, engine, client):
     with Session(engine) as session:
         # Check for the player in the database again to make sure we don't double kill them.
         # This might occur is they are attacked while incapacitated.
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == player_discord_id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one_or_none()
-        if player is None:
-            return
-        if player.hp > 0:
+        # Also check if the player was revived (hp > 0)
+        player = Player.select_with_discord_id(player_discord_id)
+        if player is None and player.hp > 0:
             return
         guild = client.get_guild(GUILD_ID)
         member = guild.get_member(int(player_discord_id))

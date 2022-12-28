@@ -18,12 +18,8 @@ async def pickup_logic(context, args, engine):
     discord_id = context.author.id
     zone_name = context.channel.name
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == discord_id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
+        player = Player.select_with_discord_id(session, discord_id)
+        assert player is not None
         if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)

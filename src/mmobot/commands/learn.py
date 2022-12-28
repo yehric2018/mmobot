@@ -27,12 +27,8 @@ async def learn_logic(context, args, engine):
         return
 
     with Session(engine) as session:
-        select_player_statement = (
-            select(Player)
-            .where(Player.discord_id == context.author.id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(select_player_statement).one()
+        player = Player.select_with_discord_id(session, context.author.id)
+        assert player is not None
         if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
