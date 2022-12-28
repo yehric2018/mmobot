@@ -1,30 +1,35 @@
 import os
 import sys
+import yaml
 
 import discord
 from discord import Intents, PermissionOverwrite
 from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+
+from mmobot.db.models import Zone
+from mmobot.test.db import init_test_engine
 
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-DB_ENTRY_SEPERATOR = '\n====================\n'
+engine = init_test_engine()
+
+grid = [
+    [0, 1, 0],
+    [2, 3, 4],
+    [0, 5, 0]
+]
 
 
 def get_zones():
-    zones = {}
-    with open('src/mmobot/db/static/zones.db', 'r') as f:
-        file_text = f.read()
-        zone_data = file_text.split(DB_ENTRY_SEPERATOR)
-        for data in zone_data:
-            lines = data.split('\n')
-            zone_name = lines[0]
-            zones[zone_name] = []
-            for i in range(1, len(lines)):
-                minizone_name = lines[i][1:]
-                zones[zone_name].append(minizone_name)
-    return zones
+    with open('src/mmobot/db/zone-channels.yaml', 'r') as f:
+        try:
+            zones_list = yaml.safe_load(f)
+        except yaml.YAMLError as exc:
+            print(exc)
+    return zones_list
 
 
 async def add_general_channel(guild, channel_name):
@@ -47,29 +52,27 @@ async def add_zones(guild):
     if world_category is None:
         world_category = await guild.create_category('World')
     zones = get_zones()
-    for zone_name in zones:
-        channel = discord.utils.get(guild.channels, name=zone_name)
-        if channel is None:
-            print(f'Creating zone channel #{zone_name}...')
-            channel = await guild.create_text_channel(
-                zone_name,
-                overwrites=overwrites,
-                category=world_category
-            )
-            print('\tChannel created!')
-        else:
-            print(f'Zone channel #{zone_name} already exists')
 
-        minizones = zones[zone_name]
-        for minizone_name in minizones:
-            thread = discord.utils.get(channel.threads, name=minizone_name)
-            if thread is None:
-                print(f'\tCreating minizone thread {minizone_name}...')
-                message = await channel.send(f'Minizone: {minizone_name}')
-                await channel.create_thread(name=minizone_name, message=message)
-                print('\t\tThread created!')
+    with Session(engine) as session:
+        for index, zone_name in enumerate(zones):
+            channel = discord.utils.get(guild.channels, name=zone_name)
+            if channel is None:
+                print(f'Creating zone channel #{zone_name}...')
+                channel = await guild.create_text_channel(
+                    zone_name,
+                    overwrites=overwrites,
+                    category=world_category
+                )
+                new_zone = Zone(
+                    id=index,
+                    channel_id=channel.id,
+                    channel_name=channel.name
+                )
+                session.add(new_zone)
+                print('\tChannel created!')
             else:
-                print(f'\tMinizone thread {minizone_name} already exists')
+                print(f'Zone channel #{zone_name} already exists')
+        session.commit()
 
 
 async def setup_server(guild):

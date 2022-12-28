@@ -16,7 +16,7 @@ async def pickup_logic(context, args, engine):
 
     item_reference = args[0]
     discord_id = context.author.id
-    zone_name = context.channel.name
+    channel_id = str(context.channel.id)
     with Session(engine) as session:
         player = Player.select_with_discord_id(session, discord_id)
         assert player is not None
@@ -27,7 +27,7 @@ async def pickup_logic(context, args, engine):
 
         get_zone_statement = (
             select(Zone)
-            .where(Zone.channel_name == zone_name)
+            .where(Zone.channel_id == channel_id)
         )
         zone = session.scalars(get_zone_statement).one()
         if is_entity_id(item_reference):

@@ -2,11 +2,16 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import pickup_logic
-from mmobot.db.models.player import Player
-from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
+from mmobot.db.models import ItemInstance, Player, WeaponInstance
+from mmobot.test.constants import (
+    MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_CHANNEL_TOWN_SQUARE_NAME,
+    TEST_ITEM_ENTITY_NUMBER,
+    TEST_ITEM_ENTITY_NUMBER_2
+)
 from mmobot.test.db import (
     add_player,
-    add_weapon_instance_to_zone,
+    add_to_database,
     delete_all_entities,
     get_item_instance_with_id,
     init_test_engine,
@@ -37,8 +42,18 @@ def prepare_database(session):
 
 @pytest.fixture()
 def setup_item(session, prepare_database):
-    add_weapon_instance_to_zone(session, 200, 'town-square', 'desert-scimitar')
-    add_weapon_instance_to_zone(session, 201, 'marketplace', 'iron-ore')
+    add_to_database(session, WeaponInstance(
+        id=TEST_ITEM_ENTITY_NUMBER,
+        item_id='desert-scimitar',
+        zone_id=0,
+        zone=TEST_CHANNEL_TOWN_SQUARE_NAME
+    ))
+    add_to_database(session, ItemInstance(
+        id=TEST_ITEM_ENTITY_NUMBER_2,
+        item_id='iron-ore',
+        zone_id=4,
+        zone='marketplace'
+    ))
 
 
 @pytest.fixture

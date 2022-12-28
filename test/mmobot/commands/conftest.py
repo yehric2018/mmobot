@@ -1,6 +1,10 @@
 import pytest
 import pytest_asyncio
 
+from mmobot.test.constants import (
+    TEST_CHANNEL_TOWN_SQUARE_NAME,
+    TEST_CHANNEL_TOWN_SQUARE_ID
+)
 from mmobot.test.mock import MockGuild, MockMember, MockTextChannel
 
 
@@ -11,7 +15,11 @@ def member():
 
 @pytest_asyncio.fixture
 async def town_square_channel(member):
-    channel = MockTextChannel(1, 'town-square', category='World')
+    channel = MockTextChannel(
+        TEST_CHANNEL_TOWN_SQUARE_ID,
+        TEST_CHANNEL_TOWN_SQUARE_NAME,
+        category='World'
+    )
     await channel.set_permissions(member, read_messages=True, send_messages=True)
     return channel
 

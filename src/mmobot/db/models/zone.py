@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy import select
 from sqlalchemy.orm import relationship
 
@@ -8,6 +8,8 @@ from .base import Base
 class Zone(Base):
     __tablename__ = 'Zones'
 
+    id = Column(Integer)  # TODO: Make this the primary key
+    channel_id = Column(String(40), unique=True)
     channel_name = Column(String(40), primary_key=True)
     minizone_parent = Column(String(40), ForeignKey('Zones.channel_name', ondelete='cascade'))
 

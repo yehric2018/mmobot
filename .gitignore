@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Zones + Discord channel metadata
+src/mmobot/db/zone-channels.yaml

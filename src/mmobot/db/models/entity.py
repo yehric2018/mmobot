@@ -18,6 +18,7 @@ class Entity(Base):
         primary_key=True
     )
     entity_type = Column(String(20))
+    zone_id = Column(String(40))  # TODO: Make this a foreign key to Zones.id
     zone = Column(String(40), ForeignKey('Zones.channel_name'))
 
     __mapper_args__ = {
