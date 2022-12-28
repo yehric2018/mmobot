@@ -11,7 +11,7 @@ class ItemInstance(Entity):
     __tablename__ = 'ItemInstances'
 
     id = Column(Integer, ForeignKey('Entities.id', ondelete='cascade'), primary_key=True)
-    player_id = Column(Integer, ForeignKey('Players.id'))
+    owner_id = Column(Integer, ForeignKey('Agents.id'))
     item_id = Column(String(40), ForeignKey('Items.id'))
     item = relationship('Item')
 
@@ -20,9 +20,9 @@ class ItemInstance(Entity):
     }
 
     def drop_into_zone(self, zone):
-        assert self.zone is None and self.player_id is not None
+        assert self.zone is None and self.owner_id is not None
         self.zone = zone
-        self.player_id = None
+        self.owner_id = None
 
     def __repr__(self):
         return f'ItemInstance(id={self.id})'

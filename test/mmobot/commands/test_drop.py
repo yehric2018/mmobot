@@ -50,7 +50,7 @@ async def test_commandDrop_withName(drop_context, session, setup_item):
     assert len(drop_context.channel.messages) == 1
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id is None
+    assert item_instance.owner_id is None
     assert item_instance.zone == 'town-square'
 
 
@@ -60,7 +60,7 @@ async def test_commandDrop_withInventoryIndex(drop_context, session, setup_item)
     assert len(drop_context.channel.messages) == 1
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id is None
+    assert item_instance.owner_id is None
     assert item_instance.zone == 'town-square'
 
 
@@ -70,7 +70,7 @@ async def test_commandDrop_withEntityId(drop_context, session, setup_item):
     assert len(drop_context.channel.messages) == 1
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id is None
+    assert item_instance.owner_id is None
     assert item_instance.zone == 'town-square'
 
 
@@ -81,7 +81,7 @@ async def test_commandDrop_dropEquippedWeapon(drop_context, session, setup_item)
     assert len(drop_context.channel.messages) == 1
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id is None
+    assert item_instance.owner_id is None
     assert item_instance.zone == 'town-square'
     player = get_player_with_name(session, 'player')
     assert player.equipped_weapon_id is None

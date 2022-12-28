@@ -62,17 +62,17 @@ def prepare_database(session):
     )
     food_instance = SolidFoodInstance(
         id=TEST_ITEM_ENTITY_NUMBER,
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         item_id=RASPBERRY_ID
     )
     non_food_instance = WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER_2,
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         item_id=DESERT_SCIMITAR_ID
     )
     container_instance = FluidContainerInstance(
         id=TEST_ITEM_ENTITY_NUMBER_3,
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         item_id=STONE_BOWL_ID,
         nonsolid_id=RASPBERRY_JUICE_ID,
         units=3

@@ -17,7 +17,7 @@ async def attack_command_mining(context, player, minable, session):
         message = 'Mined the following resource(s):\n'
         item_instances = []
         for resource in resources:
-            item_instances.append(ItemInstance(player_id=player.id, item_id=resource.id))
+            item_instances.append(ItemInstance(owner_id=player.id, item_id=resource.id))
             message += f'    - {resource.id}\n'
         session.add_all(item_instances)
         await context.send(message)

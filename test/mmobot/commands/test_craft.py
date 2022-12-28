@@ -86,7 +86,7 @@ def prepare_database(session):
     billet = ItemInstance(
         id=TEST_ITEM_ENTITY_NUMBER,
         item_id='iron-billet',
-        player_id=TEST_PLAYER_ENTITY_NUMBER
+        owner_id=TEST_PLAYER_ENTITY_NUMBER
     )
     anvil = ToolInstance(
         id=TEST_ITEM_ENTITY_NUMBER_2,
@@ -96,7 +96,7 @@ def prepare_database(session):
     hammer = WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER_3,
         item_id='iron-hammer',
-        player_id=TEST_PLAYER_ENTITY_NUMBER
+        owner_id=TEST_PLAYER_ENTITY_NUMBER
     )
     player_skills = [
         PlayerSkill(skill_name='smithing', skill_level=30),
@@ -223,7 +223,7 @@ async def test_commandCraft_missingContainer(craft_context, iron_sword_args, ses
     await craft_logic(craft_context, iron_sword_args, engine, item_index)
     assert len(craft_context.channel.messages) == 1
     assert 'container' in craft_context.channel.messages[0]
-    
+
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER
@@ -236,7 +236,7 @@ async def test_commandCraft_insufficientSkill(craft_context, iron_sword_args, se
     await craft_logic(craft_context, iron_sword_args, engine, item_index)
     assert len(craft_context.channel.messages) == 1
     assert 'skill' in craft_context.channel.messages[0]
-    
+
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER
@@ -249,7 +249,7 @@ async def test_commandCraft_notEnoughEndurance(craft_context, iron_sword_args, s
     await craft_logic(craft_context, iron_sword_args, engine, item_index)
     assert len(craft_context.channel.messages) == 1
     assert '!craftx' in craft_context.channel.messages[0]
-    
+
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
     assert player.endurance == 10
@@ -264,7 +264,7 @@ async def test_commandCraft_notEnoughEnduranceOrHP(craft_context, iron_sword_arg
     await craft_logic(craft_context, iron_sword_args, engine, item_index, use_hp=True)
     assert len(craft_context.channel.messages) == 1
     assert craft_context.channel.messages[0] == MESSAGE_NOT_ENOUGH_HP
-    
+
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
     assert player.endurance == 10
@@ -281,7 +281,7 @@ async def test_commandCraft_useHP(craft_context, iron_sword_args, session):
     assert craft_context.channel.messages[0] == MESSAGE_IRON_SWORD_SUCCESS
     assert craft_context.channel.messages[1] == MESSAGE_LOSE_ENDURANCE_10
     assert craft_context.channel.messages[2] == MESSAGE_LOSE_HP_35
-    
+
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
     assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER_3

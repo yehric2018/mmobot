@@ -39,7 +39,7 @@ async def pickup_logic(context, args, engine):
             await context.send(f'Could not find item to pick up: {item_reference}')
             return
         pickup_item.zone = None
-        pickup_item.player_id = player.id
+        pickup_item.owner_id = player.id
         session.commit()
 
         await context.send(f'You have picked up: {pickup_item.item.id}')

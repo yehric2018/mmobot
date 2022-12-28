@@ -26,7 +26,7 @@ class Player(Agent):
     inventory = relationship(
         'ItemInstance',
         order_by='ItemInstance.id',
-        foreign_keys='ItemInstance.player_id'
+        foreign_keys='ItemInstance.owner_id'
     )
 
     last_learned = Column(DateTime, default=date.fromtimestamp(1))

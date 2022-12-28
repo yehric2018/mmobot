@@ -60,7 +60,7 @@ async def give_logic(context, args, engine):
         if giving_item_instance is None:
             await context.send(f'You do not have the item: {giving_item_name}')
             return
-        giving_item_instance.player_id = receiving_player.id
+        giving_item_instance.owner_id = receiving_player.id
         if giving_player.equipped_weapon_id == giving_item_instance.id:
             giving_player.equipped_weapon_id = None
         session.commit()

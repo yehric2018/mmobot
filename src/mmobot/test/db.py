@@ -38,10 +38,10 @@ def add_to_database(session, database_entry):
     session.commit()
 
 
-def add_item_instance(session, instance_id, player_id, item_id):
+def add_item_instance(session, instance_id, owner_id, item_id):
     item_instance = ItemInstance(
         id=instance_id,
-        player_id=player_id,
+        owner_id=owner_id,
         item_id=item_id
     )
     session.add(item_instance)
@@ -53,10 +53,10 @@ def add_player(session, player):
     session.commit()
 
 
-def add_weapon_instance(session, instance_id, player_id, item_id):
+def add_weapon_instance(session, instance_id, owner_id, item_id):
     weapon_instance = WeaponInstance(
         id=instance_id,
-        player_id=player_id,
+        owner_id=owner_id,
         item_id=item_id
     )
     session.add(weapon_instance)

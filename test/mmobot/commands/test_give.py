@@ -97,7 +97,7 @@ async def test_commandGive_withItemName(giving_context, session, setup_item):
     assert item_instance is not None
     assert item_instance.id == 200
     assert item_instance.zone is None
-    assert item_instance.player_id == 2
+    assert item_instance.owner_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
 
@@ -111,7 +111,7 @@ async def test_commandGive_withInventoryIndex(giving_context, session, setup_ite
     assert item_instance is not None
     assert item_instance.id == 200
     assert item_instance.zone is None
-    assert item_instance.player_id == 2
+    assert item_instance.owner_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
 
@@ -125,7 +125,7 @@ async def test_commandGive_withEntityId(giving_context, session, setup_item):
     assert item_instance is not None
     assert item_instance.id == 200
     assert item_instance.zone is None
-    assert item_instance.player_id == 2
+    assert item_instance.owner_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
 
@@ -139,7 +139,7 @@ async def test_commandGive_withDiscordMention(giving_context, session, setup_ite
     assert item_instance is not None
     assert item_instance.id == 200
     assert item_instance.zone is None
-    assert item_instance.player_id == 2
+    assert item_instance.owner_id == 2
     assert item_instance.item_id == 'desert-scimitar'
 
 
@@ -154,7 +154,7 @@ async def test_commandGive_equippedWeapon(giving_context, session, setup_item):
     assert item_instance is not None
     assert item_instance.id == 200
     assert item_instance.zone is None
-    assert item_instance.player_id == 2
+    assert item_instance.owner_id == 2
     assert item_instance.item_id == 'desert-scimitar'
     player = get_player_with_name(session, 'giver')
     assert player.equipped_weapon_id is None
@@ -175,7 +175,7 @@ async def test_commandGive_oneArgProvided(giving_context, session, setup_item):
     expected_message = MESSAGE_GIVE_WRONG_USAGE
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 1
+    assert item_instance.owner_id == 1
 
 
 @pytest.mark.asyncio
@@ -209,7 +209,7 @@ async def test_commandGive_recieverNotInZone(
     expected_message = 'Could not find player receiver in current location'
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 1
+    assert item_instance.owner_id == 1
 
 
 @pytest.mark.asyncio
@@ -219,7 +219,7 @@ async def test_commandGive_itemNameNotInInventory(giving_context, session, setup
     expected_message = 'You do not have the item: blazing-blade'
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 1
+    assert item_instance.owner_id == 1
 
 
 @pytest.mark.asyncio
@@ -229,7 +229,7 @@ async def test_commandGive_inventoryIndexNotInInventory(giving_context, session,
     expected_message = 'You do not have the item: 200'
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 1
+    assert item_instance.owner_id == 1
 
 
 @pytest.mark.asyncio
@@ -239,4 +239,4 @@ async def test_commandGive_entityIdNotInInventory(giving_context, session, setup
     expected_message = 'You do not have the item: /abc'
     assert giving_context.channel.messages[0] == expected_message
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 1
+    assert item_instance.owner_id == 1

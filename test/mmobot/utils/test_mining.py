@@ -37,12 +37,12 @@ def member():
 
 @pytest.fixture
 def basic_pickaxe():
-    return WeaponInstance(id=2222, player_id=3333, item_id='basic-pickaxe')
+    return WeaponInstance(id=2222, owner_id=3333, item_id='basic-pickaxe')
 
 
 @pytest.fixture
 def basic_sword():
-    return WeaponInstance(id=2222, player_id=3333, item_id='iron-sword')
+    return WeaponInstance(id=2222, owner_id=3333, item_id='iron-sword')
 
 
 @pytest.fixture
@@ -268,7 +268,6 @@ def test_getMiningOutcome_noWeapon(
     monkeypatch.setattr(RANDOM_CALL, lambda min, max: mock_random.next(min, max))
     player.equipped_weapon_id = None
     add_player(session, player)
-    
     get_mining_outcome(player, None, standard_minable)
 
     assert len(mock_random.calls) == 2

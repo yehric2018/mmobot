@@ -52,7 +52,7 @@ async def test_commandPickup_withName(pickup_context, session, setup_item):
     assert len(pickup_context.channel.messages) == 1
     assert pickup_context.channel.messages[0] == MESSAGE_PICKUP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 2222
+    assert item_instance.owner_id == 2222
     assert item_instance.zone is None
 
 
@@ -62,7 +62,7 @@ async def test_commandPickup_withEntityId(pickup_context, session, setup_item):
     assert len(pickup_context.channel.messages) == 1
     assert pickup_context.channel.messages[0] == MESSAGE_PICKUP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
-    assert item_instance.player_id == 2222
+    assert item_instance.owner_id == 2222
     assert item_instance.zone is None
 
 

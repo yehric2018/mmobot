@@ -141,7 +141,7 @@ class Recipe:
         for item_instance in ingredients:
             if item_instance.item_id in ingredient_counter:
                 item_id = item_instance.item_id
-                item_instance.player_id = None
+                item_instance.owner_id = None
                 ingredient_counter[item_id] -= 1
                 if ingredient_counter[item_id] == 0:
                     del ingredient_counter[item_id]

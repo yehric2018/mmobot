@@ -97,21 +97,21 @@ async def test_commandInventory_fluidContainers(inventory_context, session):
     fluid_container_full = FluidContainerInstance(
         id=2,
         item_id='stone-bowl',
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         nonsolid_id='water',
         units=3
     )
     fluid_container_partial = FluidContainerInstance(
         id=3,
         item_id='stone-bowl',
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         nonsolid_id='water',
         units=2
     )
     fluid_container_empty = FluidContainerInstance(
         id=4,
         item_id='stone-bowl',
-        player_id=TEST_PLAYER_ENTITY_NUMBER,
+        owner_id=TEST_PLAYER_ENTITY_NUMBER,
         nonsolid_id=None,
         units=0
     )

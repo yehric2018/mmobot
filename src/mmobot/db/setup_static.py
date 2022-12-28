@@ -106,5 +106,5 @@ def setup_attire():
             session.commit()
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(bind=engine)
 setup()

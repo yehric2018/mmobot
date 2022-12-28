@@ -57,3 +57,24 @@ ALTER TABLE [db].Players
 ALTER TABLE [db].Players
     DROP COLUMN stats_id;
 DROP TABLE [db].PlayerStats;
+
+
+-- Step 6: Change the Players reference in ItemInstances to owner_id that points to
+-- the Agents table.
+-- NOTE: If you run into an error about a mapped column not being present even after
+-- renaming, check the relationship attributes of other models and make sure they
+-- are referencing by the new column name as well.
+SELECT *
+    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE REFERENCED_TABLE_SCHEMA IS NOT NULL
+    AND TABLE_SCHEMA = '[db]'
+    AND REFERENCED_TABLE_NAME = 'Players';
+
+ALTER TABLE [db].ItemInstances
+	DROP FOREIGN KEY ItemInstances_ibfk_2;
+ALTER TABLE [db].ItemInstances
+    RENAME COLUMN player_id TO owner_id;
+ALTER TABLE [db].ItemInstances
+    ADD CONSTRAINT ItemInstances_ibfk_2 FOREIGN KEY (owner_id)
+    REFERENCES [db].Agents (id)
+    ON DELETE CASCADE;

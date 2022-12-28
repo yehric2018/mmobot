@@ -35,7 +35,7 @@ async def drop_logic(context, args, engine):
             await context.send(f'You do not have the item: {item_reference}')
             return
         drop_item.zone = zone_name
-        drop_item.player_id = None
+        drop_item.owner_id = None
         if drop_item.id == player.equipped_weapon_id:
             player.equipped_weapon_id = None
         session.commit()
