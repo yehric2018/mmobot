@@ -1,5 +1,4 @@
 import discord
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player, Zone
@@ -12,56 +11,41 @@ async def move_logic(context, args, engine):
         await context.send('Please specify a location to move to! For example: !move hawaii')
         return
 
-    zone_name = args[0]
+    direction = get_direction(args[0])
     member = context.author
     curr_channel = context.channel
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == context.author.id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
+        player = Player.select_with_discord_id(session, context.author.id)
+        assert player is not None
         if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
 
-        get_zone_statement = (
-            select(Zone)
-            .where(Zone.channel_name == context.channel.name)
-        )
-        zone = session.scalars(get_zone_statement).one()
-        if zone.minizone_parent == zone_name:
-            dest_channel = discord.utils.get(context.guild.channels, name=zone_name)
-            player.zone = zone_name
-            session.commit()
+        zone = player.zone
+        assert zone is not None
+        next_zone = None
+        if direction == 'n' and zone.can_move_north():
+            next_zone = zone.north_zone
+        elif direction == 'e' and zone.can_move_east():
+            next_zone = zone.east_zone
+        elif direction == 's' and zone.can_move_south():
+            next_zone = zone.south_zone
+        elif direction == 'w' and zone.can_move_west():
+            next_zone = zone.west_zone
+        if next_zone is None:
+            await context.send(f'<@{player.discord_id}> You cannot travel {args[0]}.')
+            return
 
-            await curr_channel.send(f'{member.mention} has left.')
+        dest_channel = await context.guild.fetch_channel(next_zone.channel_id)
+        await curr_channel.send(f'{member.mention} has left for {dest_channel.mention}.')
+        await dest_channel.set_permissions(member, read_messages=True, send_messages=True)
+        await curr_channel.set_permissions(member, read_messages=False, send_messages=False)
+        await dest_channel.send(f'{member.mention} has arrived.')
 
-            await dest_channel.set_permissions(member, read_messages=True, send_messages=True)
-            await curr_channel.remove_user(member)
-        elif any(zone_path.end_zone_name == zone_name for zone_path in zone.navigation):
-            dest_channel = discord.utils.get(context.guild.channels, name=zone_name)
-            player.zone = zone_name
-            session.commit()
+        player.zone_id = next_zone.id
+        session.commit()
 
-            await curr_channel.send(f'{member.mention} has left for {dest_channel.mention}.')
 
-            await dest_channel.set_permissions(member, read_messages=True, send_messages=True)
-            await curr_channel.set_permissions(member, read_messages=False, send_messages=False)
-
-            await dest_channel.send(f'{member.mention} has arrived.')
-        elif any(minizone.channel_name == zone_name for minizone in zone.minizones):
-            dest_thread = discord.utils.get(curr_channel.threads, name=zone_name)
-            player.zone = zone_name
-            session.commit()
-
-            await curr_channel.send(f'{member.mention} has entered {dest_thread.mention}.')
-
-            await dest_thread.add_user(member)
-            await curr_channel.set_permissions(member, read_messages=True, send_messages=False)
-
-            await dest_thread.send(f'{member.mention} has arrived.')
-        else:
-            await context.send(f'You cannot travel to {zone_name} from {context.channel.name}')
+def get_direction(direction_word):
+    return direction_word[0].lower()
