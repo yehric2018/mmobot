@@ -7,17 +7,10 @@ from mmobot.test.mock import MockContext
 
 REACHABLE_FROM_TOWN_SQUARE_MESSAGE = '''\
 <title>You can reach the following locations from town-square:</title>
-<desc>0. arena
-1. barracks
-2. city-gate
-3. marketplace
-4. mines-entrance
-5. royal-palace
-6. tavern
-7. yak-farm
-</desc>
-<field>Minizones:0. bell-tower
-</field>
+<desc>None</desc>
+<field>:arrow_left: West:marketplace</field>
+<field>:arrow_up: North:barracks</field>
+<field>:arrow_right: East:mines-entrance</field>
 '''
 
 

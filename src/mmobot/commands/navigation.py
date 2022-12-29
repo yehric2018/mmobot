@@ -10,21 +10,36 @@ async def navigation_logic(context, engine):
         return
 
     with Session(engine) as session:
-        get_zone_statement = (
-            select(Zone)
-            .where(Zone.channel_name == context.channel.name)
-        )
-        zone = session.scalars(get_zone_statement).one()
-        message = ''
-        for index, zone_path in enumerate(zone.navigation):
-            message += f'{index}. {zone_path.end_zone_name}\n'
+        zone = Zone.select_with_channel_id(session, context.channel.id)
+        assert zone is not None
+
         embed = Embed(
-            title=f'You can reach the following locations from {context.channel.name}:',
-            description=message
+            title=f'You can reach the following locations from {context.channel.name}:'
         )
-        if len(zone.minizones) != 0:
-            minizones_text = ''
-            for index, minizone in enumerate(zone.minizones):
-                minizones_text += f'{index}. {minizone.channel_name}\n'
-            embed.add_field(name='Minizones', value=minizones_text)
+
+        if zone.can_move_west():
+            embed.add_field(
+                name=':arrow_left: West',
+                value=zone.west_zone.channel_name,
+                inline=True
+            )
+        if zone.can_move_north():
+            embed.add_field(
+                name=':arrow_up: North',
+                value=zone.north_zone.channel_name,
+                inline=True
+            )
+        if zone.can_move_south():
+            embed.add_field(
+                name=':arrow_down: South',
+                value=zone.south_zone.channel_name,
+                inline=True
+            )
+        if zone.can_move_east():
+            embed.add_field(
+                name=':arrow_right: East',
+                value=zone.east_zone.channel_name,
+                inline=True
+            )
+
         await context.send(embed=embed)

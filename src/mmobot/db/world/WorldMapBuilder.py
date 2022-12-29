@@ -1,17 +1,29 @@
 import os
 import pickle
 from dotenv import load_dotenv
+from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Barrier, Zone
-from mmobot.test.db import init_test_engine
 
 
 load_dotenv()
 PROJECT_PATH = os.getenv('PROJECT_PATH')
 DATA_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'world', 'data')
 
-engine = init_test_engine()
+MYSQL_USERNAME = os.getenv('MYSQL_USERNAME')
+MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD')
+MYSQL_HOSTNAME = os.getenv('MYSQL_HOSTNAME')
+MYSQL_DATABASE_NAME = os.getenv('MYSQL_DATABASE_NAME')
+
+connection_str = 'mysql+pymysql://{0}:{1}@{2}/{3}'.format(
+    MYSQL_USERNAME,
+    MYSQL_PASSWORD,
+    MYSQL_HOSTNAME,
+    MYSQL_DATABASE_NAME
+)
+
+engine = create_engine(connection_str)
 
 
 class WorldMapBuilder:
