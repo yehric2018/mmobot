@@ -40,3 +40,10 @@ ALTER TABLE [db].Entities
 -- Step 6: Remove the minizone_parent column since we aren't using it anymore.
 ALTER TABLE [db].Zones
 	DROP COLUMN minizone_parent;
+
+-------------------------------------------------------------------------
+-- Next steps: Adding new properties to Zone
+-- Step 1: Add the grid_row and grid_col columns
+ALTER TABLE [db].Zones
+    ADD COLUMN grid_row INT,
+    ADD COLUMN grid_col INT;
