@@ -10,14 +10,14 @@ from .static.resource import Resource
 from .static.solid_food import SolidFood
 from .static.tool import Tool
 from .static.weapon import Weapon
-from .zone import Zone
-from .zone_path import ZonePath
 
 from .player_skills import PlayerSkill
 from .player_skill_teaching import PlayerSkillTeaching
-
 from .entity import Entity
+from .zone import Zone
+
 from .agent import Agent
+from .barrier import Barrier
 from .interaction import Interaction
 from .minable import Minable
 from .player import Player
@@ -31,6 +31,7 @@ from .weapon_instance import WeaponInstance
 __all__ = [
     'Agent',
     'Attire',
+    'Barrier',
     'Base',
     'Entity',
     'FluidContainer',
@@ -52,6 +53,5 @@ __all__ = [
     'ToolInstance',
     'Weapon',
     'WeaponInstance',
-    'Zone',
-    'ZonePath'
+    'Zone'
 ]

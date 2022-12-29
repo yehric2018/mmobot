@@ -10,8 +10,6 @@ from mmobot.db.index import ItemIndex
 from mmobot.db.models import (
     Attire,
     Base,
-    Zone,
-    ZonePath
 )
 
 load_dotenv()
@@ -39,44 +37,6 @@ def setup():
     item_index = ItemIndex()
     with Session(engine) as session:
         item_index.load_to_database(session)
-    setup_zones()
-
-
-def setup_zones():
-    all_zones = []
-    all_zone_paths = []
-    with open(os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'zones.db'), 'r') as f:
-        file_text = f.read()
-        zone_data = file_text.split(DB_ENTRY_SEPERATOR)
-        for data in zone_data:
-            lines = data.split('\n')
-            zone_name = lines[0]
-            all_zones.append(Zone(channel_name=zone_name))
-            for i in range(1, len(lines)):
-                minizone_name = lines[i][1:]
-                all_zones.append(Zone(channel_name=minizone_name, minizone_parent=zone_name))
-
-    zone_paths_path = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'zone-paths.db')
-    with open(zone_paths_path, 'r') as f:
-        file_text = f.read()
-        zone_data = file_text.split(DB_ENTRY_SEPERATOR)
-        for data in zone_data:
-            lines = data.split('\n')
-            zone_path = ZonePath(
-                start_zone_name=lines[0],
-                end_zone_name=lines[1],
-                distance=int(lines[2]),
-                guardable='G' in lines[3],
-                lockable='L' in lines[3]
-            )
-            all_zone_paths.append(zone_path)
-
-    with Session(engine) as session:
-        for zone in all_zones:
-            session.merge(zone)
-        for zone_path in all_zone_paths:
-            session.merge(zone_path)
-        session.commit()
 
 
 def setup_attire():

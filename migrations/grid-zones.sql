@@ -47,3 +47,17 @@ ALTER TABLE [db].Zones
 ALTER TABLE [db].Zones
     ADD COLUMN grid_row INT,
     ADD COLUMN grid_col INT;
+
+-- Step 2: Add the north/south/east/west zone columns
+ALTER TABLE [db].Zones
+    ADD COLUMN north_zone_id INT REFERENCES [db].Zones,
+    ADD COLUMN east_zone_id INT REFERENCES [db].Zones,
+    ADD COLUMN south_zone_id INT REFERENCES [db].Zones,
+    ADD COLUMN west_zone_id INT REFERENCES [db].Zones;
+
+-- Step 3: Add the north/south/east/west wall columns
+ALTER TABLE [db].Zones
+    ADD COLUMN north_wall_id INT REFERENCES [db].Barriers,
+    ADD COLUMN east_wall_id INT REFERENCES [db].Barriers,
+    ADD COLUMN south_wall_id INT REFERENCES [db].Barriers,
+    ADD COLUMN west_wall_id INT REFERENCES [db].Barriers;

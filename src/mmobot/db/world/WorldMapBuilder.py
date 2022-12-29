@@ -3,7 +3,7 @@ import pickle
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Zone
+from mmobot.db.models import Barrier, Zone
 from mmobot.test.db import init_test_engine
 
 
@@ -112,12 +112,29 @@ class WorldMapBuilder:
             session.commit()
 
     def _get_zone_from_data(self, row, col, zone_data):
-        return Zone(
+        new_zone = Zone(
             id=zone_data['zone_id'],
             channel_name=zone_data['channel_name'],
             grid_row=row,
             grid_col=col
         )
+        if zone_data['north_wall'] is not None:
+            new_zone.north_wall = Barrier()
+        if zone_data['east_wall'] is not None:
+            new_zone.east_wall = Barrier()
+        if zone_data['south_wall'] is not None:
+            new_zone.south_wall = Barrier()
+        if zone_data['west_wall'] is not None:
+            new_zone.west_wall = Barrier()
+        if row > 0 and self.grid[row - 1][col] is not None:
+            new_zone.north_zone_id = self.grid[row - 1][col]['zone_id']
+        if col < self.cols - 1 and self.grid[row][col + 1] is not None:
+            new_zone.east_zone_id = self.grid[row][col + 1]['zone_id']
+        if row < self.rows - 1 and self.grid[row + 1][col] is not None:
+            new_zone.south_zone_id = self.grid[row + 1][col]['zone_id']
+        if col > 0 and self.grid[row][col - 1] is not None:
+            new_zone.west_zone_id = self.grid[row][col - 1]['zone_id']
+        return new_zone
 
     def _add_wall(self, row, col, wall_name):
         if row >= self.rows or row < 0 or col >= self.cols or col < 0:

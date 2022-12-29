@@ -1,10 +1,10 @@
 import os
 import sys
-import yaml
 
 import discord
 from discord import Intents, PermissionOverwrite
 from dotenv import load_dotenv
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Zone
@@ -21,15 +21,6 @@ grid = [
     [2, 3, 4],
     [0, 5, 0]
 ]
-
-
-def get_zones():
-    with open('src/mmobot/db/zone-channels.yaml', 'r') as f:
-        try:
-            zones_list = yaml.safe_load(f)
-        except yaml.YAMLError as exc:
-            print(exc)
-    return zones_list
 
 
 async def add_general_channel(guild, channel_name):
@@ -51,27 +42,21 @@ async def add_zones(guild):
     world_category = discord.utils.get(guild.categories, name='World')
     if world_category is None:
         world_category = await guild.create_category('World')
-    zones = get_zones()
 
     with Session(engine) as session:
-        for index, zone_name in enumerate(zones):
-            channel = discord.utils.get(guild.channels, name=zone_name)
-            if channel is None:
-                print(f'Creating zone channel #{zone_name}...')
+        all_zones = session.scalars(select(Zone)).all()
+        for zone in all_zones:
+            if zone.channel_id is None:
+                print(f'Creating zone channel #{zone.channel_name}')
                 channel = await guild.create_text_channel(
-                    zone_name,
+                    zone.channel_name,
                     overwrites=overwrites,
                     category=world_category
                 )
-                new_zone = Zone(
-                    id=index,
-                    channel_id=channel.id,
-                    channel_name=channel.name
-                )
-                session.add(new_zone)
+                zone.channel_id = channel.id
                 print('\tChannel created!')
             else:
-                print(f'Zone channel #{zone_name} already exists')
+                print(f'Zone channel #{zone.channel_name} already exists')
         session.commit()
 
 
