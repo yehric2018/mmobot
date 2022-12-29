@@ -57,7 +57,7 @@ async def attack_logic(bot, context, args, engine):
             get_target_statement = (
                 select(Entity)
                 .where(Entity.id == target_id)
-                .where(Entity.zone == context.channel.name)
+                .where(Entity.zone.has(channel_id=context.channel.id))
             )
             target = session.scalars(get_target_statement).one()
 

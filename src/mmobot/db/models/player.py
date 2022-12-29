@@ -49,10 +49,26 @@ class Player(Agent):
     def __repr__(self):
         return f'Player(name={self.name})'
 
-    def select_with_discord_id(session, discord_id):
+    def select_with_discord_id(session, discord_id, channel_id=None):
         get_player_statement = (
             select(Player)
             .where(Player.discord_id == discord_id)
             .where(Player.is_active)
         )
+        if channel_id is not None:
+            get_player_statement = get_player_statement.where(
+                Player.zone.has(channel_id=channel_id)
+            )
+        return session.scalars(get_player_statement).one_or_none()
+
+    def select_with_discord_name(session, discord_name, channel_id=None):
+        get_player_statement = (
+            select(Player)
+            .where(Player.name == discord_name)
+            .where(Player.is_active)
+        )
+        if channel_id is not None:
+            get_player_statement = get_player_statement.where(
+                Player.zone.has(channel_id=channel_id)
+            )
         return session.scalars(get_player_statement).one_or_none()

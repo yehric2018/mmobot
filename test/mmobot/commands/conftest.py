@@ -2,6 +2,8 @@ import pytest
 import pytest_asyncio
 
 from mmobot.test.constants import (
+    TEST_CHANNEL_MARKETPLACE_ID,
+    TEST_CHANNEL_MARKETPLACE_NAME,
     TEST_CHANNEL_TOWN_SQUARE_NAME,
     TEST_CHANNEL_TOWN_SQUARE_ID
 )
@@ -22,6 +24,15 @@ async def town_square_channel(member):
     )
     await channel.set_permissions(member, read_messages=True, send_messages=True)
     return channel
+
+
+@pytest_asyncio.fixture
+async def marketplace_channel():
+    return MockTextChannel(
+        TEST_CHANNEL_MARKETPLACE_ID,
+        TEST_CHANNEL_MARKETPLACE_NAME,
+        category='World'
+    )
 
 
 @pytest_asyncio.fixture

@@ -8,13 +8,13 @@ from dotenv import load_dotenv
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Zone
-from mmobot.test.db import init_test_engine
+from mmobot.db import initialize_engine
 
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-engine = init_test_engine()
+engine = initialize_engine()
 
 grid = [
     [0, 1, 0],

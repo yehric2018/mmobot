@@ -41,7 +41,7 @@ async def name_logic(context, args, engine):
             ancestry=max_ancestry + 1,
             birthday=birthday,
             is_active=True,
-            zone='town-square',
+            zone_id=0,
             hp=100,
             endurance=100,
             max_hp=100,

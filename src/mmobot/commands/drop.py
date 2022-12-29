@@ -16,7 +16,6 @@ async def drop_logic(context, args, engine):
 
     item_reference = args[0]
     discord_id = context.author.id
-    zone_name = context.channel.name
     with Session(engine) as session:
         get_player_statement = (
             select(Player)
@@ -34,7 +33,7 @@ async def drop_logic(context, args, engine):
         if not drop_item:
             await context.send(f'You do not have the item: {item_reference}')
             return
-        drop_item.zone = zone_name
+        drop_item.zone_id = player.zone_id
         drop_item.owner_id = None
         if drop_item.id == player.equipped_weapon_id:
             player.equipped_weapon_id = None

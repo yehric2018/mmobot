@@ -1,7 +1,4 @@
-from datetime import datetime
-from datetime import timedelta
-
-from sqlalchemy import select
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
 from mmobot.constants import ALL_SKILLS, TEACHING_COOLDOWN, TEACHING_DIFF
@@ -22,23 +19,6 @@ async def teach_logic(context, args, engine):
         await context.send(f'Skill {skill_name} does not exist')
         return
 
-    if is_mention(args[0]):
-        learner_id = int(args[0][2:-1])
-        learning_player_statement = (
-            select(Player)
-            .where(Player.discord_id == learner_id)
-            .where(Player.is_active)
-            .where(Player.zone == context.channel.name)
-        )
-    else:
-        learner_name = args[0]
-        learning_player_statement = (
-            select(Player)
-            .where(Player.name == learner_name)
-            .where(Player.is_active)
-            .where(Player.zone == context.channel.name)
-        )
-
     with Session(engine) as session:
         teaching_player = Player.select_with_discord_id(session, teacher_id)
         assert teaching_player is not None
@@ -47,7 +27,14 @@ async def teach_logic(context, args, engine):
             await context.send(message)
             return
 
-        learning_player = session.scalars(learning_player_statement).one_or_none()
+        if is_mention(args[0]):
+            learning_player = Player.select_with_discord_id(
+                session, args[0][2:-1], channel_id=context.channel.id
+            )
+        else:
+            learning_player = Player.select_with_discord_name(
+                session, args[0], channel_id=context.channel.id
+            )
         if learning_player is None:
             await context.send(f'Could not find player {args[0]} in current location')
             return

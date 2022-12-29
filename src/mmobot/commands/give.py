@@ -1,4 +1,3 @@
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Player
@@ -14,36 +13,25 @@ async def give_logic(context, args, engine):
         await context.send('Please supply give arguments like this: **!give player item**')
         return
 
-    giver_name = context.author.nick
     giving_item_name = args[1]
-
-    if is_mention(args[0]):
-        receiver_id = int(args[0][2:-1])
-        receiving_player_statement = (
-            select(Player)
-            .where(Player.discord_id == receiver_id)
-            .where(Player.is_active)
-            .where(Player.zone == context.channel.name)
-        )
-    else:
-        receiver_name = args[0]
-        receiving_player_statement = (
-            select(Player)
-            .where(Player.name == receiver_name)
-            .where(Player.is_active)
-            .where(Player.zone == context.channel.name)
-        )
-
     with Session(engine) as session:
-        receiving_player = session.scalars(receiving_player_statement).one_or_none()
-        if receiving_player is None:
-            await context.send(f'Could not find player {args[0]} in current location')
-            return
-        giving_player_statement = select(Player).where(Player.name == giver_name)
-        giving_player = session.scalars(giving_player_statement).one()
+        giving_player = Player.select_with_discord_id(session, context.author.id)
+        assert giving_player is not None
         if giving_player.hp == 0:
             message = f'<@{giving_player.discord_id}> You are incapacitated.'
             await context.send(message)
+            return
+
+        if is_mention(args[0]):
+            receiving_player = Player.select_with_discord_id(
+                session, args[0][2:-1], channel_id=context.channel.id
+            )
+        else:
+            receiving_player = Player.select_with_discord_name(
+                session, args[0], channel_id=context.channel.id
+            )
+        if receiving_player is None:
+            await context.send(f'Could not find player {args[0]} in current location')
             return
 
         giving_item_instance = None
@@ -60,14 +48,14 @@ async def give_logic(context, args, engine):
         if giving_item_instance is None:
             await context.send(f'You do not have the item: {giving_item_name}')
             return
-        giving_item_instance.owner_id = receiving_player.id
         if giving_player.equipped_weapon_id == giving_item_instance.id:
             giving_player.equipped_weapon_id = None
+        giving_item_instance.owner_id = receiving_player.id
         session.commit()
 
         message = '<@{0}> received {1} from {2}!'.format(
             receiving_player.discord_id,
             giving_item_instance.item.id,
-            giver_name
+            context.author.nick
         )
         await context.send(message)

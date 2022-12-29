@@ -15,6 +15,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
 
     goal_item_id = args[0]
     discord_id = context.author.id
+    channel_id = context.channel.id
     if goal_item_id not in item_index.index:
         await context.send(f'<@{discord_id}> {goal_item_id} does not exist.')
         return
@@ -26,7 +27,7 @@ async def craft_logic(context, args, engine, item_index, use_hp=False):
     with Session(engine) as session:
         player = Player.select_with_discord_id(session, discord_id)
         assert player is not None
-        zone = Zone.select_with_channel_name(session, player.zone)
+        zone = Zone.select_with_channel_id(session, channel_id)
         assert zone is not None
 
         components = separate_crafting_components(args[1:], player, zone)

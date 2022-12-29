@@ -4,7 +4,10 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import attack_logic
 from mmobot.db.models import Minable, Player
-from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
+from mmobot.test.constants import (
+    MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_TOWN_SQUARE_ZONE_ID
+)
 from mmobot.test.db import (
     add_player,
     add_to_database,
@@ -55,7 +58,7 @@ async def test_commandAttack_mining(attack_context, session, monkeypatch):
     add_weapon_instance(session, 2222, 3333, 'basic-pickaxe')
     add_to_database(session, Minable(
         id=20,
-        zone='town-square',
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID,
         stone_comp=8000,
         coal_comp=2000,
         iron_comp=2500,

@@ -5,6 +5,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Sequence
 from sqlalchemy import String
+from sqlalchemy.orm import relationship
 
 from .base import Base
 
@@ -18,8 +19,8 @@ class Entity(Base):
         primary_key=True
     )
     entity_type = Column(String(20))
-    zone_id = Column(String(40))  # TODO: Make this a foreign key to Zones.id
-    zone = Column(String(40), ForeignKey('Zones.channel_name'))
+    zone_id = Column(Integer, ForeignKey('Zones.id'))
+    zone = relationship('Zone', foreign_keys='Entity.zone_id', overlaps='interactions,loot')
 
     __mapper_args__ = {
         'polymorphic_identity': 'entity',

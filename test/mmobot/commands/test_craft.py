@@ -16,7 +16,6 @@ from mmobot.db.models import (
     WeaponInstance
 )
 from mmobot.test.constants import (
-    TEST_CHANNEL_TOWN_SQUARE_NAME,
     TEST_ITEM_ENTITY_NUMBER,
     TEST_ITEM_ENTITY_REFERENCE,
     TEST_ITEM_ENTITY_NUMBER_2,
@@ -24,7 +23,8 @@ from mmobot.test.constants import (
     TEST_ITEM_ENTITY_NUMBER_3,
     TEST_PLAYER_ENTITY_NUMBER,
     TEST_PLAYER_DISCORD_ID,
-    TEST_PLAYER_DISCORD_NAME
+    TEST_PLAYER_DISCORD_NAME,
+    TEST_TOWN_SQUARE_ZONE_ID
 )
 from mmobot.test.db import (
     add_to_database,
@@ -91,11 +91,12 @@ def prepare_database(session):
     anvil = ToolInstance(
         id=TEST_ITEM_ENTITY_NUMBER_2,
         item_id='iron-anvil',
-        zone=TEST_CHANNEL_TOWN_SQUARE_NAME
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     )
     hammer = WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER_3,
         item_id='iron-hammer',
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID,
         owner_id=TEST_PLAYER_ENTITY_NUMBER
     )
     player_skills = [
@@ -105,7 +106,7 @@ def prepare_database(session):
     player = Player(
         id=TEST_PLAYER_ENTITY_NUMBER,
         name=TEST_PLAYER_DISCORD_NAME,
-        zone=TEST_CHANNEL_TOWN_SQUARE_NAME,
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID,
         equipped_weapon_id=hammer.id,
         discord_id=TEST_PLAYER_DISCORD_ID,
         is_active=True,

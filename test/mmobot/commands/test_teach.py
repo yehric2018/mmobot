@@ -7,7 +7,11 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import teach_logic
 from mmobot.db.models import Player, PlayerSkill
-from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
+from mmobot.test.constants import (
+    MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_MARKETPLACE_ZONE_ID,
+    TEST_TOWN_SQUARE_ZONE_ID
+)
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -16,7 +20,7 @@ from mmobot.test.db import (
     init_test_engine,
     update_player
 )
-from mmobot.test.mock import MockContext, MockGuild, MockMember, MockTextChannel
+from mmobot.test.mock import MockContext, MockGuild, MockMember
 
 
 engine = init_test_engine()
@@ -50,14 +54,14 @@ def prepare_database(session):
         discord_id=100,
         is_active=True,
         hp=100,
-        zone='barracks'
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_to_database(session, Player(
         id=2,
         name='learner',
         discord_id=101,
         is_active=True,
-        zone='barracks'
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_to_database(session, PlayerSkill(
         player_id=1,
@@ -89,23 +93,26 @@ def prepare_database(session):
 
 
 @pytest_asyncio.fixture
-async def channel(teaching_member, learning_member):
-    channel = MockTextChannel(1, 'barracks', category='World')
-    await channel.set_permissions(teaching_member, read_messages=True, send_messages=True)
-    await channel.set_permissions(learning_member, read_messages=True, send_messages=True)
-    return channel
-
-
-@pytest_asyncio.fixture
-async def non_zone_channel():
-    return MockTextChannel(2, 'general')
+async def channel(teaching_member, learning_member, town_square_channel):
+    await town_square_channel.set_permissions(
+        teaching_member,
+        read_messages=True,
+        send_messages=True
+    )
+    await town_square_channel.set_permissions(
+        learning_member,
+        read_messages=True,
+        send_messages=True
+    )
+    return town_square_channel
 
 
 @pytest.fixture
-def guild(channel, non_zone_channel):
+def guild(channel, non_zone_channel, marketplace_channel):
     guild = MockGuild()
     guild.add_channel(channel)
     guild.add_channel(non_zone_channel)
+    guild.add_channel(marketplace_channel)
     return guild
 
 
@@ -173,7 +180,7 @@ async def test_commandTeach_learnerNotInZone(teaching_context, learning_member, 
         read_messages=False,
         send_messages=False
     )
-    update_player(session, 2, {'zone': 'town-square'})
+    update_player(session, 2, {'zone_id': TEST_MARKETPLACE_ZONE_ID})
     await teach_logic(teaching_context, ['learner', 'fighting'], engine)
     assert len(teaching_context.channel.messages) == 1
     expected_message = 'Could not find player learner in current location'

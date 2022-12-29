@@ -5,9 +5,10 @@ from mmobot.commands import pickup_logic
 from mmobot.db.models import ItemInstance, Player, WeaponInstance
 from mmobot.test.constants import (
     MESSAGE_TEST_PLAYER_INCAPACITATED,
-    TEST_CHANNEL_TOWN_SQUARE_NAME,
     TEST_ITEM_ENTITY_NUMBER,
-    TEST_ITEM_ENTITY_NUMBER_2
+    TEST_ITEM_ENTITY_NUMBER_2,
+    TEST_MARKETPLACE_ZONE_ID,
+    TEST_TOWN_SQUARE_ZONE_ID
 )
 from mmobot.test.db import (
     add_player,
@@ -45,14 +46,12 @@ def setup_item(session, prepare_database):
     add_to_database(session, WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER,
         item_id='desert-scimitar',
-        zone_id=0,
-        zone=TEST_CHANNEL_TOWN_SQUARE_NAME
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_to_database(session, ItemInstance(
         id=TEST_ITEM_ENTITY_NUMBER_2,
         item_id='iron-ore',
-        zone_id=4,
-        zone='marketplace'
+        zone_id=TEST_MARKETPLACE_ZONE_ID
     ))
 
 

@@ -2,6 +2,12 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import drop_logic
+from mmobot.test.constants import (
+    TEST_PLAYER_ENTITY_NUMBER,
+    TEST_PLAYER_DISCORD_NAME,
+    TEST_PLAYER_DISCORD_ID,
+    TEST_TOWN_SQUARE_ZONE_ID
+)
 from mmobot.db.models.player import Player
 from mmobot.test.db import (
     add_player,
@@ -29,7 +35,14 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    add_player(session, Player(id=2222, name='player', discord_id=100, is_active=True))
+    player = Player(
+        id=TEST_PLAYER_ENTITY_NUMBER,
+        name=TEST_PLAYER_DISCORD_NAME,
+        discord_id=TEST_PLAYER_DISCORD_ID,
+        is_active=True,
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
+    )
+    add_player(session, player)
     yield
     delete_all_entities(session)
 
@@ -51,7 +64,7 @@ async def test_commandDrop_withName(drop_context, session, setup_item):
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id is None
-    assert item_instance.zone == 'town-square'
+    assert item_instance.zone_id == TEST_TOWN_SQUARE_ZONE_ID
 
 
 @pytest.mark.asyncio
@@ -61,7 +74,7 @@ async def test_commandDrop_withInventoryIndex(drop_context, session, setup_item)
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id is None
-    assert item_instance.zone == 'town-square'
+    assert item_instance.zone_id == TEST_TOWN_SQUARE_ZONE_ID
 
 
 @pytest.mark.asyncio
@@ -71,7 +84,7 @@ async def test_commandDrop_withEntityId(drop_context, session, setup_item):
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id is None
-    assert item_instance.zone == 'town-square'
+    assert item_instance.zone_id == TEST_TOWN_SQUARE_ZONE_ID
 
 
 @pytest.mark.asyncio
@@ -82,7 +95,7 @@ async def test_commandDrop_dropEquippedWeapon(drop_context, session, setup_item)
     assert drop_context.channel.messages[0] == MESSAGE_DROP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id is None
-    assert item_instance.zone == 'town-square'
+    assert item_instance.zone_id == TEST_TOWN_SQUARE_ZONE_ID
     player = get_player_with_name(session, 'player')
     assert player.equipped_weapon_id is None
 

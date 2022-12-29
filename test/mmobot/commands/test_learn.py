@@ -6,8 +6,11 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands.learn import learn_logic
 from mmobot.db.models import Player, PlayerSkill, PlayerSkillTeaching
-from mmobot.test.constants import TEST_PLAYER_DISCORD_NAME
-from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
+from mmobot.test.constants import (
+    MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_PLAYER_DISCORD_NAME,
+    TEST_TOWN_SQUARE_ZONE_ID
+)
 from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
@@ -44,7 +47,7 @@ def prepare_database(session):
         discord_id=100,
         is_active=True,
         hp=100, skill_points=1,
-        zone='town-square'
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_to_database(session, PlayerSkill(player_id=2, skill_name='fighting', skill_level=5))
     add_to_database(session, PlayerSkill(player_id=2, skill_name='masonry', skill_level=50))

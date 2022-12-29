@@ -4,7 +4,12 @@ from sqlalchemy.orm import Session
 
 from mmobot.commands import give_logic
 from mmobot.db.models import Player
-from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
+from mmobot.test.constants import (
+    MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_CHANNEL_TOWN_SQUARE_ID,
+    TEST_MARKETPLACE_ZONE_ID,
+    TEST_TOWN_SQUARE_ZONE_ID
+)
 from mmobot.test.db import (
     add_item_instance,
     add_player,
@@ -48,14 +53,14 @@ def prepare_database(session):
         discord_id=100,
         is_active=True,
         hp=100,
-        zone='town-square'
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_player(session, Player(
         id=2,
         name='receiver',
         discord_id=101,
         is_active=True,
-        zone='town-square'
+        zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     yield
     delete_all_entities(session)
@@ -68,7 +73,7 @@ def setup_item(session, prepare_database):
 
 @pytest_asyncio.fixture
 async def channel(giving_member, receiving_member):
-    channel = MockTextChannel(1, 'town-square', category='World')
+    channel = MockTextChannel(TEST_CHANNEL_TOWN_SQUARE_ID, 'town-square', category='World')
     await channel.set_permissions(giving_member, read_messages=True, send_messages=True)
     await channel.set_permissions(receiving_member, read_messages=True, send_messages=True)
     return channel
@@ -203,7 +208,7 @@ async def test_commandGive_recieverNotInZone(
         read_messages=False,
         send_messages=False
     )
-    update_player(session, 2, {'zone': 'marketplace'})
+    update_player(session, 2, {'zone_id': TEST_MARKETPLACE_ZONE_ID})
     await give_logic(giving_context, ['receiver', 'desert-scimitar'], engine)
     assert len(giving_context.channel.messages) == 1
     expected_message = 'Could not find player receiver in current location'
