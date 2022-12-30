@@ -1,6 +1,8 @@
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer
+from datetime import datetime
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship
 
+from mmobot.constants import BASE_MOVEMENT_COOLDOWN
 from mmobot.db.models import Entity
 from mmobot.utils.entities import convert_int_to_alphanum
 
@@ -27,17 +29,31 @@ class Agent(Entity):
     )
 
     inventory_weight = Column(Float)
+    last_move_time = Column(DateTime, nullable=False)
+    retreat_direction = Column(Integer, default=0)
 
     __mapper_args__ = {
         'polymorphic_identity': 'agent',
         'inherit_condition': id == Entity.id
     }
 
+    def get_remaining_move_cooldown(self, direction):
+        if self.last_move_time is None:
+            return 0
+        cooldown = self.get_movement_cooldown()
+        if direction == self.retreat_direction:
+            cooldown /= 2
+        return max(0, (cooldown - (datetime.now() - self.last_move_time)).total_seconds())
+
     def get_name(self):
         return f'/{convert_int_to_alphanum(self.id)}'
 
     def get_burden(self):
         return max(0, self.inventory_weight - self.real_strength()) / (self.strength * 0.2)
+
+    def get_movement_cooldown(self):
+        movement_multiplier = self.hp_endurance_ratio() * self.mobility / 100
+        return BASE_MOVEMENT_COOLDOWN / movement_multiplier
 
     def hp_endurance_ratio(self):
         return (self.hp + self.endurance) / (self.max_hp + self.max_endurance)

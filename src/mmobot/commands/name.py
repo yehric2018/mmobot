@@ -47,7 +47,8 @@ async def name_logic(context, args, engine):
             max_hp=100,
             max_endurance=100,
             strength=100,
-            mobility=100
+            mobility=100,
+            last_move_time=birthday
         )
 
         try:

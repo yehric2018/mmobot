@@ -53,3 +53,11 @@ DB_ENTRY_SEPERATOR = '\n====================\n'
 
 # Discord permissions
 PERMISSIONS_DEFAULT = 0
+
+# Movement
+DIRECTION_NORTH = 1
+DIRECTION_EAST = 2
+DIRECTION_SOUTH = 3
+DIRECTION_WEST = 4
+
+BASE_MOVEMENT_COOLDOWN = timedelta(minutes=2)
