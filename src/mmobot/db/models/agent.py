@@ -22,6 +22,8 @@ class Agent(Entity):
     guarding_entity_id = Column(Integer, ForeignKey('Entities.id'))
     guarding_entity = relationship('Entity', foreign_keys='Agent.guarding_entity_id')
 
+    inventory_weight = Column(Float)
+
     __mapper_args__ = {
         'polymorphic_identity': 'agent',
         'inherit_condition': id == Entity.id

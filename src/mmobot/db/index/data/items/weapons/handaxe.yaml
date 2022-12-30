@@ -2,9 +2,9 @@
 id: handaxe
 type: weapon
 weapon_type: axe
-size: 5
 weight: 3
 lethality: 6
+range: 3
 craft: 40
 recipes:
 - ingredients:

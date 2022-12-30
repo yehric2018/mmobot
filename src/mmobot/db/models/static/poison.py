@@ -23,7 +23,6 @@ class Poison(Nonsolid):
     def from_yaml(yaml):
         return Poison(
             id=yaml['id'],
-            size=yaml['size'],
             weight=yaml['weight'],
             damage=yaml['damage'],
             duration=yaml['duration']

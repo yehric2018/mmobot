@@ -2,7 +2,6 @@
 id: iron-anvil
 type: tool
 tool_type: anvil
-size: 50
 weight: 120
 craft: 20
 recipes: []

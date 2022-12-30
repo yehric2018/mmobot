@@ -10,7 +10,6 @@ class Nonsolid(Base):
 
     id = Column(String(40), primary_key=True)
     nonsolid_type = Column(String(20))
-    size = Column(Float)
     weight = Column(Float)
 
     __mapper_args__ = {

@@ -24,7 +24,6 @@ class Weapon(Item):
     def from_yaml(yaml):
         return Weapon(
             id=yaml['id'],
-            size=yaml['size'],
             weight=yaml['weight'],
             weapon_type=yaml['weapon_type'],
             lethality=yaml['lethality'] if 'lethality' in yaml else 0,

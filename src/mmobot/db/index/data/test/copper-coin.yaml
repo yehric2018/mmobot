@@ -1,7 +1,6 @@
 ---
 id: copper-coin
 type: resource
-size: 1
 weight: 1
 recipes:
 - quantity: 4

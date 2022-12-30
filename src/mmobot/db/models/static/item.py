@@ -10,7 +10,6 @@ class Item(Base):
 
     id = Column(String(40), primary_key=True)
     item_type = Column(String(20))
-    size = Column(Float)
     weight = Column(Float)
 
     __mapper_args__ = {

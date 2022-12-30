@@ -29,7 +29,6 @@ class FluidFood(Nonsolid):
     def from_yaml(yaml):
         return FluidFood(
             id=yaml['id'],
-            size=FluidFood._handle_field(yaml, 'size'),
             weight=FluidFood._handle_field(yaml, 'weight'),
             hp_recover=FluidFood._handle_field(yaml, 'hp_recover'),
             endurance_recover=FluidFood._handle_field(yaml, 'endurance_recover'),

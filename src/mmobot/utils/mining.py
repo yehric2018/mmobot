@@ -31,49 +31,41 @@ STRENGTH_PER_RESOURCE = 20
 
 MINING_RESOURCE_STONE = Item(
     id='stone',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_COAL = Item(
     id='coal',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_IRON = Item(
     id='iron-ore',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_COPPER = Item(
     id='copper-ore',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_SILVER = Item(
     id='silver-ore',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_GOLD = Item(
     id='golden-ore',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_DIAMOND = Item(
     id='diamond-ore',
-    size=5,
     weight=5
 )
 
 MINING_RESOURCE_PLATINUM = Item(
     id='platinum-ore',
-    size=5,
     weight=5
 )
 

@@ -2,7 +2,6 @@
 id: handaxe
 type: weapon
 weapon_type: axe
-size: 5
 weight: 3
 lethality: 6
 craft: 40

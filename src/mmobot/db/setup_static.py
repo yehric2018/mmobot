@@ -52,7 +52,6 @@ def setup_attire():
 
             attire = Attire(
                 id=lines[0],
-                size=float(item_stats[0]),
                 weight=float(item_stats[1]),
                 coverage=int(armor_stats[0]),
                 armor=int(armor_stats[1]),

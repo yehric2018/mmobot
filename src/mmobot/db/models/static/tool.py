@@ -24,7 +24,6 @@ class Tool(Item):
         return Tool(
             id=yaml['id'],
             tool_type=yaml['tool_type'],
-            size=yaml['size'],
             weight=yaml['weight'],
             craft=yaml['craft']
         )

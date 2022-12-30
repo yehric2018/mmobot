@@ -1,7 +1,6 @@
 ---
 id: strange-liquid
 type: fluid_food
-size: 1
 weight: 1
 hp_recover: 5
 recipes:

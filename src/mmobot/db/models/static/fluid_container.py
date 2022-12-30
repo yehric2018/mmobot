@@ -22,7 +22,6 @@ class FluidContainer(Item):
     def from_yaml(yaml):
         return FluidContainer(
             id=yaml['id'],
-            size=yaml['size'],
             weight=yaml['weight'],
             max_capacity=yaml['max_capacity']
         )

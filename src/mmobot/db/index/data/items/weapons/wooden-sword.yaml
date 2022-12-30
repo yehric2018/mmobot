@@ -1,9 +1,9 @@
 ---
 id: wooden-sword
 weapon_type: sword
-size: 20
 weight: 5
 lethality: 2
+range: 20
 recipes:
 - ingredients:
   - id: wood

@@ -1,6 +1,5 @@
 ---
 id: water
-size: 1
 weight: 1
 hp_recover: 0
 endurance_recover: 1

@@ -29,7 +29,6 @@ class SolidFood(Item):
     def from_yaml(yaml):
         return SolidFood(
             id=yaml['id'],
-            size=yaml['size'],
             weight=yaml['weight'],
             hp_recover=yaml['hp_recover'],
             endurance_recover=yaml['endurance_recover'],

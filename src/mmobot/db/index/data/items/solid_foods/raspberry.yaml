@@ -1,6 +1,5 @@
 ---
 id: raspberry
-size: 1
 weight: 1
 hp_recover: 1
 endurance_recover: 1

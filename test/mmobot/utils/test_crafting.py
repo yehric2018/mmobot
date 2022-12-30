@@ -44,7 +44,7 @@ def recipes_liquid():
 def recipes_solid():
     stone_item = {'id': 'stone', 'quantity': 1}
     iron_item = {'id': 'iron-ore', 'quantity': 1}
-    solid_item = Resource(id='solid-item', size=2, weight=2)
+    solid_item = Resource(id='solid-item', weight=2)
     return [
         Recipe.from_yaml(solid_item, {'ingredients': [stone_item], 'endurance': 20}),
         Recipe.from_yaml(solid_item, {'ingredients': [iron_item], 'endurance': 20})

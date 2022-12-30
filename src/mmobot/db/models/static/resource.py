@@ -20,6 +20,5 @@ class Resource(Item):
     def from_yaml(yaml):
         return Resource(
             id=yaml['id'],
-            size=yaml['size'],
             weight=yaml['weight']
         )
