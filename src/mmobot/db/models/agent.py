@@ -20,7 +20,11 @@ class Agent(Entity):
     mobility = Column(Integer)
 
     guarding_entity_id = Column(Integer, ForeignKey('Entities.id'))
-    guarding_entity = relationship('Entity', foreign_keys='Agent.guarding_entity_id')
+    guarding_entity = relationship(
+        'Entity',
+        foreign_keys='Agent.guarding_entity_id',
+        back_populates='guardians'
+    )
 
     inventory_weight = Column(Float)
 

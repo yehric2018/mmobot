@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import select
 
 from mmobot.db.models import (
+    Agent,
     Entity,
     Interaction,
     ItemInstance,
@@ -81,6 +82,7 @@ def delete_all_entities(session):
     session.query(PlayerSkill).delete()
     session.query(PlayerSkillTeaching).delete()
     session.query(Player).delete()
+    session.query(Agent).delete()
     session.query(Entity).delete()
     session.commit()
 

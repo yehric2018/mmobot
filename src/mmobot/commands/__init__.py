@@ -4,6 +4,7 @@ from .drop import drop_logic
 from .eat import eat_logic
 from .equip import equip_logic
 from .give import give_logic
+from .guard import guard_logic
 from .here import here_logic
 from .inventory import inventory_logic
 from .learn import learn_logic
@@ -21,6 +22,7 @@ __all__ = [
     'eat_logic',
     'equip_logic',
     'give_logic',
+    'guard_logic',
     'here_logic',
     'inventory_logic',
     'learn_logic',

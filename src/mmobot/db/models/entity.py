@@ -3,11 +3,13 @@ from sqlalchemy import DDL
 from sqlalchemy import event
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
+from sqlalchemy import select
 from sqlalchemy import Sequence
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
 from .base import Base
+from mmobot.utils.entities import convert_alphanum_to_int
 
 
 class Entity(Base):
@@ -21,6 +23,7 @@ class Entity(Base):
     entity_type = Column(String(20))
     zone_id = Column(Integer, ForeignKey('Zones.id'))
     zone = relationship('Zone', foreign_keys='Entity.zone_id', overlaps='interactions,loot')
+    guardians = relationship('Agent', foreign_keys='Agent.guarding_entity_id')
 
     __mapper_args__ = {
         'polymorphic_identity': 'entity',
@@ -29,6 +32,17 @@ class Entity(Base):
 
     def __repr__(self):
         return f'Entity(id={self.id})'
+
+    def select_with_reference(session, entity_id, channel_id=None):
+        get_entity_statement = (
+            select(Entity)
+            .where(Entity.id == convert_alphanum_to_int(entity_id))
+        )
+        if channel_id is not None:
+            get_entity_statement = get_entity_statement.where(
+                Entity.zone.has(channel_id=channel_id)
+            )
+        return session.scalars(get_entity_statement).one_or_none()
 
 
 event.listen(
