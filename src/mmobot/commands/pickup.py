@@ -34,6 +34,7 @@ async def pickup_logic(context, args, engine):
             return
         pickup_item.zone_id = None
         pickup_item.owner_id = player.id
+        player.inventory_weight += pickup_item.item.weight
         session.commit()
 
         await context.send(f'You have picked up: {pickup_item.item.id}')

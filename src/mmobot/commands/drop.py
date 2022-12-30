@@ -17,12 +17,8 @@ async def drop_logic(context, args, engine):
     item_reference = args[0]
     discord_id = context.author.id
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == discord_id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
+        player = Player.select_with_discord_id(session, discord_id)
+        assert player is not None
         if is_entity_id(item_reference):
             item_id = convert_alphanum_to_int(item_reference)
             drop_item = find_item_with_id(player.inventory, item_id)
@@ -35,8 +31,10 @@ async def drop_logic(context, args, engine):
             return
         drop_item.zone_id = player.zone_id
         drop_item.owner_id = None
+        player.inventory_weight -= drop_item.item.weight
         if drop_item.id == player.equipped_weapon_id:
             player.equipped_weapon_id = None
+            player.inventory_weight -= drop_item.item.weight
         session.commit()
 
         await context.send(f'You have dropped: {drop_item.item.id}')

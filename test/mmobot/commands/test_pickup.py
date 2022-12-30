@@ -5,9 +5,13 @@ from mmobot.commands import pickup_logic
 from mmobot.db.models import ItemInstance, Player, WeaponInstance
 from mmobot.test.constants import (
     MESSAGE_TEST_PLAYER_INCAPACITATED,
+    TEST_IRON_SWORD_WEIGHT,
     TEST_ITEM_ENTITY_NUMBER,
     TEST_ITEM_ENTITY_NUMBER_2,
     TEST_MARKETPLACE_ZONE_ID,
+    TEST_PLAYER_ENTITY_NUMBER,
+    TEST_PLAYER_DISCORD_ID,
+    TEST_PLAYER_DISCORD_NAME,
     TEST_TOWN_SQUARE_ZONE_ID
 )
 from mmobot.test.db import (
@@ -15,13 +19,14 @@ from mmobot.test.db import (
     add_to_database,
     delete_all_entities,
     get_item_instance_with_id,
+    get_player_with_name,
     init_test_engine,
     update_player
 )
 from mmobot.test.mock import MockContext
 
 
-MESSAGE_PICKUP_SUCCESS = 'You have picked up: desert-scimitar'
+MESSAGE_PICKUP_SUCCESS = 'You have picked up: iron-sword'
 
 
 engine = init_test_engine()
@@ -35,7 +40,14 @@ def session():
 @pytest.fixture(autouse=True)
 def prepare_database(session):
     delete_all_entities(session)
-    player = Player(id=2222, name='player', discord_id=100, hp=100, is_active=True)
+    player = Player(
+        id=TEST_PLAYER_ENTITY_NUMBER,
+        name=TEST_PLAYER_DISCORD_NAME,
+        discord_id=TEST_PLAYER_DISCORD_ID,
+        inventory_weight=0,
+        hp=100,
+        is_active=True
+    )
     add_player(session, player)
     yield
     delete_all_entities(session)
@@ -45,7 +57,7 @@ def prepare_database(session):
 def setup_item(session, prepare_database):
     add_to_database(session, WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER,
-        item_id='desert-scimitar',
+        item_id='iron-sword',
         zone_id=TEST_TOWN_SQUARE_ZONE_ID
     ))
     add_to_database(session, ItemInstance(
@@ -62,12 +74,14 @@ def pickup_context(member, town_square_channel, test_guild):
 
 @pytest.mark.asyncio
 async def test_commandPickup_withName(pickup_context, session, setup_item):
-    await pickup_logic(pickup_context, ['desert-scimitar'], engine)
+    await pickup_logic(pickup_context, ['iron-sword'], engine)
     assert len(pickup_context.channel.messages) == 1
     assert pickup_context.channel.messages[0] == MESSAGE_PICKUP_SUCCESS
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id == 2222
     assert item_instance.zone is None
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.inventory_weight == TEST_IRON_SWORD_WEIGHT
 
 
 @pytest.mark.asyncio
@@ -78,6 +92,8 @@ async def test_commandPickup_withEntityId(pickup_context, session, setup_item):
     item_instance = get_item_instance_with_id(session, 200)
     assert item_instance.owner_id == 2222
     assert item_instance.zone is None
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.inventory_weight == TEST_IRON_SWORD_WEIGHT
 
 
 @pytest.mark.asyncio
@@ -87,12 +103,14 @@ async def test_commandPickup_incapacitated(pickup_context, session):
     assert len(pickup_context.channel.messages) == 1
     expected_message = MESSAGE_TEST_PLAYER_INCAPACITATED
     assert pickup_context.channel.messages[0] == expected_message
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.inventory_weight == 0
 
 
 @pytest.mark.asyncio
 async def test_commandPickup_notInZone(pickup_context, non_zone_channel):
     pickup_context.channel = non_zone_channel
-    await pickup_logic(pickup_context, ['desert-scimitar'], engine)
+    await pickup_logic(pickup_context, ['iron-sword'], engine)
     assert len(pickup_context.channel.messages) == 0
 
 
@@ -106,16 +124,20 @@ async def test_commandPickup_noArgsProvided(pickup_context):
 
 
 @pytest.mark.asyncio
-async def test_commandPickup_itemNameNotInZone(pickup_context):
+async def test_commandPickup_itemNameNotInZone(pickup_context, session):
     await pickup_logic(pickup_context, ['iron-ore'], engine)
     assert len(pickup_context.channel.messages) == 1
     expected_message = 'Could not find item to pick up: iron-ore'
     assert pickup_context.channel.messages[0] == expected_message
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.inventory_weight == 0
 
 
 @pytest.mark.asyncio
-async def test_commandDrop_entityIdNotInInventory(pickup_context):
+async def test_commandDrop_entityIdNotInInventory(pickup_context, session):
     await pickup_logic(pickup_context, ['/5l'], engine)
     assert len(pickup_context.channel.messages) == 1
     expected_message = 'Could not find item to pick up: /5l'
     assert pickup_context.channel.messages[0] == expected_message
+    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
+    assert player.inventory_weight == 0

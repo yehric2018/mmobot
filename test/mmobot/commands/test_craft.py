@@ -111,6 +111,7 @@ def prepare_database(session):
         discord_id=TEST_PLAYER_DISCORD_ID,
         is_active=True,
         hp=100, endurance=100, max_endurance=100,
+        inventory_weight=185,
         skills=player_skills
     )
     add_to_database(session, player)
@@ -146,6 +147,7 @@ async def test_commandCraft_simpleRecipe(craft_context, session, iron_sword_args
     assert player.inventory[1].item_id == 'iron-sword'
     assert player.hp == 100
     assert player.endurance == 55
+    assert player.inventory_weight == 180
 
 
 @pytest.mark.asyncio

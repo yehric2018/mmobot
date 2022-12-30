@@ -136,12 +136,14 @@ class Recipe:
             product_instance = create_item_instance(self.product)
             for _ in range(self.quantity):
                 player.inventory.append(product_instance)
+                player.inventory_weight += self.product.weight
 
         ingredient_counter = self._get_ingredient_counter()
         for item_instance in ingredients:
             if item_instance.item_id in ingredient_counter:
                 item_id = item_instance.item_id
                 item_instance.owner_id = None
+                player.inventory_weight -= item_instance.item.weight
                 ingredient_counter[item_id] -= 1
                 if ingredient_counter[item_id] == 0:
                     del ingredient_counter[item_id]

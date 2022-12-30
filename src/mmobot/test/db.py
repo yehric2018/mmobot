@@ -129,4 +129,6 @@ def update_player(session, id, data):
         player.skill_points = data['skill_points']
     if 'zone_id' in data:
         player.zone_id = data['zone_id']
+    if 'inventory_weight' in data:
+        player.inventory_weight = data['inventory_weight']
     session.commit()

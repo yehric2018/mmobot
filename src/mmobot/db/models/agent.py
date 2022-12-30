@@ -31,3 +31,12 @@ class Agent(Entity):
 
     def get_name(self):
         return f'/{convert_int_to_alphanum(self.id)}'
+
+    def get_burden(self):
+        return max(0, self.inventory_weight - self.real_strength()) / (self.strength * 0.2)
+
+    def hp_endurance_ratio(self):
+        return (self.hp + self.endurance) / (self.max_hp + self.max_endurance)
+
+    def real_strength(self):
+        return self.strength * self.hp_endurance_ratio()

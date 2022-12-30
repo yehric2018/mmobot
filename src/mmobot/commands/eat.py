@@ -35,6 +35,7 @@ async def eat_logic(context, args, engine):
 
         if isinstance(eat_item.item, SolidFood):
             await eat_solid_food(context, session, player, eat_item)
+            player.inventory_weight -= eat_item.item.weight
             session.commit()
         elif isinstance(eat_item, FluidContainerInstance):
             if len(args) >= 2 and args[1].isnumeric() and int(args[1]) > 0:

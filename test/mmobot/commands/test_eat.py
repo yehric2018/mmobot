@@ -36,7 +36,6 @@ MESSAGE_RECOVER_1_ENDURANCE = 'Recovered 1 endurance'
 MESSAGE_RECOVER_3_HP = 'Recovered 3 HP'
 MESSAGE_RECOVER_3_ENDURANCE = 'Recovered 3 endurance'
 
-DESERT_SCIMITAR_ID = 'desert-scimitar'
 RASPBERRY_ID = 'raspberry'
 RASPBERRY_JUICE_ID = 'raspberry-juice'
 STONE_BOWL_ID = 'stone-bowl'
@@ -58,6 +57,7 @@ def prepare_database(session):
         name=TEST_PLAYER_DISCORD_NAME,
         discord_id=TEST_PLAYER_DISCORD_ID,
         hp=50, endurance=50, max_hp=100, max_endurance=100,
+        inventory_weight=36,
         is_active=True
     )
     food_instance = SolidFoodInstance(
@@ -68,7 +68,7 @@ def prepare_database(session):
     non_food_instance = WeaponInstance(
         id=TEST_ITEM_ENTITY_NUMBER_2,
         owner_id=TEST_PLAYER_ENTITY_NUMBER,
-        item_id=DESERT_SCIMITAR_ID
+        item_id='iron-sword'
     )
     container_instance = FluidContainerInstance(
         id=TEST_ITEM_ENTITY_NUMBER_3,
@@ -102,6 +102,7 @@ async def test_commandEat_solidWithName(eat_context, session):
     assert player.hp == 51
     assert player.endurance == 51
     assert len(player.inventory) == 2
+    assert player.inventory_weight == 35
 
 
 @pytest.mark.asyncio
@@ -116,6 +117,7 @@ async def test_commandEat_solidWithEntityId(eat_context, session):
     assert player.hp == 51
     assert player.endurance == 51
     assert len(player.inventory) == 2
+    assert player.inventory_weight == 35
 
 
 @pytest.mark.asyncio
@@ -130,6 +132,7 @@ async def test_commandEat_solidHpDoesNotSurpassMax(eat_context, session):
     assert player.hp == 100
     assert player.endurance == 51
     assert len(player.inventory) == 2
+    assert player.inventory_weight == 35
 
 
 @pytest.mark.asyncio
@@ -144,6 +147,7 @@ async def test_commandEat_solidEnduranceDoesNotSurpassMax(eat_context, session):
     assert player.hp == 51
     assert player.endurance == 100
     assert len(player.inventory) == 2
+    assert player.inventory_weight == 35
 
 
 @pytest.mark.asyncio
@@ -159,6 +163,7 @@ async def test_commandEat_containerWithoutUnits(eat_context, session):
     assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -175,6 +180,7 @@ async def test_commandEat_containerWithUnits(eat_context, session):
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 0
     assert player.inventory[2].nonsolid_id is None
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -191,6 +197,7 @@ async def test_commandEat_containerTooManyUnits(eat_context, session):
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 0
     assert player.inventory[2].nonsolid_id is None
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -212,6 +219,7 @@ async def test_commandEat_zeroUnitsProvided(eat_context, session):
     assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -227,6 +235,7 @@ async def test_commandEat_negativeUnitsProvided(eat_context, session):
     assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -242,6 +251,7 @@ async def test_commandEat_nonnumericUnitsProvided(eat_context, session):
     assert player.endurance == 51
     assert len(player.inventory) == 3
     assert player.inventory[2].units == 2
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -256,6 +266,7 @@ async def test_commandEat_containerHpDoesNotSurpassMax(eat_context, session):
     assert player.hp == 100
     assert player.endurance == 51
     assert len(player.inventory) == 3
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -270,6 +281,7 @@ async def test_commandEat_containerEnduranceDoesNotSurpassMax(eat_context, sessi
     assert player.hp == 51
     assert player.endurance == 100
     assert len(player.inventory) == 3
+    assert player.inventory_weight == 36
 
 
 @pytest.mark.asyncio
@@ -313,12 +325,13 @@ async def test_commandEat_referenceIdNotFound(eat_context):
 
 @pytest.mark.asyncio
 async def test_commandEat_itemNotEatable(eat_context, session):
-    await eat_logic(eat_context, ['desert-scimitar'], engine)
+    await eat_logic(eat_context, ['iron-sword'], engine)
     assert len(eat_context.channel.messages) == 1
-    expected_message = '<@100> You cannot eat desert-scimitar!'
+    expected_message = '<@100> You cannot eat iron-sword!'
     assert eat_context.channel.messages[0] == expected_message
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.hp == 50
     assert player.endurance == 50
     assert len(player.inventory) == 3
+    assert player.inventory_weight == 36

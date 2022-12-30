@@ -44,7 +44,9 @@ TEST_HANDAXE_RECIPE_TOOLS = ['anvil']
 TEST_HANDAXE_RECIPE_HANDHELD = 'hammer'
 TEST_HANDAXE_RECIPE_ENDURANCE = 120
 TEST_HANDAXE_RECIPE_SKILL_KNAPPING = 5
-TEST_HANDAXE_INGREDIENT_LIST = [ItemInstance(id=TEST_ITEM_ENTITY_NUMBER, item_id='stone')]
+TEST_HANDAXE_INGREDIENT_LIST = [
+    ItemInstance(id=TEST_ITEM_ENTITY_NUMBER, item_id='stone', item=Resource(weight=5))
+]
 
 TEST_COIN_ID = 'copper-coin'
 TEST_COIN_RECIPE_PRODUCT = {'id': TEST_COIN_ID, 'type': 'item', 'quantity': 4}
@@ -159,7 +161,8 @@ def handaxe_crafter():
         skills=[
             PlayerSkill(skill_name='knapping', skill_level=TEST_HANDAXE_RECIPE_SKILL_KNAPPING)
         ],
-        inventory=[] + TEST_HANDAXE_INGREDIENT_LIST
+        inventory=[] + TEST_HANDAXE_INGREDIENT_LIST,
+        inventory_weight=5
     )
 
 
@@ -334,6 +337,7 @@ def test_Recipe_apply_weaponRecipeNoCost(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[0].owner_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_recipeWithCost(handaxe_crafter, handaxe_recipe):
@@ -344,6 +348,7 @@ def test_Recipe_apply_recipeWithCost(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[0].owner_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_recipeWithHPCost(handaxe_crafter, handaxe_recipe):
@@ -354,10 +359,11 @@ def test_Recipe_apply_recipeWithHPCost(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[0].owner_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_toolRecipe(handaxe_crafter, handaxe_recipe):
-    handaxe_recipe.product = Tool(id=TEST_HANDAXE_ID)
+    handaxe_recipe.product = Tool(id=TEST_HANDAXE_ID, weight=3)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
     assert handaxe_crafter.hp == 100
     assert handaxe_crafter.endurance == 60
@@ -365,10 +371,11 @@ def test_Recipe_apply_toolRecipe(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[0].owner_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], ToolInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_fluidContainerRecipe(handaxe_crafter, handaxe_recipe):
-    handaxe_recipe.product = FluidContainer(id=TEST_HANDAXE_ID)
+    handaxe_recipe.product = FluidContainer(id=TEST_HANDAXE_ID, weight=3)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
     assert handaxe_crafter.hp == 100
     assert handaxe_crafter.endurance == 60
@@ -377,10 +384,11 @@ def test_Recipe_apply_fluidContainerRecipe(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
     assert handaxe_crafter.inventory[1].units == 0
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_solidFoodRecipe(handaxe_crafter, handaxe_recipe):
-    handaxe_recipe.product = SolidFood(id=TEST_HANDAXE_ID)
+    handaxe_recipe.product = SolidFood(id=TEST_HANDAXE_ID, weight=3)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
     assert handaxe_crafter.hp == 100
     assert handaxe_crafter.endurance == 60
@@ -388,10 +396,11 @@ def test_Recipe_apply_solidFoodRecipe(handaxe_crafter, handaxe_recipe):
     assert handaxe_crafter.inventory[0].owner_id is None
     assert handaxe_crafter.inventory[1].item_id == TEST_HANDAXE_ID
     assert isinstance(handaxe_crafter.inventory[1], SolidFoodInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_resourceRecipe(handaxe_crafter, handaxe_recipe):
-    handaxe_recipe.product = Resource(id=TEST_HANDAXE_ID)
+    handaxe_recipe.product = Resource(id=TEST_HANDAXE_ID, weight=3)
     handaxe_recipe.apply(handaxe_crafter, 40, ingredients=TEST_HANDAXE_INGREDIENT_LIST)
     assert handaxe_crafter.hp == 100
     assert handaxe_crafter.endurance == 60
@@ -403,6 +412,7 @@ def test_Recipe_apply_resourceRecipe(handaxe_crafter, handaxe_recipe):
     assert not isinstance(handaxe_crafter.inventory[1], ToolInstance)
     assert not isinstance(handaxe_crafter.inventory[1], FluidContainerInstance)
     assert not isinstance(handaxe_crafter.inventory[1], SolidFoodInstance)
+    assert handaxe_crafter.inventory_weight == 3
 
 
 def test_Recipe_apply_recipeWithQuantity(handaxe_crafter, handaxe_recipe):
@@ -415,6 +425,7 @@ def test_Recipe_apply_recipeWithQuantity(handaxe_crafter, handaxe_recipe):
     for i in range(1, 5):
         assert handaxe_crafter.inventory[i].item_id == TEST_HANDAXE_ID
         assert isinstance(handaxe_crafter.inventory[1], WeaponInstance)
+    assert handaxe_crafter.inventory_weight == 12
 
 
 def test_Recipe_apply_nonsolidRecipe(handaxe_crafter, handaxe_recipe, ingredients_with_bowl):
