@@ -8,6 +8,7 @@ from sqlalchemy import select
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
+from mmobot.constants import WEAPONLESS_LETHALITY
 from mmobot.db.models import Agent
 
 
@@ -53,7 +54,7 @@ class Player(Agent):
     def get_attack_damage(self):
         weapon_instance = self.get_equipped_weapon()
         if weapon_instance is None:
-            return 0
+            return WEAPONLESS_LETHALITY * (self.strength / 100) * self.hp_endurance_ratio()
         weapon = weapon_instance.item
         return weapon.lethality * (self.strength / 100) * self.hp_endurance_ratio()
 

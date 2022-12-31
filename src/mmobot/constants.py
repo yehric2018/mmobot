@@ -3,6 +3,7 @@ from datetime import timedelta
 # Combat
 
 BASE_HIT_CHANCE = 30
+WEAPONLESS_LETHALITY = 5
 
 
 # Stats

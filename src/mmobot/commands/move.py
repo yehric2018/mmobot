@@ -47,7 +47,7 @@ async def move_logic(context, args, engine):
         remaining_cooldown = player.get_remaining_move_cooldown(direction)
         if remaining_cooldown > 0:
             message = f'<@{player.discord_id}> You cannot travel {args[0]} '
-            message += f'for {remaining_cooldown} seconds'
+            message += f'for {int(remaining_cooldown)} seconds'
             await context.send(message)
             return
 
