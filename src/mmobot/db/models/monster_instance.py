@@ -22,9 +22,6 @@ class MonsterInstance(Agent):
         'inherit_condition': id == Agent.id
     }
 
-    def match(self, monster):
-        self.monster = monster
-
     def get_armor(self):
         return self.monster.armor
 
@@ -54,6 +51,5 @@ class MonsterInstance(Agent):
             max_endurance=monster.endurance,
             strength=monster.strength,
             mobility=monster.mobility,
-            monster=monster,
             zone=zone
         )

@@ -15,6 +15,12 @@ class MonsterIndex:
         self.index = {}
         self._setup_index()
 
+    def load_to_database(self, session):
+        for monster in self.index:
+            print(self.index[monster])
+            session.merge(self.index[monster])
+        session.commit()
+
     def _setup_index(self):
         monsters_path = os.path.join(DATA_PATH, 'monsters')
         for monster_filename in os.listdir(monsters_path):

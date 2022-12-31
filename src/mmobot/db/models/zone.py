@@ -35,6 +35,7 @@ class Zone(Base):
     west_wall = relationship('Barrier', foreign_keys='Zone.west_wall_id')
 
     interactions = relationship('Interaction', foreign_keys='Interaction.zone_id')
+    monsters = relationship('MonsterInstance', foreign_keys='MonsterInstance.zone_id')
     loot = relationship('ItemInstance', foreign_keys='ItemInstance.zone_id')
 
     def can_move_north(self):

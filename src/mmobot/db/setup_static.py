@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from mmobot.constants import DB_ENTRY_SEPERATOR
-from mmobot.db.index import ItemIndex
+from mmobot.db.index import ItemIndex, MonsterIndex
 from mmobot.db.models import (
     Attire,
     Base,
@@ -35,8 +35,10 @@ engine = create_engine(connection_str)
 def setup():
     # TODO: Load in using MockItemIndex for tests so we don't need to load in as many  items
     item_index = ItemIndex()
+    monster_index = MonsterIndex()
     with Session(engine) as session:
         item_index.load_to_database(session)
+        monster_index.load_to_database(session)
 
 
 def setup_attire():

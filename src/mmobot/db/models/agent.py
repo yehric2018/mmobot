@@ -75,3 +75,10 @@ class Agent(Entity):
 
     def real_strength(self):
         return self.strength * self.hp_endurance_ratio()
+
+    def kill(self):
+        for item in self.inventory:
+            item.drop_into_zone(self.zone)
+        self.inventory_weight = 0
+        self.zone = None
+        self.is_active = False
