@@ -1,7 +1,13 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
 
-from mmobot.constants import DIRECTION_NORTH, DIRECTION_EAST, DIRECTION_SOUTH, DIRECTION_WEST
+from mmobot.constants import (
+    DIRECTION_NORTH,
+    DIRECTION_EAST,
+    DIRECTION_SOUTH,
+    DIRECTION_WEST,
+    MOVE_ENDURANCE_COST
+)
 from mmobot.db.models import Player
 
 
@@ -52,8 +58,9 @@ async def move_logic(context, args, engine):
         await dest_channel.send(f'{member.mention} has arrived.')
 
         player.zone_id = next_zone.id
-        player.last_move_time = datetime.now()
         player.guarding_entity_id = None
+        player.endurance -= (MOVE_ENDURANCE_COST + player.get_burden())
+        player.last_move_time = datetime.now()
         player.retreat_direction = reverse_direction(direction)
         session.commit()
 

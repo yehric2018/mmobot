@@ -1,0 +1,19 @@
+---
+- name: fighting
+  max_level: 50
+- name: sword-mastery
+  max_level: 50
+- name: spear-mastery
+  max_level: 50
+- name: axe-mastery
+  max_level: 50
+- name: evasion
+  max_level: 30
+- name: guarding
+  max_level: 30
+- name: marksmanship
+  max_level: 50
+- name: bow-mastery
+  max_level: 50
+- name: smithing
+  max_level: 50

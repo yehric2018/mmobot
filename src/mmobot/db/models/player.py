@@ -46,6 +46,78 @@ class Player(Agent):
         'inherit_condition': id == Agent.id
     }
 
+    def get_armor(self):
+        attire = self.get_equipped_attire()
+        return attire.armor if attire is not None else 0
+
+    def get_attack_damage(self):
+        weapon_instance = self.get_equipped_weapon()
+        if weapon_instance is None:
+            return 0
+        weapon = weapon_instance.item
+        return weapon.lethality * (self.strength / 100) * self.hp_endurance_ratio()
+
+    def get_defense_score(self):
+        weapon_instance = self.get_equipped_weapon()
+        weapon_range = weapon_skill = 0
+        if weapon_instance is not None:
+            weapon_range = weapon_instance.item.range
+            weapon_skill = self.get_weapon_skill(weapon_instance.item)
+        fighting_skill = self.get_fighting_skill()
+        evasion_skill = self.get_evasion_skill()
+        raw_score = fighting_skill + weapon_skill + evasion_skill + weapon_range
+        return raw_score * self.hp_endurance_ratio()
+
+    def get_equipped_attire(self):
+        for item_instance in self.inventory:
+            if item_instance.id == self.equipped_attire_id:
+                return item_instance
+        return None
+
+    def get_equipped_weapon(self):
+        for item_instance in self.inventory:
+            if item_instance.id == self.equipped_weapon_id:
+                return item_instance
+        return None
+
+    def get_evasion_skill(self):
+        skill_level = self.get_skill_level('evasion')
+        return skill_level
+
+    def get_fighting_skill(self):
+        skill_level = self.get_skill_level('fighting')
+        return skill_level
+
+    def get_offense_score(self):
+        weapon_instance = self.get_equipped_weapon()
+        weapon_range = weapon_skill = 0
+        if weapon_instance is not None:
+            weapon_range = weapon_instance.item.range
+            weapon_skill = self.get_weapon_skill(weapon_instance.item)
+        fighting_skill = self.get_fighting_skill()
+        raw_score = fighting_skill + weapon_skill + weapon_range
+        return raw_score * self.hp_endurance_ratio()
+
+    def get_skill_level(self, skill_name):
+        for skill in self.skills:
+            if skill.skill_name == skill_name:
+                return skill.skill_level
+        return 0
+
+    def get_weapon_skill(self, weapon=None):
+        if weapon is None:
+            weapon_instance = self.get_equipped_weapon()
+            if weapon_instance is None:
+                return 0
+            weapon = weapon_instance.item
+        if weapon.weapon_type == 'sword':
+            return self.get_skill_level('sword-mastery')
+        elif weapon.weapon_type == 'spear':
+            return self.get_skill_level('spear-mastery')
+        elif weapon.weapon_type == 'axe':
+            return self.get_skill_level('axe-mastery')
+        return 0
+
     def __repr__(self):
         return f'Player(name={self.name})'
 

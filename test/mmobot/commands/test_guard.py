@@ -136,3 +136,9 @@ async def test_commandGuard_incapacitated(guard_context, session):
     assert guard_context.channel.messages[0] == MESSAGE_TEST_PLAYER_INCAPACITATED
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert player.guarding_entity_id is None
+
+
+@pytest.mark.asyncio
+async def test_commandGuard_guardSelfFails():
+    # TODO: Make sure you can't guard yourself
+    pass

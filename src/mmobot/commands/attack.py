@@ -18,24 +18,17 @@ async def attack_logic(bot, context, args, engine):
         return
 
     with Session(engine) as session:
-        get_player_statement = (
-            select(Player)
-            .where(Player.discord_id == context.author.id)
-            .where(Player.is_active)
-        )
-        player = session.scalars(get_player_statement).one()
+        player = Player.select_with_discord_id(session, context.author.id)
+        assert player is not None
         if player.hp == 0:
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
 
         if is_mention(args[0]):
-            get_defender_statement = (
-                select(Player)
-                .where(Player.discord_id == args[0][2:-1])
-                .where(Player.is_active)
+            defender = Player.select_with_discord_id(
+                session, args[0][2:-1], channel_id=context.channel.id
             )
-            defender = session.scalars(get_defender_statement).one_or_none()
             if defender is None:
                 await context.send(f'Could not find target {args[0]}')
                 return

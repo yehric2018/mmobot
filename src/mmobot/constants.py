@@ -1,8 +1,16 @@
 from datetime import timedelta
 
+# Combat
+
+BASE_HIT_CHANCE = 30
+
+
 # Stats
 
 HEALTHY_PLAYER_THRESHOLD = 30  # hp > 30 means player is generally healthy
+
+ATTACK_ENDURANCE_COST = 2
+MOVE_ENDURANCE_COST = 4
 
 # Skills
 

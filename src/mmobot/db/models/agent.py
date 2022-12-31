@@ -48,12 +48,27 @@ class Agent(Entity):
     def get_name(self):
         return f'/{convert_int_to_alphanum(self.id)}'
 
+    def get_armor(self):
+        pass
+
+    def get_attack_damage(self):
+        pass
+
     def get_burden(self):
         return max(0, self.inventory_weight - self.real_strength()) / (self.strength * 0.2)
+
+    def get_evasion_skill(self):
+        pass
+
+    def get_fighting_skill(self):
+        pass
 
     def get_movement_cooldown(self):
         movement_multiplier = self.hp_endurance_ratio() * self.mobility / 100
         return BASE_MOVEMENT_COOLDOWN / movement_multiplier
+
+    def get_offense_score(self):
+        pass
 
     def hp_endurance_ratio(self):
         return (self.hp + self.endurance) / (self.max_hp + self.max_endurance)
