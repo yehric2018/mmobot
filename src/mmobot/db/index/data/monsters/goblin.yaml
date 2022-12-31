@@ -1,0 +1,11 @@
+---
+id: goblin
+hp: 80
+endurance: 80
+strength: 20
+mobility: 100
+armor: 0
+aggro_chance: 70
+fights_back: true
+fighting_skill: 15
+evasion: -10

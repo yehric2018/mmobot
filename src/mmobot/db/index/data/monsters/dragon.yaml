@@ -1,0 +1,11 @@
+---
+id: dragon
+hp: 600
+endurance: 200
+strength: 140
+mobility: 160
+armor: 36
+aggro_chance: 0
+fights_back: true
+fighting_skill: 135
+evasion: 15

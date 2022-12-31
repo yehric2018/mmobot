@@ -21,6 +21,13 @@ class Agent(Entity):
     strength = Column(Integer)
     mobility = Column(Integer)
 
+    inventory = relationship(
+        'ItemInstance',
+        order_by='ItemInstance.id',
+        foreign_keys='ItemInstance.owner_id'
+    )
+    inventory_weight = Column(Float)
+
     guarding_entity_id = Column(Integer, ForeignKey('Entities.id'))
     guarding_entity = relationship(
         'Entity',
@@ -28,7 +35,6 @@ class Agent(Entity):
         back_populates='guardians'
     )
 
-    inventory_weight = Column(Float)
     last_move_time = Column(DateTime, nullable=False)
     retreat_direction = Column(Integer, default=0)
 
@@ -56,12 +62,6 @@ class Agent(Entity):
 
     def get_burden(self):
         return max(0, self.inventory_weight - self.real_strength()) / (self.strength * 0.2)
-
-    def get_evasion_skill(self):
-        pass
-
-    def get_fighting_skill(self):
-        pass
 
     def get_movement_cooldown(self):
         movement_multiplier = self.hp_endurance_ratio() * self.mobility / 100

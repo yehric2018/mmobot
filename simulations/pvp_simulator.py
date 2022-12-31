@@ -1,287 +1,177 @@
-import random
-
+from mmobot.db.index import MonsterIndex
 from mmobot.db.models import (
-    Attire,
-    ItemInstance,
+    MonsterInstance,
     Player,
     PlayerSkill,
-    PlayerStats,
     Weapon,
     WeaponInstance
 )
 from mmobot.utils.battle import calculate_hit_chance, calculate_hit_damage
 
 
-NEW_STATS_1 = PlayerStats(
-    hp=100,
-    max_hp=100,
-    armor=1,
-    mobility=25,
-    dexterity=25,
-    endurance=100,
-    max_endurance=100,
-    strength=15,
-    luck=1
-)
-
-INTERMEDIATE_STATS_1 = PlayerStats(
-    hp=100,
-    max_hp=100,
-    armor=1,
-    mobility=30,
-    dexterity=60,
-    endurance=120,
-    max_endurance=120,
-    strength=40,
-    luck=1
-)
-
-ADVANCED_STATS_1 = PlayerStats(
-    hp=100,
-    max_hp=100,
-    armor=1,
-    mobility=30,
-    dexterity=100,
-    endurance=120,
-    max_endurance=120,
-    strength=40,
-    luck=1
-)
-
-IRON_SWORD = WeaponInstance(
-    id=25,
-    item=Weapon(
-        id='iron-sword',
-        weapon_type='sword',
-        size=50,
-        weight=70,
-        lethality=40
-    )
-)
-
-WOODEN_SPEAR = WeaponInstance(
-    id=25,
-    item=Weapon(
-        id='wooden-spear',
-        weapon_type='spear',
-        size=70,
-        weight=50,
-        lethality=25
-    )
-)
-
-BASIC_TUNIC = ItemInstance(
-    id=26,
-    item=Attire(
-        id='basic-tunic',
-        size=6,
-        weight=2,
-        coverage=50,
-        armor=2,
-        warmth=5
-    )
-)
+def skill(name, level):
+    return PlayerSkill(skill_name=name, skill_level=level)
 
 
-NEW_PLAYER_1 = Player(
-    name='P1',
-    stats=NEW_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=0
-        ),
-        PlayerSkill(
-            skill_name='sword_mastery',
-            skill_level=0
-        )
-    ],
-    inventory=[
-        IRON_SWORD,
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=25,
-    equipped_attire_id=26
-)
+monster_index = MonsterIndex().index
 
-INTERMEDIATE_PLAYER_1 = Player(
-    name='P1',
-    stats=INTERMEDIATE_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=30
-        ),
-        PlayerSkill(
-            skill_name='sword-mastery',
-            skill_level=20
-        ),
-        PlayerSkill(
-            skill_name='evasion',
-            skill_level=30
-        )
-    ],
-    inventory=[
-        IRON_SWORD,
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=25,
-    equipped_attire_id=26
-)
 
-ADVANCED_PLAYER_1 = Player(
-    name='P1',
-    stats=ADVANCED_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=50
-        ),
-        PlayerSkill(
-            skill_name='sword-mastery',
-            skill_level=30
-        ),
-        PlayerSkill(
-            skill_name='evasion',
-            skill_level=30
-        )
-    ],
-    inventory=[
-        IRON_SWORD,
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=25,
-    equipped_attire_id=26
-)
+IRON_SWORD = Weapon(id='iron-sword', weapon_type='sword', lethality=40, range=13)
+IRONHEAD_SPEAR = Weapon(id='ironhead-spear', weapon_type='spear', lethality=45, range=20)
+IRON_AXE = Weapon(id='iron-axe', weapon_type='axe', lethality=55, range=8)
 
-ADVANCED_PLAYER_2 = Player(
-    name='AdvancedPlayerSpear',
-    stats=ADVANCED_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=50
-        ),
-        PlayerSkill(
-            skill_name='spear-mastery',
-            skill_level=30
-        ),
-        PlayerSkill(
-            skill_name='evasion',
-            skill_level=30
-        )
-    ],
-    inventory=[
-        WOODEN_SPEAR,
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=25,
-    equipped_attire_id=26
-)
 
-NEW_PLAYER_2 = Player(
-    name='P1Spear',
-    stats=NEW_STATS_1,
+NEW_PLAYER_SWORD = Player(
+    name='NewSwordsman',
+    hp=100, endurance=100,
+    max_hp=100, max_endurance=100, strength=100, mobility=100,
     skills=[],
-    inventory=[
-        WOODEN_SPEAR,
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=25,
-    equipped_attire_id=26
+    equipped_weapon=WeaponInstance(item=IRON_SWORD)
 )
 
-NEW_FIST_FIGHTER_1 = Player(
-    name='P1',
-    stats=NEW_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=0
-        ),
-        PlayerSkill(
-            skill_name='weaponless-combat',
-            skill_level=0
-        )
-    ],
-    inventory=[
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=None,
-    equipped_attire_id=26
+NEW_PLAYER_FIST = Player(
+    name='NewFistFighter',
+    hp=100, endurance=100,
+    max_hp=100, max_endurance=100, strength=100, mobility=100,
+    skills=[],
+    equipped_weapon=None
 )
 
-ADVANCED_FIST_FIGHTER_1 = Player(
-    name='P1',
-    stats=ADVANCED_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='fighting',
-            skill_level=50
-        ),
-        PlayerSkill(
-            skill_name='weaponless-combat',
-            skill_level=30
-        ),
-        PlayerSkill(
-            skill_name='evasion',
-            skill_level=30
-        )
-    ],
-    inventory=[
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=None,
-    equipped_attire_id=26
+NEW_PLAYER_SPEAR = Player(
+    name='NewSpearFighter',
+    hp=100, endurance=100,
+    max_hp=100, max_endurance=100, strength=100, mobility=100,
+    skills=[],
+    equipped_weapon=WeaponInstance(item=IRONHEAD_SPEAR)
 )
 
-ADVANCED_WEAVER_1 = Player(
-    name='P1',
-    stats=ADVANCED_STATS_1,
-    skills=[
-        PlayerSkill(
-            skill_name='weaving',
-            skill_level=50
-        ),
-    ],
-    inventory=[
-        BASIC_TUNIC
-    ],
-    equipped_weapon_id=None,
-    equipped_attire_id=26
+NEW_PLAYER_AXE = Player(
+    name='NewAxeFighter',
+    hp=100, endurance=100,
+    max_hp=100, max_endurance=100, strength=100, mobility=100,
+    skills=[],
+    equipped_weapon=WeaponInstance(item=IRON_AXE)
 )
+
+INTERMEDIATE_SWORD_FIGHTER = Player(
+    name='IntermediateSwordFighter',
+    hp=100, endurance=100,
+    max_hp=100, max_endurance=100, strength=100, mobility=100,
+    skills=[skill('fighting', 20), skill('sword-mastery', 10), skill('evasion', 0)],
+    equipped_weapon=WeaponInstance(item=IRON_SWORD)
+)
+
+ADVANCED_SWORD_FIGHTER = Player(
+    name='ExpertSwordsman',
+    hp=100, endurance=200,
+    max_hp=100, max_endurance=200, strength=180, mobility=100,
+    skills=[skill('fighting', 50), skill('sword-mastery', 50), skill('evasion', 50)],
+    equipped_weapon=WeaponInstance(item=IRON_SWORD)
+)
+
+ADVANCED_SWORD_WOUNDED = Player(
+    name='WoundedExpertSwordsman',
+    hp=50, endurance=200,
+    max_hp=100, max_endurance=200, strength=180, mobility=100,
+    skills=[skill('fighting', 50), skill('sword-mastery', 50), skill('evasion', 50)],
+    equipped_weapon=WeaponInstance(item=IRON_SWORD)
+)
+
+ALMOST_MAXED_SWORD_FIGHTER = Player(
+    name='GreatSwordsman',
+    hp=100, endurance=200,
+    max_hp=100, max_endurance=200, strength=180, mobility=100,
+    skills=[skill('fighting', 40), skill('sword-mastery', 40), skill('evasion', 50)],
+    equipped_weapon=WeaponInstance(item=IRON_SWORD)
+)
+
+
+ADVANCED_SPEAR_FIGHTER = Player(
+    name='ExpertSpearman',
+    hp=100, endurance=200,
+    max_hp=100, max_endurance=200, strength=180, mobility=100,
+    skills=[skill('fighting', 50), skill('spear-mastery', 50), skill('evasion', 50)],
+    equipped_weapon=WeaponInstance(item=IRONHEAD_SPEAR)
+)
+
+ADVANCED_SPEAR_TANK = Player(
+    name='ExpertPaladin',
+    hp=100, endurance=200,
+    max_hp=200, max_endurance=140, strength=140, mobility=100,
+    skills=[skill('fighting', 50), skill('spear-mastery', 50), skill('evasion', 50)],
+    equipped_weapon=WeaponInstance(item=IRONHEAD_SPEAR)
+)
+
+ADVANCED_HUNTER = Player(
+    name='ExpertHunter',
+    hp=100, endurance=180,
+    max_hp=100, max_endurance=180, strength=180, mobility=200,
+    skills=[skill('evasion', 50)]
+)
+
+ADVANCED_MONK = Player(
+    name='ExpertMonk',
+    hp=150, endurance=200,
+    max_hp=150, max_endurance=200, strength=130, mobility=200,
+    skills=[skill('evasion', 50)]
+)
+
+GOBLIN_MONSTER = MonsterInstance.create_instance(monster_index['goblin'])
+GOBLIN_MONSTER.id = 600
+
+DRAGON_MONSTER = MonsterInstance.create_instance(monster_index['dragon'])
+DRAGON_MONSTER.id = 601
+
+BEAR_MONSTER = MonsterInstance.create_instance(monster_index['bear'])
+BEAR_MONSTER.id = 602
 
 
 def simulate_attack(attacker, defender):
     hit_chance = calculate_hit_chance(attacker, defender)
-    print('P1 attacks P2')
-    print(f'Hit chance: {hit_chance}%')
-    random_number = random.randint(0, 99)
-    print(f'Roll: {random_number}')
-    if random_number < hit_chance:
-        hit_damage, hit_armor = calculate_hit_damage(attacker, defender)
-        if hit_armor:
-            print('P1 landed an armor hit on P2!')
-        else:
-            print('P1 landed a hit on P2!')
-        print(f'P2 took {hit_damage} damage')
-        defender.stats.hp -= hit_damage
-        remaining_hp = defender.stats.hp
-        if remaining_hp <= 0:
-            print('P2 is incapacitated')
-        elif remaining_hp <= 50:
-            print('P2 is weak')
-        else:
-            print(f'P2 has {remaining_hp} HP remaining')
-    else:
-        print('P2 evaded the attack!')
+    print(f'{attacker.get_name()} attacks {defender.get_name()}')
+    print(f'\tHit chance: {hit_chance}%')
+    hit_damage = calculate_hit_damage(attacker, defender)
+    print(f'\tIf hit: deals {hit_damage} damage')
 
 
-simulate_attack(NEW_PLAYER_2, INTERMEDIATE_PLAYER_1)
-simulate_attack(INTERMEDIATE_PLAYER_1, NEW_PLAYER_2)
-simulate_attack(NEW_PLAYER_2, INTERMEDIATE_PLAYER_1)
-simulate_attack(INTERMEDIATE_PLAYER_1, NEW_PLAYER_2)
-simulate_attack(NEW_PLAYER_2, INTERMEDIATE_PLAYER_1)
-simulate_attack(INTERMEDIATE_PLAYER_1, NEW_PLAYER_2)
-simulate_attack(NEW_PLAYER_2, INTERMEDIATE_PLAYER_1)
-simulate_attack(INTERMEDIATE_PLAYER_1, NEW_PLAYER_2)
+simulate_attack(NEW_PLAYER_SWORD, NEW_PLAYER_SWORD)
+simulate_attack(NEW_PLAYER_FIST, NEW_PLAYER_SWORD)
+simulate_attack(NEW_PLAYER_SWORD, NEW_PLAYER_FIST)
+simulate_attack(NEW_PLAYER_SWORD, NEW_PLAYER_AXE)
+simulate_attack(NEW_PLAYER_SWORD, GOBLIN_MONSTER)
+simulate_attack(GOBLIN_MONSTER, NEW_PLAYER_SWORD)
+
+simulate_attack(NEW_PLAYER_SWORD, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, NEW_PLAYER_SWORD)
+simulate_attack(NEW_PLAYER_SWORD, ADVANCED_HUNTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, GOBLIN_MONSTER)
+simulate_attack(GOBLIN_MONSTER, ADVANCED_SWORD_FIGHTER)
+
+simulate_attack(NEW_PLAYER_SWORD, BEAR_MONSTER)
+simulate_attack(BEAR_MONSTER, NEW_PLAYER_SWORD)
+simulate_attack(ADVANCED_SWORD_FIGHTER, BEAR_MONSTER)
+simulate_attack(BEAR_MONSTER, ADVANCED_SWORD_FIGHTER)
+
+simulate_attack(ADVANCED_SWORD_FIGHTER, ADVANCED_HUNTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, ADVANCED_SWORD_WOUNDED)
+simulate_attack(ADVANCED_SWORD_WOUNDED, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, ALMOST_MAXED_SWORD_FIGHTER)
+simulate_attack(ALMOST_MAXED_SWORD_FIGHTER, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, ADVANCED_SPEAR_FIGHTER)
+simulate_attack(ADVANCED_SPEAR_FIGHTER, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, ADVANCED_SPEAR_TANK)
+simulate_attack(ADVANCED_SPEAR_TANK, ADVANCED_SWORD_FIGHTER)
+
+simulate_attack(ADVANCED_SWORD_FIGHTER, DRAGON_MONSTER)
+simulate_attack(DRAGON_MONSTER, ADVANCED_SWORD_FIGHTER)
+simulate_attack(NEW_PLAYER_SWORD, DRAGON_MONSTER)
+simulate_attack(DRAGON_MONSTER, NEW_PLAYER_SWORD)
+
+print('----------INTERMEDIATE SWORD FIGHTER----------')
+simulate_attack(INTERMEDIATE_SWORD_FIGHTER, NEW_PLAYER_SWORD)
+simulate_attack(NEW_PLAYER_SWORD, INTERMEDIATE_SWORD_FIGHTER)
+simulate_attack(INTERMEDIATE_SWORD_FIGHTER, ADVANCED_SWORD_FIGHTER)
+simulate_attack(ADVANCED_SWORD_FIGHTER, INTERMEDIATE_SWORD_FIGHTER)
+simulate_attack(INTERMEDIATE_SWORD_FIGHTER, DRAGON_MONSTER)
+simulate_attack(DRAGON_MONSTER, INTERMEDIATE_SWORD_FIGHTER)

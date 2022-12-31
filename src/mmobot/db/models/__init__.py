@@ -2,6 +2,7 @@ from .base import Base
 
 from .static.item import Item
 from .static.nonsolid import Nonsolid
+from .static.monster import Monster
 from .static.arrow import Arrow
 from .static.attire import Attire
 from .static.fluid_container import FluidContainer
@@ -22,6 +23,7 @@ from .agent import Agent
 from .barrier import Barrier
 from .interaction import Interaction
 from .minable import Minable
+from .monster_instance import MonsterInstance
 from .player import Player
 from .item_instance import ItemInstance
 from .arrow_instance import ArrowInstance
@@ -49,6 +51,8 @@ __all__ = [
     'Item',
     'ItemInstance',
     'Minable',
+    'Monster',
+    'MonsterInstance',
     'Nonsolid',
     'PlayerSkill',
     'PlayerSkillTeaching',
