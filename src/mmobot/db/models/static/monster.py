@@ -16,6 +16,7 @@ class Monster(Base):
     fighting_skill = Column(Integer)
     evasion = Column(Integer)
 
+    loop_cooldown = Column(Integer)
     aggro_chance = Column(Integer)
     fights_back = Column(Boolean)
 
@@ -27,6 +28,7 @@ class Monster(Base):
             strength=yaml['strength'],
             mobility=yaml['mobility'],
             armor=yaml['armor'],
+            loop_cooldown=yaml['loop_cooldown'],
             aggro_chance=yaml['aggro_chance'],
             fights_back=yaml['fights_back'],
             fighting_skill=yaml['fighting_skill'],

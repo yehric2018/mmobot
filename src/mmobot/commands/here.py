@@ -1,5 +1,4 @@
 from discord import Embed
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from mmobot.db.models import Zone

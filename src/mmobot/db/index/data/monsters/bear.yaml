@@ -5,6 +5,7 @@ endurance: 100
 strength: 70
 mobility: 180
 armor: 15
+loop_cooldown: 7
 aggro_chance: 15
 fights_back: true
 fighting_skill: 5

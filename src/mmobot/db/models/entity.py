@@ -9,7 +9,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
 from .base import Base
-from mmobot.utils.entities import convert_alphanum_to_int
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 
 
 class Entity(Base):
@@ -22,7 +22,11 @@ class Entity(Base):
     )
     entity_type = Column(String(20))
     zone_id = Column(Integer, ForeignKey('Zones.id'))
-    zone = relationship('Zone', foreign_keys='Entity.zone_id', overlaps='interactions,loot')
+    zone = relationship(
+        'Zone',
+        foreign_keys='Entity.zone_id',
+        overlaps='interactions,loot,monsters'
+    )
     guardians = relationship('Agent', foreign_keys='Agent.guarding_entity_id')
 
     __mapper_args__ = {
@@ -34,9 +38,11 @@ class Entity(Base):
         return f'Entity(id={self.id})'
 
     def select_with_reference(session, entity_id, channel_id=None):
+        if is_entity_id(str(entity_id)):
+            entity_id = convert_alphanum_to_int(entity_id)
         get_entity_statement = (
             select(Entity)
-            .where(Entity.id == convert_alphanum_to_int(entity_id))
+            .where(Entity.id == entity_id)
         )
         if channel_id is not None:
             get_entity_statement = get_entity_statement.where(

@@ -1,3 +1,4 @@
+import math
 import random
 
 from mmobot.constants import ATTACK_ENDURANCE_COST, BASE_HIT_CHANCE
@@ -16,15 +17,16 @@ async def attack_command_pvp(context, attacker, defender):
     if random.randint(0, 99) < hit_chance:
         damage = calculate_hit_damage(attacker, defender)
         defender.hp = max(defender.hp - damage, 0)
-        message = f'{attacker.name} landed a hit on {defender.name}, dealing {damage} damage.\n'
-        message += f'<@{defender.discord_id}> You have {defender.hp} HP remaining'
+        message = f'{attacker.name} landed a hit on {defender.name}, '
+        message += f'dealing {math.ceil(damage)} damage.\n'
+        message += f'<@{defender.discord_id}> You have {math.ceil(defender.hp)} HP remaining'
     else:
         message += f'{defender.name} evaded the attack\n'
     attacker.endurance -= (ATTACK_ENDURANCE_COST + attacker.get_burden())
     await context.send(message)
 
 
-async def attack_in_channel(context, attacker, defender):
+async def attack_in_channel(channel, attacker, defender):
     attacker_name = attacker.get_name()
     defender_name = defender.get_name()
     message = f'{attacker_name} is attacking {defender_name}\n'
@@ -38,7 +40,7 @@ async def attack_in_channel(context, attacker, defender):
     else:
         message += f'{defender_name} evaded the attack\n'
     attacker.endurance -= (ATTACK_ENDURANCE_COST + attacker.get_burden())
-    await context.send(message)
+    await channel.send(message)
 
 
 def calculate_hit_chance(attacker, defender):

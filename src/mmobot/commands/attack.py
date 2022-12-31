@@ -38,7 +38,7 @@ async def attack_logic(bot, context, args, engine):
                 await kill_player(defender.discord_id, engine, bot)
                 return
 
-            await attack_in_channel(context, player, defender)
+            await attack_in_channel(context.channel, player, defender)
             session.commit()
             await handle_incapacitation(player, engine, bot)
             await handle_incapacitation(defender, engine, bot)
@@ -51,7 +51,7 @@ async def attack_logic(bot, context, args, engine):
                 return
 
             if isinstance(target, MonsterInstance):
-                await attack_in_channel(context, player, target)
+                await attack_in_channel(context.channel, player, target)
                 session.commit()
                 if target.hp <= 0:
                     await context.send(f'{target.get_name()} has been slain!')

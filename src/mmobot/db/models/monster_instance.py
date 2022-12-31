@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -7,6 +8,7 @@ from mmobot.constants import (
     MOBILITY_DEFENSE_RATIO
 )
 from mmobot.db.models import Agent
+from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 
 
 class MonsterInstance(Agent):
@@ -53,3 +55,13 @@ class MonsterInstance(Agent):
             mobility=monster.mobility,
             zone=zone
         )
+
+    def select_with_reference(session, reference):
+        if is_entity_id(str(reference)):
+            reference = convert_alphanum_to_int(reference)
+        get_monster_statement = (
+            select(MonsterInstance)
+            .where(MonsterInstance.id == reference)
+            .where(MonsterInstance.is_active)
+        )
+        return session.scalars(get_monster_statement).one_or_none()
