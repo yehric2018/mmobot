@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from mmobot.constants import ATTACK_ENDURANCE_COST
 from mmobot.db.models import Entity, Minable, MonsterInstance, Player
 from mmobot.utils.battle import attack_in_channel
 from mmobot.utils.discord import is_mention
@@ -33,6 +34,10 @@ async def attack_logic(bot, context, args, engine):
                 return
             elif player == defender:
                 await context.send('You cannot attack yourself!')
+                return
+            elif player.endurance < ATTACK_ENDURANCE_COST + player.get_burden():
+                message = f'<@{player.discord_id}> You do not have enough endurance to attack.'
+                await context.send(message)
                 return
             elif defender.hp == 0:
                 await kill_player(defender.discord_id, engine, bot)

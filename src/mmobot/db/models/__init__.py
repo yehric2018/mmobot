@@ -25,13 +25,13 @@ from .interaction import Interaction
 from .minable import Minable
 from .monster_instance import MonsterInstance
 from .player import Player
-from .item_instance import ItemInstance
-from .arrow_instance import ArrowInstance
-from .fluid_container_instance import FluidContainerInstance
-from .solid_food_instance import SolidFoodInstance
-from .tool_instance import ToolInstance
-from .weapon_instance import WeaponInstance
-from .bow_instance import BowInstance
+from .item_instances.item_instance import ItemInstance
+from .item_instances.arrow_instance import ArrowInstance
+from .item_instances.fluid_container_instance import FluidContainerInstance
+from .item_instances.solid_food_instance import SolidFoodInstance
+from .item_instances.tool_instance import ToolInstance
+from .item_instances.weapon_instance import WeaponInstance
+from .item_instances.bow_instance import BowInstance
 
 
 __all__ = [

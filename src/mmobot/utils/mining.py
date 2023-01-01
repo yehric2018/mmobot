@@ -1,7 +1,7 @@
 import random
 
 from mmobot.db.models import Item
-from mmobot.db.models.item_instance import ItemInstance
+from mmobot.db.models import ItemInstance
 from mmobot.utils.entities import convert_int_to_alphanum
 from mmobot.utils.players import find_item_with_id
 
