@@ -36,7 +36,7 @@ async def attack_logic(bot, context, args, engine):
                 await context.send('You cannot attack yourself!')
                 return
             elif player.endurance < ATTACK_ENDURANCE_COST + player.get_burden():
-                message = f'<@{player.discord_id}> You do not have enough endurance to attack.'
+                message = f'<@{player.discord_id}> You do not have enough endurance.'
                 await context.send(message)
                 return
             elif defender.hp == 0:

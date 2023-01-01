@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import ItemInstance, SolidFoodInstance, Player
+from mmobot.db.models import ArrowInstance, BowInstance, Player
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -31,14 +31,9 @@ with Session(engine) as session:
         .where(Player.name == 'NoobLoser')
     )
     player = session.scalars(get_player_statement).one()
-    # item = ItemInstance(
-    #     player_id=player.id,
-    #     item_id='basic-pickaxe'
-    # )
-    item = SolidFoodInstance(
-        owner_id=player.id,
-        item_id='raspberry'
-    )
-    session.add(item)
+    
+    player.inventory.append(BowInstance(item_id='wooden-bow'))
+    player.inventory.append(ArrowInstance(item_id='stonehead-arrow'))
+    player.inventory_weight += (5 + 1)
 
     session.commit()

@@ -43,9 +43,8 @@ def prepare_database(session):
 @pytest.fixture()
 def setup_item(session, prepare_database):
     add_weapon_instance(session, 200, 1, 'desert-scimitar')
-    bow_instance = BowInstance(id=205, owner_id=1, item_id='wooden-bow')
-    bow_instance.arrow = ArrowInstance(id=202, owner_id=1, item_id='stonehead-arrow')
-    add_to_database(session, bow_instance)
+    add_to_database(session, BowInstance(id=205, owner_id=1, item_id='wooden-bow'))
+    add_to_database(session, ArrowInstance(id=202, owner_id=1, item_id='stonehead-arrow'))
     add_to_database(session, ItemInstance(id=208, owner_id=1, item_id='knights-armor'))
     add_to_database(session, ItemInstance(id=209, owner_id=1, item_id='stone'))
 

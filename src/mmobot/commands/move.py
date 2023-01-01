@@ -28,6 +28,9 @@ async def move_logic(context, args, engine):
             message = f'<@{player.discord_id}> You are incapacitated.'
             await context.send(message)
             return
+        elif player.endurance < MOVE_ENDURANCE_COST + player.get_burden():
+            await context.send(f'<@{player.discord_id}> You do not have enough endurance.')
+            return
 
         zone = player.zone
         assert zone is not None

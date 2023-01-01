@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from mmobot.db.models import Player
+from mmobot.db.models import BowInstance, Player
 from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
 from mmobot.utils.players import find_item_with_id, find_item_with_name
 
@@ -29,8 +29,11 @@ async def drop_logic(context, args, engine):
         if not drop_item:
             await context.send(f'You do not have the item: {item_reference}')
             return
+        if isinstance(drop_item, BowInstance):
+            drop_item.arrow = None
         drop_item.zone_id = player.zone_id
         drop_item.owner_id = None
+
         player.inventory_weight -= drop_item.item.weight
         if drop_item.id == player.equipped_weapon_id:
             player.equipped_weapon_id = None
