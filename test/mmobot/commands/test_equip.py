@@ -2,12 +2,14 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import equip_logic
-from mmobot.db.models import Player
+from mmobot.db.models import ArrowInstance, BowInstance, ItemInstance, Player
 from mmobot.test.constants import MESSAGE_TEST_PLAYER_INCAPACITATED
 from mmobot.test.db import (
     add_player,
+    add_to_database,
     add_weapon_instance,
     delete_all_entities,
+    get_item_instance_with_id,
     get_player_with_name,
     init_test_engine,
     update_player
@@ -15,8 +17,11 @@ from mmobot.test.db import (
 from mmobot.test.mock import MockContext
 
 
-MESSAGE_EQUIP_SUCCESS = 'You have equipped: desert-scimitar'
-MESSAGE_EQUIP_PICKAXE_SUCCESS = 'You have equipped: basic-pickaxe'
+MESSAGE_EQUIP_SUCCESS = '<@100> You have equipped: [ /5k ] desert-scimitar'
+MESSAGE_EQUIP_PICKAXE_SUCCESS = '<@100> You have equipped: [ /5l ] basic-pickaxe'
+MESSAGE_BOW_NOT_EQUIPPED = '<@100> You must have a bow equipped first.'
+MESSAGE_EQUIP_BOW_SUCCESS = '<@100> You have equipped: [ /5p ] wooden-bow'
+MESSAGE_EQUIP_ARROW_SUCCESS = '<@100> You have equipped: [ /5m ] stonehead-arrow'
 
 
 engine = init_test_engine()
@@ -38,7 +43,11 @@ def prepare_database(session):
 @pytest.fixture()
 def setup_item(session, prepare_database):
     add_weapon_instance(session, 200, 1, 'desert-scimitar')
-    add_weapon_instance(session, 208, 1, 'knights-armor')
+    bow_instance = BowInstance(id=205, owner_id=1, item_id='wooden-bow')
+    bow_instance.arrow = ArrowInstance(id=202, owner_id=1, item_id='stonehead-arrow')
+    add_to_database(session, bow_instance)
+    add_to_database(session, ItemInstance(id=208, owner_id=1, item_id='knights-armor'))
+    add_to_database(session, ItemInstance(id=209, owner_id=1, item_id='stone'))
 
 
 @pytest.fixture
@@ -49,15 +58,6 @@ def equip_context(member, town_square_channel, test_guild):
 @pytest.mark.asyncio
 async def test_commandEquip_weaponWithName(equip_context, session, setup_item):
     await equip_logic(equip_context, ['desert-scimitar'], engine)
-    assert len(equip_context.channel.messages) == 1
-    assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
-    player = get_player_with_name(session, 'player')
-    assert player.equipped_weapon_id == 200
-
-
-@pytest.mark.asyncio
-async def test_commandEquip_weaponWithInventoryIndex(equip_context, session, setup_item):
-    await equip_logic(equip_context, ['0'], engine)
     assert len(equip_context.channel.messages) == 1
     assert equip_context.channel.messages[0] == MESSAGE_EQUIP_SUCCESS
     player = get_player_with_name(session, 'player')
@@ -77,7 +77,7 @@ async def test_commandEquip_weaponWithEntityId(equip_context, session, setup_ite
 async def test_commandEquip_attireWithEntityId(equip_context, session, setup_item):
     await equip_logic(equip_context, ['/5s'], engine)
     assert len(equip_context.channel.messages) == 1
-    expected_message = 'You have equipped: knights-armor'
+    expected_message = '<@100> You have equipped: [ /5s ] knights-armor'
     assert equip_context.channel.messages[0] == expected_message
     player = get_player_with_name(session, 'player')
     assert player.equipped_attire_id == 208
@@ -116,7 +116,7 @@ async def test_commandEquip_incapacitated(equip_context, session):
 async def test_commandEquip_noArgsProvided(equip_context):
     await equip_logic(equip_context, [], engine)
     assert len(equip_context.channel.messages) == 1
-    expected_message = 'Please indicate what item you would like to equip,' \
+    expected_message = '<@100> Please indicate what item you would like to equip,' \
         ' for example: !equip item'
     assert equip_context.channel.messages[0] == expected_message
 
@@ -125,15 +125,7 @@ async def test_commandEquip_noArgsProvided(equip_context):
 async def test_commandEquip_itemNameNotInInventory(equip_context):
     await equip_logic(equip_context, ['iron-sword'], engine)
     assert len(equip_context.channel.messages) == 1
-    expected_message = 'You do not have the item: iron-sword'
-    assert equip_context.channel.messages[0] == expected_message
-
-
-@pytest.mark.asyncio
-async def test_commandEquip_inventoryIndexNotInInventory(equip_context):
-    await equip_logic(equip_context, ['20'], engine)
-    assert len(equip_context.channel.messages) == 1
-    expected_message = 'You do not have the item: 20'
+    expected_message = '<@100> You do not have the item: iron-sword'
     assert equip_context.channel.messages[0] == expected_message
 
 
@@ -141,11 +133,48 @@ async def test_commandEquip_inventoryIndexNotInInventory(equip_context):
 async def test_commandEquip_entityIdNotInInventory(equip_context):
     await equip_logic(equip_context, ['/abc'], engine)
     assert len(equip_context.channel.messages) == 1
-    expected_message = 'You do not have the item: /abc'
+    expected_message = '<@100> You do not have the item: /abc'
     assert equip_context.channel.messages[0] == expected_message
 
 
 @pytest.mark.asyncio
-async def test_commandEquip_itemNotEquippable():
+async def test_commandEquip_itemNotEquippable(equip_context, session, setup_item):
     # TODO: Add some nonequippable items and write this test (most likely iron/ore)
-    pass
+    await equip_logic(equip_context, ['/5t'], engine)
+    assert len(equip_context.channel.messages) == 1
+    expected_message = '<@100> [ /5t ] stone cannot be equipped'
+    assert equip_context.channel.messages[0] == expected_message
+
+
+@pytest.mark.asyncio
+async def test_commandEquip_equipArrowNothingEquipped(equip_context, session, setup_item):
+    await equip_logic(equip_context, ['stonehead-arrow'], engine)
+    assert len(equip_context.channel.messages) == 1
+    assert equip_context.channel.messages[0] == MESSAGE_BOW_NOT_EQUIPPED
+    player = get_player_with_name(session, 'player')
+    assert player.equipped_weapon_id is None
+
+
+@pytest.mark.asyncio
+async def test_commandEquip_equipArrowWeaponEquipped(equip_context, session, setup_item):
+    await equip_logic(equip_context, ['desert-scimitar'], engine)
+    await equip_logic(equip_context, ['stonehead-arrow'], engine)
+    assert len(equip_context.channel.messages) == 2
+    assert equip_context.channel.messages[1] == MESSAGE_BOW_NOT_EQUIPPED
+    player = get_player_with_name(session, 'player')
+    assert player.equipped_weapon_id == 200
+
+
+@pytest.mark.asyncio
+async def test_commandEquip_equipArrowWithBow(equip_context, session, setup_item):
+    await equip_logic(equip_context, ['wooden-bow'], engine)
+    await equip_logic(equip_context, ['stonehead-arrow'], engine)
+    assert len(equip_context.channel.messages) == 2
+    assert equip_context.channel.messages[0] == MESSAGE_EQUIP_BOW_SUCCESS
+    assert equip_context.channel.messages[1] == MESSAGE_EQUIP_ARROW_SUCCESS
+    player = get_player_with_name(session, 'player')
+    assert player.equipped_weapon_id == 205
+    item_instance = get_item_instance_with_id(session, 205)
+    assert item_instance.owner_id == 1
+    assert isinstance(item_instance, BowInstance)
+    assert item_instance.arrow_id == 202
