@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 from mmobot.db.index.models import Recipe
 from mmobot.db.models import (
+    Arrow,
+    Bow,
     FluidContainer,
     FluidFood,
     Poison,
@@ -47,6 +49,8 @@ class ItemIndex:
         self._setup_resources()
         self._setup_tools()
         self._setup_weapons()
+        self._setup_bows()
+        self._setup_arrows()
         self._setup_solid_food()
         self._setup_fluid_containers()
 
@@ -87,6 +91,30 @@ class ItemIndex:
                     weapon = Weapon.from_yaml(weapon_yaml)
                     self.index[weapon.id] = weapon
                     self.recipes[weapon.id] = ItemIndex.get_recipes(weapon, weapon_yaml)
+                except yaml.YAMLError as exc:
+                    print(exc)
+
+    def _setup_bows(self):
+        bows_path = os.path.join(DATA_PATH, 'items', 'bows')
+        for bow_filename in os.listdir(bows_path):
+            with open(os.path.join(bows_path, bow_filename), 'r') as f:
+                try:
+                    bow_yaml = yaml.safe_load(f)
+                    bow = Bow.from_yaml(bow_yaml)
+                    self.index[bow.id] = bow
+                    self.recipes[bow.id] = ItemIndex.get_recipes(bow, bow_yaml)
+                except yaml.YAMLError as exc:
+                    print(exc)
+
+    def _setup_arrows(self):
+        arrows_path = os.path.join(DATA_PATH, 'items', 'arrows')
+        for arrow_filename in os.listdir(arrows_path):
+            with open(os.path.join(arrows_path, arrow_filename), 'r') as f:
+                try:
+                    arrow_yaml = yaml.safe_load(f)
+                    arrow = Arrow.from_yaml(arrow_yaml)
+                    self.index[arrow.id] = arrow
+                    self.recipes[arrow.id] = ItemIndex.get_recipes(arrow, arrow_yaml)
                 except yaml.YAMLError as exc:
                     print(exc)
 

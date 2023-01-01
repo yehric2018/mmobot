@@ -6,6 +6,8 @@ from sqlalchemy import select
 
 from mmobot.db.models import (
     Agent,
+    ArrowInstance,
+    BowInstance,
     Entity,
     Interaction,
     ItemInstance,
@@ -75,6 +77,8 @@ def add_weapon_instance_to_zone(session, instance_id, zone_name, item_id):
 
 
 def delete_all_entities(session):
+    session.query(BowInstance).delete()
+    session.query(ArrowInstance).delete()
     session.query(WeaponInstance).delete()
     session.query(ItemInstance).delete()
     session.query(Minable).delete()

@@ -132,6 +132,7 @@ class Player(Agent):
             select(Player)
             .where(Player.discord_id == discord_id)
             .where(Player.is_active)
+            .with_for_update()
         )
         if channel_id is not None:
             get_player_statement = get_player_statement.where(
@@ -144,6 +145,7 @@ class Player(Agent):
             select(Player)
             .where(Player.name == discord_name)
             .where(Player.is_active)
+            .with_for_update()
         )
         if channel_id is not None:
             get_player_statement = get_player_statement.where(

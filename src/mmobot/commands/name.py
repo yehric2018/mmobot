@@ -29,7 +29,7 @@ async def name_logic(context, args, engine):
             select(func.max(Player.ancestry))
             .where(Player.discord_id == context.author.id)
         )
-        max_ancestry = session.scalars(get_ancestors_statement).one()
+        max_ancestry = session.scalars(get_ancestors_statement).one_or_none()
         if max_ancestry is None:
             max_ancestry = 0
         else:

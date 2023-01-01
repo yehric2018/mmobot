@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 
 
-from mmobot.db.models import Player
-from mmobot.utils.entities import convert_alphanum_to_int, is_entity_id
+from mmobot.db.models import BowInstance, Player
+from mmobot.utils.entities import convert_int_to_alphanum, is_entity_id
 
 
 async def unequip_logic(context, args, engine):
@@ -17,40 +17,32 @@ async def unequip_logic(context, args, engine):
     discord_id = context.author.id
     with Session(engine) as session:
         player = Player.select_with_discord_id(session, discord_id)
-
-        did_unequip = False
-        if is_entity_id(item_reference):
-            did_unequip = unequip_using_id(player, convert_alphanum_to_int(item_reference))
-        elif item_reference.isnumeric() and int(item_reference) < len(player.inventory):
-            item_reference = player.inventory[int(item_reference)].item.id
-            did_unequip = unequip_using_name(player, item_reference)
-        else:
-            did_unequip = unequip_using_name(player, item_reference)
+        assert player is not None
+        unequipped_item = None
+        for item_instance in player.inventory:
+            if ('/' + convert_int_to_alphanum(item_instance.id) == item_reference):
+                unequipped_item = unequip_if_equipped(player, item_instance)
+                break
+            elif (item_instance.item.id == item_reference):
+                unequipped_item = unequip_if_equipped(player, item_instance)
+                if unequipped_item is not None:
+                    break
         session.commit()
 
-        if did_unequip:
-            await context.send(f'Unequipped {item_reference}')
+        if unequipped_item is not None:
+            reference_id = '/' + convert_int_to_alphanum(unequipped_item[0])
+            await context.send(f'Unequipped [ {reference_id} ] {unequipped_item[1]}')
         else:
             await context.send(f'{item_reference} is not equipped')
 
 
-def unequip_using_id(player, id):
-    if player.equipped_weapon_id == id:
+def unequip_if_equipped(player, item_instance):
+    if player.equipped_weapon_id == item_instance.id:
+        if isinstance(item_instance, BowInstance):
+            item_instance.arrow = None
         player.equipped_weapon_id = None
-        return True
-    elif player.equipped_attire_id == id:
+    elif player.equipped_attire_id == item_instance.id:
         player.equipped_attire_id = None
-        return True
-    return False
-
-
-def unequip_using_name(player, name):
-    for item_instance in player.inventory:
-        if name == item_instance.item.id:
-            if player.equipped_weapon_id == item_instance.id:
-                player.equipped_weapon_id = None
-                return True
-            elif player.equipped_attire_id == item_instance.id:
-                player.equipped_attire_id = None
-                return True
-    return False
+    else:
+        return None
+    return (item_instance.id, item_instance.item.id)

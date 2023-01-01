@@ -62,9 +62,9 @@ class Zone(Base):
         return f'Zone({self.channel_name})'
 
     def select_with_id(session, id):
-        get_zone_statement = select(Zone).where(Zone.id == id)
+        get_zone_statement = select(Zone).where(Zone.id == id).with_for_update()
         return session.scalars(get_zone_statement).one_or_none()
 
     def select_with_channel_id(session, id):
-        get_zone_statement = select(Zone).where(Zone.channel_id == id)
+        get_zone_statement = select(Zone).where(Zone.channel_id == id).with_for_update()
         return session.scalars(get_zone_statement).one_or_none()
