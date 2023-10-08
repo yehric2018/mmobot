@@ -12,19 +12,6 @@ load_dotenv()
 GUILD_ID = int(os.getenv('DISCORD_GUILD'))
 
 
-async def handle_incapacitation(player, engine, client):
-    '''
-    Checks if the player has remaining HP. If they do not, schedule them to be killed
-    in two minutes.
-    '''
-    if player.hp <= 0:
-        for channel in client.get_all_channels():
-            if channel.name == player.zone:
-                await channel.send(f'{player.name} is incapacitated')
-        await asyncio.sleep(120)
-        await kill_player(player.discord_id, engine, client)
-
-
 async def kill_player(player_discord_id, engine, client):
     '''
     Checks if the given player is incapacitated (hp = 0 or satiety = 0).
@@ -39,7 +26,7 @@ async def kill_player(player_discord_id, engine, client):
         # This might occur is they are attacked while incapacitated.
         # Also check if the player was revived (hp > 0)
         player = Player.select_with_discord_id(player_discord_id)
-        if player is None and player.hp > 0:
+        if player is None or player.hp > 0:
             return
         guild = client.get_guild(GUILD_ID)
         member = guild.get_member(int(player_discord_id))

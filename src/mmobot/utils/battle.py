@@ -18,7 +18,7 @@ async def attack_in_channel(channel, attacker, defender):
         damage = calculate_hit_damage(attacker, defender)
         defender.hp = max(defender.hp - damage, 0)
         message = f'{attacker_name} landed a hit on **{defender_name}**,'
-        message += ' dealing {damage} damage.\n'
+        message += f' dealing {damage} damage.\n'
         if isinstance(defender, Player):
             message += f'<@{defender.discord_id}> You have {defender.hp} HP remaining'
     else:
