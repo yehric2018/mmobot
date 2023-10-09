@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 
 from mmobot.db.index import ItemIndex
 from mmobot.db.models import (
-    FluidContainer,
-    FluidFood,
     Resource,
     Tool,
     Weapon
@@ -19,7 +17,6 @@ DATA_PATH = os.path.join(PROJECT_PATH, 'src', 'mmobot', 'db', 'index', 'data')
 
 TEST_HANDAXE_FILEPATH = os.path.join(DATA_PATH, 'test', 'handaxe.yaml')
 TEST_COIN_FILEPATH = os.path.join(DATA_PATH, 'test', 'copper-coin.yaml')
-TEST_LIQUID_FILEPATH = os.path.join(DATA_PATH, 'test', 'strange-liquid.yaml')
 TEST_ANVIL_FILEPATH = os.path.join(DATA_PATH, 'test', 'iron-anvil.yaml')
 TEST_HAMMER_FILEPATH = os.path.join(DATA_PATH, 'test', 'iron-hammer.yaml')
 TEST_BOWL_FILEPATH = os.path.join(DATA_PATH, 'test', 'stone-bowl.yaml')
@@ -40,10 +37,6 @@ class MockItemIndex(ItemIndex):
         self.index[coin['id']] = Resource.from_yaml(coin)
         self.recipes[coin['id']] = ItemIndex.get_recipes(self.index[coin['id']], coin)
 
-        liquid = self.load_yaml(TEST_LIQUID_FILEPATH)
-        self.index[liquid['id']] = FluidFood.from_yaml(liquid)
-        self.recipes[liquid['id']] = ItemIndex.get_recipes(self.index[liquid['id']], liquid)
-
         anvil = self.load_yaml(TEST_ANVIL_FILEPATH)
         self.index[anvil['id']] = Tool.from_yaml(anvil)
         self.recipes[anvil['id']] = ItemIndex.get_recipes(self.index[anvil['id']], anvil)
@@ -51,10 +44,6 @@ class MockItemIndex(ItemIndex):
         hammer = self.load_yaml(TEST_HAMMER_FILEPATH)
         self.index[hammer['id']] = Weapon.from_yaml(hammer)
         self.recipes[hammer['id']] = ItemIndex.get_recipes(self.index[hammer['id']], hammer)
-
-        bowl = self.load_yaml(TEST_BOWL_FILEPATH)
-        self.index[bowl['id']] = FluidContainer.from_yaml(bowl)
-        self.recipes[bowl['id']] = ItemIndex.get_recipes(self.index[bowl['id']], bowl)
 
     def load_yaml(self, filepath):
         with open(filepath, 'r') as f:

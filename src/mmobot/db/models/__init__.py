@@ -1,13 +1,9 @@
 from .base import Base
 
 from .static.item import Item
-from .static.nonsolid import Nonsolid
 from .static.monster import Monster
 from .static.arrow import Arrow
 from .static.attire import Attire
-from .static.fluid_container import FluidContainer
-from .static.fluid_food import FluidFood
-from .static.poison import Poison
 from .static.resource import Resource
 from .static.solid_food import SolidFood
 from .static.tool import Tool
@@ -27,7 +23,6 @@ from .monster_instance import MonsterInstance
 from .player import Player
 from .item_instances.item_instance import ItemInstance
 from .item_instances.arrow_instance import ArrowInstance
-from .item_instances.fluid_container_instance import FluidContainerInstance
 from .item_instances.solid_food_instance import SolidFoodInstance
 from .item_instances.tool_instance import ToolInstance
 from .item_instances.weapon_instance import WeaponInstance
@@ -44,20 +39,15 @@ __all__ = [
     'Bow',
     'BowInstance',
     'Entity',
-    'FluidContainer',
-    'FluidContainerInstance',
-    'FluidFood',
     'Interaction',
     'Item',
     'ItemInstance',
     'Minable',
     'Monster',
     'MonsterInstance',
-    'Nonsolid',
     'PlayerSkill',
     'PlayerSkillTeaching',
     'Player',
-    'Poison',
     'Resource',
     'SolidFood',
     'SolidFoodInstance',

@@ -2,8 +2,6 @@ from dataclasses import dataclass
 
 from mmobot.db.models import (
     Item,
-    FluidContainerInstance,
-    Nonsolid,
 )
 from mmobot.utils.crafting import create_item_instance
 
@@ -39,11 +37,6 @@ class Recipe:
                 ingredient_counter[ingredient.item_id] -= 1
                 if ingredient_counter[ingredient.item_id] == 0:
                     del ingredient_counter[ingredient.item_id]
-            elif (isinstance(ingredient, FluidContainerInstance)
-                    and ingredient.nonsolid_id in ingredient_counter):
-                ingredient_counter[ingredient.nonsolid_id] -= ingredient.units
-                if ingredient_counter[ingredient.nonsolid_id] <= 0:
-                    del ingredient_counter[ingredient.nonsolid_id]
         return ingredient_counter
 
     def is_missing_container(self, ingredients):
@@ -57,8 +50,7 @@ class Recipe:
 
         Args: ingredients - list of ItemInstances.
         '''
-        return (isinstance(self.product, Nonsolid)
-                and self._find_compatible_container(ingredients) is None)
+        return False
 
     def get_crafting_skill(self, player_skills):
         '''
@@ -128,15 +120,10 @@ class Recipe:
         player.endurance -= actual_endurance_cost
         player.hp -= hp_cost
 
-        if isinstance(self.product, Nonsolid):
-            container = self._find_compatible_container(ingredients)
-            container.nonsolid_id = self.product.id
-            container.units = self.quantity
-        else:
-            product_instance = create_item_instance(self.product)
-            for _ in range(self.quantity):
-                player.inventory.append(product_instance)
-                player.inventory_weight += self.product.weight
+        product_instance = create_item_instance(self.product)
+        for _ in range(self.quantity):
+            player.inventory.append(product_instance)
+            player.inventory_weight += self.product.weight
 
         ingredient_counter = self._get_ingredient_counter()
         for item_instance in ingredients:
@@ -147,19 +134,6 @@ class Recipe:
                 ingredient_counter[item_id] -= 1
                 if ingredient_counter[item_id] == 0:
                     del ingredient_counter[item_id]
-            elif (isinstance(item_instance, FluidContainerInstance)
-                    and item_instance.nonsolid_id in ingredient_counter):
-                nonsolid_id = item_instance.nonsolid_id
-                units_used = min(
-                    item_instance.units,
-                    ingredient_counter[nonsolid_id]
-                )
-                item_instance.units -= units_used
-                ingredient_counter[nonsolid_id] -= units_used
-                if item_instance.units == 0:
-                    item_instance.nonsolid_id = None
-                if ingredient_counter[nonsolid_id] == 0:
-                    del ingredient_counter[nonsolid_id]
         assert len(ingredient_counter) == 0
 
     def from_yaml(item, yaml):
@@ -192,9 +166,4 @@ class Recipe:
         this recipe. Returns None if no container is found (this should never happen if we
         ran is_missing_container before).
         '''
-        if isinstance(self.product, Nonsolid):
-            for ingredient in ingredients:
-                if (isinstance(ingredient, FluidContainerInstance) and ingredient.units == 0
-                        and ingredient.item.max_capacity >= self.quantity):
-                    return ingredient
         return None

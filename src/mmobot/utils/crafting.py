@@ -1,8 +1,5 @@
 from mmobot.db.models import (
-    FluidContainer,
-    FluidContainerInstance,
     ItemInstance,
-    Nonsolid,
     SolidFood,
     SolidFoodInstance,
     Tool,
@@ -54,10 +51,6 @@ def find_best_recipe(goal_item, recipes, player, ingredients, tools, handheld):
         if len(current_missing) != 0:
             missing_ingredients = current_missing
             continue
-        if (isinstance(goal_item, Nonsolid)
-                and recipe.is_missing_container(ingredients)):
-            missing_container = True
-            continue
         crafting_skill = recipe.get_crafting_skill(player.skills)
         if crafting_skill == -1:
             insufficient_skill = True
@@ -94,6 +87,4 @@ def create_item_instance(item, condition=99999):
         return ToolInstance(item_id=item.id)
     elif isinstance(item, SolidFood):
         return SolidFoodInstance(item_id=item.id)
-    elif isinstance(item, FluidContainer):
-        return FluidContainerInstance(item_id=item.id, units=0)
     return ItemInstance(item_id=item.id)

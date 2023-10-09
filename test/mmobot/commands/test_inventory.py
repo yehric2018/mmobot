@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.orm import Session
 
 from mmobot.commands import inventory_logic
-from mmobot.db.models import FluidContainerInstance, Player
+from mmobot.db.models import Player
 from mmobot.test.constants import (
     TEST_PLAYER_ENTITY_NUMBER,
     TEST_PLAYER_DISCORD_ID,
@@ -11,7 +11,6 @@ from mmobot.test.constants import (
 from mmobot.test.db import (
     add_item_instance,
     add_player,
-    add_to_database,
     delete_all_entities,
     init_test_engine,
     update_player
@@ -28,14 +27,6 @@ SINGLE_ITEM_INVENTORY_MESSAGE = '''\
 EQUIPPED_WEAPON_INVENTORY_MESSAGE = '''\
 <title>player\'s Inventory</title>
 <desc>  0. [ /2 ] : desert-scimitar **(weapon)**
-</desc>
-'''
-
-FLUID_CONTAINERS_MESSAGE = '''\
-<title>player\'s Inventory</title>
-<desc>  0. [ /2 ] : stone-bowl (water 3/3)
-  1. [ /3 ] : stone-bowl (water 2/3)
-  2. [ /4 ] : stone-bowl (empty)
 </desc>
 '''
 
@@ -90,38 +81,6 @@ async def test_commandInventory_equippedWeapon(inventory_context, session):
     await inventory_logic(inventory_context, engine)
     assert len(inventory_context.channel.messages) == 1
     assert inventory_context.channel.messages[0] == EQUIPPED_WEAPON_INVENTORY_MESSAGE
-
-
-@pytest.mark.asyncio
-async def test_commandInventory_fluidContainers(inventory_context, session):
-    fluid_container_full = FluidContainerInstance(
-        id=2,
-        item_id='stone-bowl',
-        owner_id=TEST_PLAYER_ENTITY_NUMBER,
-        nonsolid_id='water',
-        units=3
-    )
-    fluid_container_partial = FluidContainerInstance(
-        id=3,
-        item_id='stone-bowl',
-        owner_id=TEST_PLAYER_ENTITY_NUMBER,
-        nonsolid_id='water',
-        units=2
-    )
-    fluid_container_empty = FluidContainerInstance(
-        id=4,
-        item_id='stone-bowl',
-        owner_id=TEST_PLAYER_ENTITY_NUMBER,
-        nonsolid_id=None,
-        units=0
-    )
-    add_to_database(session, fluid_container_full)
-    add_to_database(session, fluid_container_partial)
-    add_to_database(session, fluid_container_empty)
-
-    await inventory_logic(inventory_context, engine)
-    assert len(inventory_context.channel.messages) == 1
-    assert inventory_context.channel.messages[0] == FLUID_CONTAINERS_MESSAGE
 
 
 @pytest.mark.asyncio

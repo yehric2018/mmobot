@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 from mmobot.commands import craft_logic
 from mmobot.db.index import ItemIndex
 from mmobot.db.models import (
-    FluidFood,
     ItemInstance,
     Player,
     PlayerSkill,
@@ -50,11 +49,6 @@ item_index.recipes[sword.id] = ItemIndex.get_recipes(sword, sword_yaml)
 
 item_index.index['no-recipe-item'] = sword
 item_index.recipes['no-recipe-item'] = []
-
-nonsolid = FluidFood(id='test-fluid')
-item_index.index['test-fluid'] = nonsolid
-item_index.recipes['test-fluid'] = ItemIndex.get_recipes(sword, sword_yaml)
-item_index.recipes['test-fluid'][0].product = nonsolid
 
 item_index.index['skill-test-item'] = sword
 item_index.recipes['skill-test-item'] = ItemIndex.get_recipes(sword, sword_yaml)
@@ -213,19 +207,6 @@ async def test_commandCraft_missingIngredients(craft_context, session):
     await craft_logic(craft_context, ['iron-sword'], engine, item_index)
     assert len(craft_context.channel.messages) == 1
     assert 'ingredient' in craft_context.channel.messages[0]
-
-    player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
-    assert len(player.inventory) == 2
-    assert player.inventory[0].id == TEST_ITEM_ENTITY_NUMBER
-    assert player.inventory[1].id == TEST_ITEM_ENTITY_NUMBER_3
-
-
-@pytest.mark.asyncio
-async def test_commandCraft_missingContainer(craft_context, iron_sword_args, session):
-    iron_sword_args[0] = 'test-fluid'
-    await craft_logic(craft_context, iron_sword_args, engine, item_index)
-    assert len(craft_context.channel.messages) == 1
-    assert 'container' in craft_context.channel.messages[0]
 
     player = get_player_with_name(session, TEST_PLAYER_DISCORD_NAME)
     assert len(player.inventory) == 2
